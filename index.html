@@ -6,7 +6,7 @@
 <title>Дневник</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Literata:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
   --pink:#F8DCE6; --pink-2:#F0BFD2; --pink-ink:#C97BA0;
@@ -23,7 +23,7 @@
 html,body{height:100%}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 body::before{
@@ -118,20 +118,36 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
 .cal{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
 .cal .wd{font-size:10.5px; text-align:center; color:var(--ink-soft); font-weight:700; padding-bottom:3px}
 .cal .day{
-  aspect-ratio:1; border-radius:11px; font-size:12.5px; font-weight:700; color:var(--ink-soft);
-  display:grid; place-items:center; position:relative; background:transparent;
+  aspect-ratio:1; border-radius:11px; font-weight:700; color:var(--ink-soft);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  position:relative; background:transparent; transition:transform .12s ease;
 }
+.cal .day .n{font-size:12.5px; line-height:1}
+.cal .day .m{font-size:10.5px; line-height:1}
 .cal .day.pad{visibility:hidden}
 .cal .day.has{background:var(--gray); color:var(--ink); cursor:pointer}
-.cal .day.has:hover{transform:scale(1.08)}
-.cal .day.today{outline:2px solid var(--orange-2); outline-offset:-2px}
-.cal .day em{position:absolute; bottom:2px; font-style:normal; font-size:9px}
+.cal .day.has:hover{transform:scale(1.09)}
+.cal .day.today{outline:2px solid var(--orange-ink); outline-offset:-2px}
+.cal .day .more{position:absolute; top:2px; right:4px; font-size:8.5px; opacity:.75}
+
+/* ---------- статистика месяца ---------- */
+.stats{margin-top:16px; padding-top:15px; border-top:1.5px solid var(--gray)}
+.stat-top{display:flex; gap:10px; margin-bottom:13px}
+.stat-top div{flex:1; background:var(--bg); border-radius:12px; padding:9px 11px}
+.stat-top b{display:block; font-size:19px; line-height:1.2}
+.stat-top span{font-size:11px; color:var(--ink-soft); font-weight:600}
+.mb{display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; font-weight:600}
+.mb-l{width:96px; flex:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mb-track{flex:1; height:9px; background:var(--bg); border-radius:99px; overflow:hidden}
+.mb-track i{display:block; height:100%; border-radius:99px; transition:width .35s ease}
+.mb-n{width:16px; flex:none; text-align:right; color:var(--ink-soft); font-weight:700}
+.stat-note{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:11px 0 0; line-height:1.55}
 
 /* ---------- editor ---------- */
 .editor{display:flex; flex-direction:column; gap:14px; min-height:60vh}
 .title-in{
-  width:100%; border:none; outline:none; background:transparent; font-size:27px; font-weight:700;
-  font-family:'Literata',Georgia,serif; padding:2px 0;
+  width:100%; border:none; outline:none; background:transparent; font-size:26px; font-weight:700;
+  letter-spacing:-.3px; padding:2px 0;
 }
 .title-in::placeholder{color:var(--gray-2)}
 .meta{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
@@ -153,8 +169,8 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
 .tag-in:focus{border-color:var(--pink-2)}
 .body-in{
   flex:1; min-height:340px; width:100%; border:none; outline:none; resize:vertical;
-  background:var(--bg); border-radius:14px; padding:18px 20px; line-height:1.75; font-size:16px;
-  font-family:'Literata',Georgia,serif;
+  background:var(--bg); border-radius:14px; padding:18px 20px; line-height:1.8; font-size:15px;
+  font-weight:400;
 }
 .body-in::placeholder{color:var(--gray-2)}
 .photo-box{display:flex; flex-direction:column; gap:9px}
@@ -230,6 +246,7 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
           <button class="cal-nav" onclick="shiftMonth(1)">›</button>
         </div>
         <div class="cal" id="cal"></div>
+        <div class="stats" id="stats"></div>
       </div>
 
       <div class="panel">
@@ -628,9 +645,7 @@ function filtered(){
 }
 
 function render(){
-  $('counter').textContent = entries.length + ' ' +
-    (entries.length%10===1 && entries.length%100!==11 ? 'запись' :
-     [2,3,4].includes(entries.length%10) && ![12,13,14].includes(entries.length%100) ? 'записи' : 'записей');
+  $('counter').textContent = entries.length+' '+plural(entries.length,'запись','записи','записей');
 
   // теги
   const all=[...new Set(entries.flatMap(e=>e.tags||[]))].sort((a,b)=>a.localeCompare(b,'ru'));
@@ -660,23 +675,71 @@ function shiftMonth(n){ calDate=new Date(calDate.getFullYear(), calDate.getMonth
 
 function renderCal(){
   const y=calDate.getFullYear(), mo=calDate.getMonth();
+  const pref=`${y}-${String(mo+1).padStart(2,'0')}`;
   $('calLabel').textContent = calDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
-  const first=new Date(y,mo,1), pad=(first.getDay()+6)%7, days=new Date(y,mo+1,0).getDate();
-  const byDay={};
-  entries.forEach(e=>{ if(e.date && e.date.startsWith(`${y}-${String(mo+1).padStart(2,'0')}`)) {
+  const pad=(new Date(y,mo,1).getDay()+6)%7, days=new Date(y,mo+1,0).getDate();
+
+  const byDay={}, monthEntries=[];
+  entries.forEach(e=>{ if(e.date && e.date.startsWith(pref)){
+    monthEntries.push(e);
     const d=+e.date.slice(8,10); (byDay[d]=byDay[d]||[]).push(e);
   }});
+
   let html=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d=>`<div class="wd">${d}</div>`).join('');
   for(let i=0;i<pad;i++) html+='<div class="day pad"></div>';
   const t=today();
   for(let d=1;d<=days;d++){
-    const iso=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const iso=`${pref}-${String(d).padStart(2,'0')}`;
     const list=byDay[d]||[], m=list.length?moodBy(list[0].mood):null;
+    const tip=list.length ? (m?m.l+' · ':'')+list.map(x=>x.title).join(' · ') : '';
     html+=`<div class="day${list.length?' has':''}${iso===t?' today':''}"
-      ${list.length?`onclick="openEntry('${list[0].file}')" title="${esc(list[0].title)}"`:''}
-      style="${m?'background:'+m.c+';color:#fff':''}">${d}${list.length>1?'<em>•••</em>':''}</div>`;
+      ${list.length?`onclick="openEntry('${list[0].file}')" title="${esc(tip)}"`:''}
+      style="${m?'background:'+m.c+';color:#fff':''}">
+      <span class="n">${d}</span>${m?`<span class="m">${m.e}</span>`:''}
+      ${list.length>1?`<span class="more">${list.length}</span>`:''}</div>`;
   }
   $('cal').innerHTML=html;
+  renderStats(monthEntries, Object.keys(byDay).length, days);
+}
+
+function renderStats(list, daysUsed, daysTotal){
+  const box=$('stats');
+  if(!list.length){
+    box.innerHTML='<p class="stat-note" style="text-align:center;margin:0">В этом месяце записей пока нет 🌱</p>';
+    return;
+  }
+  const counts={};
+  list.forEach(e=>{ const k=e.mood||'none'; counts[k]=(counts[k]||0)+1; });
+  const rows=MOODS.concat([{k:'none',e:'✧',l:'Без настроения',c:'var(--gray-2)'}])
+    .filter(m=>counts[m.k]).sort((a,b)=>counts[b.k]-counts[a.k]);
+  const max=Math.max(...rows.map(m=>counts[m.k]));
+
+  const tags={};
+  list.forEach(e=>(e.tags||[]).forEach(t=>tags[t]=(tags[t]||0)+1));
+  const top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const photos=list.filter(e=>e.photo||e.photoData).length;
+  const best=rows[0];
+
+  box.innerHTML=
+    `<div class="stat-top">
+       <div><b>${list.length}</b><span>${plural(list.length,'запись','записи','записей')}</span></div>
+       <div><b>${daysUsed}</b><span>${plural(daysUsed,'день','дня','дней')} из ${daysTotal}</span></div>
+     </div>`+
+    rows.map(m=>`<div class="mb">
+        <span class="mb-l">${m.e} ${m.l}</span>
+        <span class="mb-track"><i style="width:${Math.round(counts[m.k]/max*100)}%;background:${m.c}"></i></span>
+        <span class="mb-n">${counts[m.k]}</span>
+      </div>`).join('')+
+    `<p class="stat-note">Чаще всего — <b>${best.l.toLowerCase()}</b> ${best.e}` +
+      (photos?`, фото: ${photos}`:'') + `</p>` +
+    (top.length?`<div class="tags-row">${top.map(([t,n])=>`<span class="tag mini">#${esc(t)} · ${n}</span>`).join('')}</div>`:'');
+}
+
+function plural(n,one,few,many){
+  const a=Math.abs(n)%100, b=a%10;
+  if(a>10&&a<20) return many;
+  if(b>1&&b<5) return few;
+  return b===1?one:many;
 }
 
 /* =============== настройки =============== */
