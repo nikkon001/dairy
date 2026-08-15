@@ -176,6 +176,7 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
   background:var(--bg); outline:none}
 .field input:focus{border-color:var(--blue-2)}
 .field .note{font-size:12px; color:var(--ink-soft); margin-top:5px; line-height:1.5}
+.tok-btns{display:flex; gap:7px; margin-top:8px}
 .field .note a{color:var(--blue-ink)}
 .note-box{background:var(--blue); border-radius:14px; padding:13px 15px; font-size:12.5px;
   line-height:1.6; color:var(--blue-ink); font-weight:600; margin-bottom:16px}
@@ -247,7 +248,7 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
 <div class="mask" id="mask" onclick="if(event.target===this)closeSettings()">
   <div class="modal">
     <h2>Синхронизация с GitHub</h2>
-    <p class="sub">Записи будут сохраняться отдельными .md файлами в папку <b>entries/</b> твоего репозитория.</p>
+    <p class="sub">Записи будут сохраняться отдельными .md файлами в папку <b>entries/</b>. Указывай тут свой <b>приватный</b> репозиторий — тот, что с записями, а не тот, где лежит само приложение.</p>
     <div class="note-box">Токен хранится только в этом браузере и никуда больше не отправляется — только напрямую в GitHub.</div>
     <div class="field"><label>Владелец (твой ник на GitHub)</label><input id="cOwner" placeholder="nika"></div>
     <div class="field"><label>Репозиторий</label><input id="cRepo" placeholder="dairy"></div>
@@ -256,6 +257,10 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
     <div class="field">
       <label>Personal access token</label>
       <input id="cToken" type="password" placeholder="github_pat_…">
+      <div class="tok-btns">
+        <button class="btn ghost tiny" id="eyeBtn" onclick="toggleToken()">👁 Показать</button>
+        <button class="btn ghost tiny" onclick="copyToken()">📋 Копировать</button>
+      </div>
       <div class="note">Создай на <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>, дай доступ к своему репозиторию и права <b>Contents: Read and write</b>.</div>
     </div>
     <div class="foot" style="margin-top:18px">
@@ -539,7 +544,27 @@ function openSettings(){
   $('cBranch').value=c.branch||'main'; $('cPath').value=c.path||'entries'; $('cToken').value=c.token||'';
   $('mask').classList.add('open');
 }
-function closeSettings(){ $('mask').classList.remove('open'); }
+function closeSettings(){
+  $('mask').classList.remove('open');
+  $('cToken').type='password'; $('eyeBtn').textContent='👁 Показать';   // прячем обратно
+}
+function toggleToken(){
+  const i=$('cToken'), show=i.type==='password';
+  i.type = show?'text':'password';
+  $('eyeBtn').textContent = show?'🙈 Скрыть':'👁 Показать';
+}
+function copyToken(){
+  const v=$('cToken').value.trim();
+  if(!v){ toast('Токен пока не сохранён'); return; }
+  const done=()=>toast('Токен скопирован 📋');
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(v).then(done, fallback);
+  else fallback();
+  function fallback(){
+    const t=$('cToken'), was=t.type; t.type='text'; t.select(); t.setSelectionRange(0,99999);
+    try{ document.execCommand('copy'); done(); }catch(e){ toast('Не вышло — выдели и скопируй вручную'); }
+    t.type=was; t.blur();
+  }
+}
 async function saveSettings(){
   localStorage.setItem(LS_C, JSON.stringify({
     owner:$('cOwner').value.trim(), repo:$('cRepo').value.trim(),
