@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дневник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Literata:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#F8DCE6; --pink-2:#F0BFD2; --pink-ink:#C97BA0;
+  --orange:#FCE3CC; --orange-2:#F7C79B; --orange-ink:#D9924E;
+  --blue:#D9EAF4; --blue-2:#B3D4E8; --blue-ink:#6A9CBE;
+  --gray:#EAE7E4; --gray-2:#D3CECA; --gray-ink:#8C8480;
+  --brown:#E8DACB; --brown-2:#D3BCA3; --brown-ink:#A17E5C;
+  --bg:#FDF9F6; --card:#FFFFFF; --ink:#5C4A42; --ink-soft:#8C7B72;
+  --shadow:0 2px 14px rgba(160,130,115,.10);
+  --shadow-lg:0 8px 34px rgba(160,130,115,.18);
+  --r:18px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(60vw 60vw at 8% -10%, var(--pink) 0%, transparent 60%),
+    radial-gradient(50vw 50vw at 98% 8%, var(--blue) 0%, transparent 60%),
+    radial-gradient(55vw 55vw at 80% 105%, var(--orange) 0%, transparent 60%),
+    radial-gradient(45vw 45vw at 0% 100%, var(--brown) 0%, transparent 60%);
+  opacity:.55;
+}
+button,input,textarea,select{font-family:inherit; font-size:inherit; color:inherit}
+button{cursor:pointer; border:none; background:none}
+
+/* ---------- layout ---------- */
+.app{max-width:1240px; margin:0 auto; padding:22px 20px 60px}
+header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:20px}
+.logo{display:flex; align-items:center; gap:11px; margin-right:auto}
+.logo .mark{
+  width:42px; height:42px; border-radius:14px; display:grid; place-items:center; font-size:21px;
+  background:linear-gradient(135deg,var(--pink-2),var(--orange-2)); box-shadow:var(--shadow);
+}
+.logo h1{font-size:22px; margin:0; font-weight:700; letter-spacing:.2px}
+.logo small{display:block; font-size:12px; color:var(--ink-soft); font-weight:600}
+
+.btn{
+  padding:10px 16px; border-radius:999px; font-weight:700; font-size:14px;
+  background:var(--card); box-shadow:var(--shadow); transition:transform .12s ease, box-shadow .12s ease;
+  display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:linear-gradient(135deg,var(--pink-2),var(--orange-2)); color:#fff}
+.btn.ghost{background:rgba(255,255,255,.65)}
+.btn.tiny{padding:7px 12px; font-size:13px}
+.btn.danger{color:var(--pink-ink)}
+
+.sync{
+  font-size:12.5px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,.7); padding:8px 14px; border-radius:999px; box-shadow:var(--shadow);
+}
+.dot{width:9px; height:9px; border-radius:50%; background:var(--gray-2); flex:none}
+.dot.ok{background:#9BC9A5} .dot.busy{background:var(--orange-2); animation:pulse 1s infinite}
+.dot.err{background:var(--pink-2)}
+@keyframes pulse{50%{opacity:.35}}
+
+.grid{display:grid; grid-template-columns:330px 1fr; gap:20px; align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.panel{background:var(--card); border-radius:var(--r); box-shadow:var(--shadow); padding:18px}
+
+/* ---------- sidebar ---------- */
+.side{display:flex; flex-direction:column; gap:16px; position:sticky; top:20px}
+@media(max-width:900px){.side{position:static}}
+.search{
+  width:100%; padding:11px 15px; border-radius:999px; border:1.5px solid var(--gray);
+  background:var(--bg); outline:none; transition:border-color .15s;
+}
+.search:focus{border-color:var(--blue-2)}
+.tags-row{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px}
+.tag{
+  font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:999px;
+  background:var(--blue); color:var(--blue-ink); transition:.15s;
+}
+.tag:hover{filter:brightness(.96)}
+.tag.on{background:var(--blue-2); color:#fff}
+.tag.mini{background:var(--gray); color:var(--gray-ink); padding:3px 9px; font-size:11.5px}
+
+.sect-title{font-size:12px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--ink-soft); margin:0 0 10px}
+
+.list{display:flex; flex-direction:column; gap:9px; max-height:46vh; overflow:auto; padding-right:4px; margin:0 -4px 0 0}
+.list::-webkit-scrollbar{width:7px}
+.list::-webkit-scrollbar-thumb{background:var(--gray-2); border-radius:9px}
+.item{
+  text-align:left; width:100%; padding:12px 14px; border-radius:14px; background:var(--bg);
+  border-left:5px solid var(--gray-2); transition:.15s; display:block;
+}
+.item:hover{background:#fff; box-shadow:var(--shadow)}
+.item.on{background:#fff; box-shadow:var(--shadow-lg)}
+.item .t{font-weight:700; font-size:14.5px; display:flex; gap:7px; align-items:center}
+.item .t span.txt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.item .d{font-size:12px; color:var(--ink-soft); margin-top:3px; font-weight:600}
+.item .p{font-size:12.5px; color:var(--ink-soft); margin-top:5px; line-height:1.45;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+.empty{color:var(--ink-soft); font-size:13.5px; text-align:center; padding:22px 8px; line-height:1.6}
+
+/* ---------- calendar ---------- */
+.cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+.cal-head b{font-size:14.5px; text-transform:capitalize}
+.cal-nav{width:30px; height:30px; border-radius:10px; background:var(--bg); font-weight:700; color:var(--ink-soft)}
+.cal-nav:hover{background:var(--gray)}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
+.cal .wd{font-size:10.5px; text-align:center; color:var(--ink-soft); font-weight:700; padding-bottom:3px}
+.cal .day{
+  aspect-ratio:1; border-radius:11px; font-size:12.5px; font-weight:700; color:var(--ink-soft);
+  display:grid; place-items:center; position:relative; background:transparent;
+}
+.cal .day.pad{visibility:hidden}
+.cal .day.has{background:var(--gray); color:var(--ink); cursor:pointer}
+.cal .day.has:hover{transform:scale(1.08)}
+.cal .day.today{outline:2px solid var(--orange-2); outline-offset:-2px}
+.cal .day em{position:absolute; bottom:2px; font-style:normal; font-size:9px}
+
+/* ---------- editor ---------- */
+.editor{display:flex; flex-direction:column; gap:14px; min-height:60vh}
+.title-in{
+  width:100%; border:none; outline:none; background:transparent; font-size:27px; font-weight:700;
+  font-family:'Literata',Georgia,serif; padding:2px 0;
+}
+.title-in::placeholder{color:var(--gray-2)}
+.meta{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.date-in{
+  border:1.5px solid var(--gray); background:var(--bg); border-radius:999px; padding:8px 14px;
+  outline:none; font-weight:600; font-size:13.5px; color:var(--ink-soft);
+}
+.moods{display:flex; gap:6px; flex-wrap:wrap}
+.mood{
+  padding:7px 12px; border-radius:999px; font-size:13px; font-weight:700; background:var(--bg);
+  display:inline-flex; gap:6px; align-items:center; transition:.15s; color:var(--ink-soft);
+}
+.mood:hover{filter:brightness(.97)}
+.mood.on{color:#fff; box-shadow:var(--shadow)}
+.tag-in{
+  flex:1; min-width:180px; border:1.5px solid var(--gray); background:var(--bg);
+  border-radius:999px; padding:9px 15px; outline:none; font-size:13.5px;
+}
+.tag-in:focus{border-color:var(--pink-2)}
+.body-in{
+  flex:1; min-height:340px; width:100%; border:none; outline:none; resize:vertical;
+  background:var(--bg); border-radius:14px; padding:18px 20px; line-height:1.75; font-size:16px;
+  font-family:'Literata',Georgia,serif;
+}
+.body-in::placeholder{color:var(--gray-2)}
+.foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.foot .spacer{margin-left:auto}
+.hint{font-size:12.5px; color:var(--ink-soft); font-weight:600}
+
+/* ---------- modal ---------- */
+.mask{position:fixed; inset:0; background:rgba(92,74,66,.35); backdrop-filter:blur(4px);
+  display:none; place-items:center; padding:20px; z-index:50}
+.mask.open{display:grid}
+.modal{background:var(--card); border-radius:22px; box-shadow:var(--shadow-lg); padding:26px;
+  width:min(520px,100%); max-height:88vh; overflow:auto}
+.modal h2{margin:0 0 4px; font-size:20px}
+.modal p.sub{margin:0 0 18px; color:var(--ink-soft); font-size:13.5px; line-height:1.6}
+.field{margin-bottom:13px}
+.field label{display:block; font-size:12px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.6px; color:var(--ink-soft); margin-bottom:5px}
+.field input{width:100%; padding:11px 14px; border-radius:12px; border:1.5px solid var(--gray);
+  background:var(--bg); outline:none}
+.field input:focus{border-color:var(--blue-2)}
+.field .note{font-size:12px; color:var(--ink-soft); margin-top:5px; line-height:1.5}
+.field .note a{color:var(--blue-ink)}
+.note-box{background:var(--blue); border-radius:14px; padding:13px 15px; font-size:12.5px;
+  line-height:1.6; color:var(--blue-ink); font-weight:600; margin-bottom:16px}
+
+.toast{position:fixed; left:50%; bottom:26px; transform:translate(-50%,80px); z-index:99;
+  background:var(--ink); color:#fff; padding:12px 22px; border-radius:999px; font-weight:700;
+  font-size:14px; opacity:0; transition:.3s; pointer-events:none; max-width:90vw; text-align:center}
+.toast.show{transform:translate(-50%,0); opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="logo">
+      <div class="mark">🌸</div>
+      <div>
+        <h1>Мой дневник</h1>
+        <small id="counter">0 записей</small>
+      </div>
+    </div>
+    <div class="sync" id="sync"><span class="dot" id="syncDot"></span><span id="syncText">Только на этом устройстве</span></div>
+    <button class="btn ghost" onclick="openSettings()">⚙️ Настройки</button>
+    <button class="btn primary" onclick="newEntry()">✏️ Новая запись</button>
+  </header>
+
+  <div class="grid">
+    <!-- SIDEBAR -->
+    <aside class="side">
+      <div class="panel">
+        <input class="search" id="search" placeholder="🔍 Поиск по записям…" oninput="render()">
+        <div class="tags-row" id="tagFilters"></div>
+      </div>
+
+      <div class="panel">
+        <div class="cal-head">
+          <button class="cal-nav" onclick="shiftMonth(-1)">‹</button>
+          <b id="calLabel"></b>
+          <button class="cal-nav" onclick="shiftMonth(1)">›</button>
+        </div>
+        <div class="cal" id="cal"></div>
+      </div>
+
+      <div class="panel">
+        <p class="sect-title">Записи</p>
+        <div class="list" id="list"></div>
+      </div>
+    </aside>
+
+    <!-- EDITOR -->
+    <main class="panel editor">
+      <input class="title-in" id="fTitle" placeholder="Название записи…">
+      <div class="meta">
+        <input class="date-in" id="fDate" type="date">
+        <div class="moods" id="moods"></div>
+      </div>
+      <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги…">
+      <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить…"></textarea>
+      <div class="foot">
+        <button class="btn primary" onclick="saveEntry()">💾 Сохранить</button>
+        <button class="btn ghost danger" id="delBtn" onclick="deleteEntry()" style="display:none">🗑 Удалить</button>
+        <span class="hint spacer" id="editHint">Новая запись</span>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="mask" id="mask" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <h2>Синхронизация с GitHub</h2>
+    <p class="sub">Записи будут сохраняться отдельными .md файлами в папку <b>entries/</b> твоего репозитория.</p>
+    <div class="note-box">Токен хранится только в этом браузере и никуда больше не отправляется — только напрямую в GitHub.</div>
+    <div class="field"><label>Владелец (твой ник на GitHub)</label><input id="cOwner" placeholder="nika"></div>
+    <div class="field"><label>Репозиторий</label><input id="cRepo" placeholder="dairy"></div>
+    <div class="field"><label>Ветка</label><input id="cBranch" placeholder="main"></div>
+    <div class="field"><label>Папка для записей</label><input id="cPath" placeholder="entries"></div>
+    <div class="field">
+      <label>Personal access token</label>
+      <input id="cToken" type="password" placeholder="github_pat_…">
+      <div class="note">Создай на <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>, дай доступ к своему репозиторию и права <b>Contents: Read and write</b>.</div>
+    </div>
+    <div class="foot" style="margin-top:18px">
+      <button class="btn primary" onclick="saveSettings()">Сохранить и синхронизировать</button>
+      <button class="btn ghost" onclick="closeSettings()">Отмена</button>
+      <button class="btn ghost spacer" onclick="exportAll()">⬇️ Скачать все записи</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =============== настроения =============== */
+const MOODS = [
+  {k:'joy',   e:'🌸', l:'Радость',      c:'var(--pink-2)'},
+  {k:'calm',  e:'🌤', l:'Спокойствие',  c:'var(--blue-2)'},
+  {k:'energy',e:'🔥', l:'Энергия',      c:'var(--orange-2)'},
+  {k:'cozy',  e:'🍂', l:'Уют',          c:'var(--brown-2)'},
+  {k:'sad',   e:'🌫', l:'Грусть',       c:'var(--gray-2)'}
+];
+const moodBy = k => MOODS.find(m=>m.k===k);
+
+/* =============== состояние =============== */
+let entries = [];          // {file, title, date, mood, tags[], body, sha}
+let currentFile = null;    // редактируемая запись
+let activeTags = new Set();
+let calDate = new Date();
+const LS_E='diary_entries_v1', LS_C='diary_cfg_v1';
+
+const $ = id => document.getElementById(id);
+const cfg = () => { try{ return JSON.parse(localStorage.getItem(LS_C)||'{}'); }catch(e){ return {}; } };
+const hasGH = () => { const c=cfg(); return !!(c.owner && c.repo && c.token); };
+
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+function setSync(state, text){
+  $('syncDot').className='dot'+(state?' '+state:'');
+  $('syncText').textContent=text;
+}
+
+/* =============== утилиты =============== */
+function b64enc(s){ const b=new TextEncoder().encode(s); let x=''; b.forEach(c=>x+=String.fromCharCode(c)); return btoa(x); }
+function b64dec(s){ const bin=atob(s.replace(/\s/g,'')); return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))); }
+const today = () => new Date().toISOString().slice(0,10);
+
+const TR={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'c',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+function slug(s){
+  return (s||'').toLowerCase().split('').map(c=>TR[c]!==undefined?TR[c]:c).join('')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,42) || 'zapis';
+}
+function fmtDate(d){
+  const dt=new Date(d+'T12:00:00');
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+}
+
+/* =============== markdown <-> объект =============== */
+function toMd(e){
+  return ['---',
+    'title: '+(e.title||'Без названия').replace(/\n/g,' '),
+    'date: '+e.date,
+    'mood: '+(e.mood||''),
+    'tags: '+(e.tags||[]).join(', '),
+    '---','',
+    '# '+(e.title||'Без названия'),'',
+    e.body||''].join('\n');
+}
+function fromMd(text, file){
+  const e={file, title:'Без названия', date:file.slice(0,10), mood:'', tags:[], body:text};
+  const m=text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if(m){
+    m[1].split(/\r?\n/).forEach(line=>{
+      const i=line.indexOf(':'); if(i<0) return;
+      const k=line.slice(0,i).trim(), v=line.slice(i+1).trim();
+      if(k==='title') e.title=v.replace(/^["']|["']$/g,'');
+      else if(k==='date') e.date=v.slice(0,10);
+      else if(k==='mood') e.mood=v;
+      else if(k==='tags') e.tags=v.replace(/^\[|\]$/g,'').split(',').map(t=>t.trim()).filter(Boolean);
+    });
+    let rest=text.slice(m[0].length).replace(/^[\r\n]+/,'');
+    const h='# '+e.title;                       // убираем дублирующий заголовок
+    if(rest.startsWith(h)) rest=rest.slice(h.length).replace(/^[\r\n]+/,'');
+    e.body=rest.trim();
+  }
+  return e;
+}
+
+/* =============== GitHub API =============== */
+async function gh(path, opts={}){
+  const c=cfg();
+  const res=await fetch('https://api.github.com/repos/'+c.owner+'/'+c.repo+path,{
+    ...opts,
+    headers:{Authorization:'Bearer '+c.token, Accept:'application/vnd.github+json', ...(opts.headers||{})}
+  });
+  return res;
+}
+const dirPath = () => (cfg().path||'entries').replace(/^\/+|\/+$/g,'');
+const branch  = () => cfg().branch||'main';
+
+async function pullAll(){
+  if(!hasGH()) { setSync('', 'Только на этом устройстве'); return; }
+  setSync('busy','Загружаю из GitHub…');
+  try{
+    const res=await gh('/contents/'+dirPath()+'?ref='+encodeURIComponent(branch()));
+    if(res.status===404){ setSync('ok','GitHub подключён'); return; }   // папки ещё нет — нормально
+    if(!res.ok) throw new Error((await res.json()).message||res.status);
+    const files=(await res.json()).filter(f=>f.type==='file' && f.name.endsWith('.md'));
+    const loaded=[];
+    for(const f of files){
+      const r=await gh('/contents/'+encodeURI(f.path)+'?ref='+encodeURIComponent(branch()));
+      if(!r.ok) continue;
+      const j=await r.json();
+      const e=fromMd(b64dec(j.content), f.name);
+      e.sha=j.sha; loaded.push(e);
+    }
+    // сливаем: GitHub — источник правды, локальные новые записи оставляем
+    const names=new Set(loaded.map(e=>e.file));
+    entries=loaded.concat(entries.filter(e=>!names.has(e.file) && !e.sha));
+    saveLocal(); render();
+    setSync('ok','Синхронизировано · '+loaded.length);
+  }catch(err){
+    setSync('err','Ошибка: '+err.message);
+    toast('Не удалось загрузить из GitHub: '+err.message);
+  }
+}
+
+async function pushEntry(e){
+  if(!hasGH()) return;
+  setSync('busy','Сохраняю в GitHub…');
+  try{
+    const body={message:'diary: '+e.date+' — '+(e.title||'запись'), content:b64enc(toMd(e)), branch:branch()};
+    if(e.sha) body.sha=e.sha;
+    const res=await gh('/contents/'+encodeURI(dirPath()+'/'+e.file),{method:'PUT',body:JSON.stringify(body)});
+    if(!res.ok) throw new Error((await res.json()).message||res.status);
+    e.sha=(await res.json()).content.sha;
+    saveLocal(); setSync('ok','Сохранено в GitHub');
+  }catch(err){
+    setSync('err','Ошибка сохранения');
+    toast('GitHub: '+err.message+' (запись сохранена локально)');
+  }
+}
+
+async function pushDelete(e){
+  if(!hasGH() || !e.sha) return;
+  try{
+    await gh('/contents/'+encodeURI(dirPath()+'/'+e.file),{method:'DELETE',
+      body:JSON.stringify({message:'diary: удалена запись '+e.file, sha:e.sha, branch:branch()})});
+    setSync('ok','Удалено в GitHub');
+  }catch(err){ toast('Не удалось удалить в GitHub: '+err.message); }
+}
+
+/* =============== локальное хранилище =============== */
+function saveLocal(){ try{ localStorage.setItem(LS_E, JSON.stringify(entries)); }catch(e){} }
+function loadLocal(){ try{ entries=JSON.parse(localStorage.getItem(LS_E)||'[]'); }catch(e){ entries=[]; } }
+
+/* =============== редактор =============== */
+function renderMoods(sel){
+  $('moods').innerHTML = MOODS.map(m=>
+    `<button class="mood${m.k===sel?' on':''}" style="${m.k===sel?'background:'+m.c:''}" onclick="pickMood('${m.k}')">${m.e} ${m.l}</button>`
+  ).join('');
+}
+let pickedMood='';
+function pickMood(k){ pickedMood = (pickedMood===k?'':k); renderMoods(pickedMood); }
+
+function newEntry(){
+  currentFile=null; pickedMood='';
+  $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
+  renderMoods(''); $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
+  render(); $('fTitle').focus();
+}
+function openEntry(file){
+  const e=entries.find(x=>x.file===file); if(!e) return;
+  currentFile=file; pickedMood=e.mood||'';
+  $('fTitle').value=e.title; $('fDate').value=e.date; $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
+  renderMoods(pickedMood); $('delBtn').style.display='';
+  $('editHint').textContent='Редактирую · '+fmtDate(e.date);
+  render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function saveEntry(){
+  const title=$('fTitle').value.trim(), body=$('fBody').value.trim();
+  if(!title && !body){ toast('Запись пустая 🙂'); return; }
+  const date=$('fDate').value||today();
+  const tags=$('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+
+  let e;
+  if(currentFile){
+    e=entries.find(x=>x.file===currentFile);
+    Object.assign(e,{title:title||'Без названия', date, tags, mood:pickedMood, body});
+  }else{
+    let file=date+'-'+slug(title||body.slice(0,30))+'.md', n=2;
+    while(entries.some(x=>x.file===file)) file=date+'-'+slug(title||body.slice(0,30))+'-'+(n++)+'.md';
+    e={file, title:title||'Без названия', date, tags, mood:pickedMood, body, sha:null};
+    entries.push(e); currentFile=file;
+  }
+  saveLocal(); render(); $('delBtn').style.display=''; $('editHint').textContent='Сохранено · '+fmtDate(e.date);
+  toast(hasGH()?'Сохранено 💾':'Сохранено локально 💾');
+  await pushEntry(e);
+}
+
+async function deleteEntry(){
+  if(!currentFile) return;
+  if(!confirm('Удалить эту запись навсегда?')) return;
+  const e=entries.find(x=>x.file===currentFile);
+  entries=entries.filter(x=>x.file!==currentFile);
+  saveLocal(); newEntry(); toast('Запись удалена');
+  if(e) await pushDelete(e);
+}
+
+/* =============== отрисовка =============== */
+function filtered(){
+  const q=$('search').value.trim().toLowerCase();
+  return entries
+    .filter(e=>{
+      if(activeTags.size && !(e.tags||[]).some(t=>activeTags.has(t))) return false;
+      if(!q) return true;
+      return (e.title+' '+e.body+' '+(e.tags||[]).join(' ')).toLowerCase().includes(q);
+    })
+    .sort((a,b)=> b.date.localeCompare(a.date) || b.file.localeCompare(a.file));
+}
+
+function render(){
+  $('counter').textContent = entries.length + ' ' +
+    (entries.length%10===1 && entries.length%100!==11 ? 'запись' :
+     [2,3,4].includes(entries.length%10) && ![12,13,14].includes(entries.length%100) ? 'записи' : 'записей');
+
+  // теги
+  const all=[...new Set(entries.flatMap(e=>e.tags||[]))].sort((a,b)=>a.localeCompare(b,'ru'));
+  $('tagFilters').innerHTML = all.length
+    ? all.map(t=>`<button class="tag${activeTags.has(t)?' on':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">#${t}</button>`).join('')
+    : '<span class="hint">Теги появятся, когда добавишь их к записям</span>';
+
+  // список
+  const list=filtered();
+  $('list').innerHTML = list.length ? list.map(e=>{
+    const m=moodBy(e.mood);
+    return `<button class="item${e.file===currentFile?' on':''}" style="border-left-color:${m?m.c:'var(--gray-2)'}" onclick="openEntry('${e.file}')">
+      <div class="t">${m?m.e:'📄'}<span class="txt">${esc(e.title)}</span></div>
+      <div class="d">${fmtDate(e.date)}${e.sha?' · ☁️':''}</div>
+      <div class="p">${esc((e.body||'').slice(0,140))}</div>
+      ${(e.tags||[]).length?`<div class="tags-row">${e.tags.slice(0,4).map(t=>`<span class="tag mini">#${esc(t)}</span>`).join('')}</div>`:''}
+    </button>`;
+  }).join('')
+    : '<div class="empty">Пока пусто.<br>Нажми «Новая запись» ✏️</div>';
+
+  renderCal();
+}
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function toggleTag(t){ activeTags.has(t)?activeTags.delete(t):activeTags.add(t); render(); }
+function shiftMonth(n){ calDate=new Date(calDate.getFullYear(), calDate.getMonth()+n, 1); renderCal(); }
+
+function renderCal(){
+  const y=calDate.getFullYear(), mo=calDate.getMonth();
+  $('calLabel').textContent = calDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+  const first=new Date(y,mo,1), pad=(first.getDay()+6)%7, days=new Date(y,mo+1,0).getDate();
+  const byDay={};
+  entries.forEach(e=>{ if(e.date && e.date.startsWith(`${y}-${String(mo+1).padStart(2,'0')}`)) {
+    const d=+e.date.slice(8,10); (byDay[d]=byDay[d]||[]).push(e);
+  }});
+  let html=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d=>`<div class="wd">${d}</div>`).join('');
+  for(let i=0;i<pad;i++) html+='<div class="day pad"></div>';
+  const t=today();
+  for(let d=1;d<=days;d++){
+    const iso=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const list=byDay[d]||[], m=list.length?moodBy(list[0].mood):null;
+    html+=`<div class="day${list.length?' has':''}${iso===t?' today':''}"
+      ${list.length?`onclick="openEntry('${list[0].file}')" title="${esc(list[0].title)}"`:''}
+      style="${m?'background:'+m.c+';color:#fff':''}">${d}${list.length>1?'<em>•••</em>':''}</div>`;
+  }
+  $('cal').innerHTML=html;
+}
+
+/* =============== настройки =============== */
+function openSettings(){
+  const c=cfg();
+  $('cOwner').value=c.owner||''; $('cRepo').value=c.repo||'';
+  $('cBranch').value=c.branch||'main'; $('cPath').value=c.path||'entries'; $('cToken').value=c.token||'';
+  $('mask').classList.add('open');
+}
+function closeSettings(){ $('mask').classList.remove('open'); }
+async function saveSettings(){
+  localStorage.setItem(LS_C, JSON.stringify({
+    owner:$('cOwner').value.trim(), repo:$('cRepo').value.trim(),
+    branch:$('cBranch').value.trim()||'main', path:$('cPath').value.trim()||'entries',
+    token:$('cToken').value.trim()
+  }));
+  closeSettings();
+  if(hasGH()){ await pullAll(); await pushUnsynced(); }
+  else setSync('','Только на этом устройстве');
+}
+async function pushUnsynced(){
+  for(const e of entries.filter(x=>!x.sha)) await pushEntry(e);
+  render();
+}
+function exportAll(){
+  if(!entries.length){ toast('Записей пока нет'); return; }
+  entries.forEach((e,i)=>setTimeout(()=>{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([toMd(e)],{type:'text/markdown'}));
+    a.download=e.file; a.click(); URL.revokeObjectURL(a.href);
+  }, i*220));
+  toast('Скачиваю '+entries.length+' файл(ов)');
+}
+
+/* =============== старт =============== */
+document.addEventListener('keydown', ev=>{
+  if((ev.metaKey||ev.ctrlKey) && ev.key==='s'){ ev.preventDefault(); saveEntry(); }
+  if(ev.key==='Escape') closeSettings();
+});
+loadLocal();
+newEntry();
+if(hasGH()) pullAll(); else setSync('','Только на этом устройстве');
+</script>
+</body>
+</html>
