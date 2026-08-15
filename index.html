@@ -157,6 +157,18 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
   font-family:'Literata',Georgia,serif;
 }
 .body-in::placeholder{color:var(--gray-2)}
+.photo-box{display:flex; flex-direction:column; gap:9px}
+.photo-prev{border-radius:14px; overflow:hidden; background:var(--gray); box-shadow:var(--shadow)}
+.photo-prev img{display:block; width:100%; max-height:340px; object-fit:cover}
+.photo-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.photo-drop{
+  border:2px dashed var(--gray-2); border-radius:14px; padding:15px; text-align:center;
+  color:var(--ink-soft); font-weight:700; font-size:13.5px; cursor:pointer;
+  background:var(--bg); transition:.15s;
+}
+.photo-drop:hover{border-color:var(--pink-2); color:var(--pink-ink); background:#fff}
+.photo-load{padding:15px; text-align:center; color:var(--ink-soft); font-weight:700; font-size:13.5px;
+  background:var(--bg); border-radius:14px}
 .foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 .foot .spacer{margin-left:auto}
 .hint{font-size:12.5px; color:var(--ink-soft); font-weight:600}
@@ -234,6 +246,8 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
         <div class="moods" id="moods"></div>
       </div>
       <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги…">
+      <div class="photo-box" id="photoBox"></div>
+      <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
       <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить…"></textarea>
       <div class="foot">
         <button class="btn primary" onclick="saveEntry()">💾 Сохранить</button>
@@ -322,17 +336,19 @@ function fmtDate(d){
 
 /* =============== markdown <-> объект =============== */
 function toMd(e){
-  return ['---',
+  const head=['---',
     'title: '+(e.title||'Без названия').replace(/\n/g,' '),
     'date: '+e.date,
     'mood: '+(e.mood||''),
-    'tags: '+(e.tags||[]).join(', '),
-    '---','',
-    '# '+(e.title||'Без названия'),'',
-    e.body||''].join('\n');
+    'tags: '+(e.tags||[]).join(', ')];
+  if(e.photo) head.push('photo: '+e.photo);
+  head.push('---','', '# '+(e.title||'Без названия'), '');
+  // относительная ссылка — так фото видно прямо на GitHub
+  if(e.photo) head.push('![фото](../'+e.photo+')','');
+  return head.concat([e.body||'']).join('\n');
 }
 function fromMd(text, file){
-  const e={file, title:'Без названия', date:file.slice(0,10), mood:'', tags:[], body:text};
+  const e={file, title:'Без названия', date:file.slice(0,10), mood:'', tags:[], photo:'', body:text};
   const m=text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if(m){
     m[1].split(/\r?\n/).forEach(line=>{
@@ -341,11 +357,13 @@ function fromMd(text, file){
       if(k==='title') e.title=v.replace(/^["']|["']$/g,'');
       else if(k==='date') e.date=v.slice(0,10);
       else if(k==='mood') e.mood=v;
+      else if(k==='photo') e.photo=v;
       else if(k==='tags') e.tags=v.replace(/^\[|\]$/g,'').split(',').map(t=>t.trim()).filter(Boolean);
     });
     let rest=text.slice(m[0].length).replace(/^[\r\n]+/,'');
     const h='# '+e.title;                       // убираем дублирующий заголовок
     if(rest.startsWith(h)) rest=rest.slice(h.length).replace(/^[\r\n]+/,'');
+    if(e.photo) rest=rest.replace(/^!\[[^\]]*\]\([^)]*\)[\r\n]*/,'');   // и картинку-дубль
     e.body=rest.trim();
   }
   return e;
@@ -360,8 +378,31 @@ async function gh(path, opts={}){
   });
   return res;
 }
-const dirPath = () => (cfg().path||'entries').replace(/^\/+|\/+$/g,'');
-const branch  = () => cfg().branch||'main';
+const dirPath  = () => (cfg().path||'entries').replace(/^\/+|\/+$/g,'');
+const mediaDir = () => (cfg().media||'media').replace(/^\/+|\/+$/g,'');
+const branch   = () => cfg().branch||'main';
+
+/* положить файл; если sha устарел или неизвестен — подтянуть свежий и повторить */
+async function putFile(path, contentB64, message, sha){
+  const body={message, content:contentB64, branch:branch()};
+  if(sha) body.sha=sha;
+  const send=()=>gh('/contents/'+encodeURI(path),{method:'PUT',body:JSON.stringify(body)});
+  let res=await send();
+  if(!res.ok && (res.status===409 || res.status===422)){
+    const g=await gh('/contents/'+encodeURI(path)+'?ref='+encodeURIComponent(branch()));
+    if(g.ok){ body.sha=(await g.json()).sha; res=await send(); }
+  }
+  if(!res.ok) throw new Error((await res.json()).message||res.status);
+  return (await res.json()).content.sha;
+}
+async function delFile(path, sha, message){
+  if(!sha){
+    const g=await gh('/contents/'+encodeURI(path)+'?ref='+encodeURIComponent(branch()));
+    if(!g.ok) return; sha=(await g.json()).sha;
+  }
+  await gh('/contents/'+encodeURI(path),{method:'DELETE',
+    body:JSON.stringify({message, sha, branch:branch()})});
+}
 
 async function pullAll(){
   if(!hasGH()) { setSync('', 'Только на этом устройстве'); return; }
@@ -392,14 +433,26 @@ async function pullAll(){
 
 async function pushEntry(e){
   if(!hasGH()) return;
-  setSync('busy','Сохраняю в GitHub…');
+  setSync('busy', e.photoDirty&&e.photoData ? 'Загружаю фото…' : 'Сохраняю в GitHub…');
   try{
-    const body={message:'diary: '+e.date+' — '+(e.title||'запись'), content:b64enc(toMd(e)), branch:branch()};
-    if(e.sha) body.sha=e.sha;
-    const res=await gh('/contents/'+encodeURI(dirPath()+'/'+e.file),{method:'PUT',body:JSON.stringify(body)});
-    if(!res.ok) throw new Error((await res.json()).message||res.status);
-    e.sha=(await res.json()).content.sha;
-    saveLocal(); setSync('ok','Сохранено в GitHub');
+    // 1) фото — отдельным файлом, чтобы оно было видно и на самом GitHub
+    if(e.photoDirty){
+      if(e.photoData){
+        const path=mediaDir()+'/'+e.file.replace(/\.md$/,'')+'.jpg';
+        e.photoSha=await putFile(path, e.photoData.split(',')[1], 'diary: фото '+e.date, e.photoSha);
+        e.photo=path; mediaCache[path]=e.photoData;
+      }else if(e.photo){
+        await delFile(e.photo, e.photoSha, 'diary: удалено фото '+e.date);
+        delete mediaCache[e.photo]; e.photo=''; e.photoSha=null;
+      }
+      e.photoDirty=false;
+      setSync('busy','Сохраняю в GitHub…');
+    }
+    // 2) сама запись
+    e.sha=await putFile(dirPath()+'/'+e.file, b64enc(toMd(e)),
+                        'diary: '+e.date+' — '+(e.title||'запись'), e.sha);
+    e.photoData='';                       // уже в GitHub — не держим копию в хранилище
+    saveLocal(); render(); setSync('ok','Сохранено в GitHub');
   }catch(err){
     setSync('err','Ошибка сохранения');
     toast('GitHub: '+err.message+' (запись сохранена локально)');
@@ -407,16 +460,59 @@ async function pushEntry(e){
 }
 
 async function pushDelete(e){
-  if(!hasGH() || !e.sha) return;
+  if(!hasGH()) return;
   try{
-    await gh('/contents/'+encodeURI(dirPath()+'/'+e.file),{method:'DELETE',
-      body:JSON.stringify({message:'diary: удалена запись '+e.file, sha:e.sha, branch:branch()})});
+    if(e.photo){ await delFile(e.photo, e.photoSha, 'diary: удалено фото '+e.date); delete mediaCache[e.photo]; }
+    if(e.sha) await delFile(dirPath()+'/'+e.file, e.sha, 'diary: удалена запись '+e.file);
     setSync('ok','Удалено в GitHub');
   }catch(err){ toast('Не удалось удалить в GitHub: '+err.message); }
 }
 
+/* ---- фото: сжатие и подгрузка ---- */
+const mediaCache={};
+
+function compressImage(file, maxDim=1400){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file), img=new Image();
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      const k=Math.min(1, maxDim/Math.max(img.width,img.height));
+      const w=Math.max(1,Math.round(img.width*k)), h=Math.max(1,Math.round(img.height*k));
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      const ctx=c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h);
+      ctx.drawImage(img,0,0,w,h);
+      let q=.85, out=c.toDataURL('image/jpeg',q);
+      while(out.length>1150000 && q>0.35){ q-=0.12; out=c.toDataURL('image/jpeg',q); }
+      res(out);
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('не удалось открыть файл')); };
+    img.src=url;
+  });
+}
+
+async function fetchPhoto(path){
+  if(mediaCache[path]) return mediaCache[path];
+  if(!hasGH()) return null;
+  const r=await gh('/contents/'+encodeURI(path)+'?ref='+encodeURIComponent(branch()));
+  if(!r.ok) return null;
+  const j=await r.json();
+  const d='data:image/jpeg;base64,'+(j.content||'').replace(/\s/g,'');
+  mediaCache[path]=d; return d;
+}
+
 /* =============== локальное хранилище =============== */
-function saveLocal(){ try{ localStorage.setItem(LS_E, JSON.stringify(entries)); }catch(e){} }
+function saveLocal(){
+  try{ localStorage.setItem(LS_E, JSON.stringify(entries)); return; }catch(err){}
+  // не влезло — фото уже уехавших записей можно не хранить, они есть в GitHub
+  try{
+    localStorage.setItem(LS_E, JSON.stringify(entries.map(e=> e.sha?{...e,photoData:''}:e)));
+  }catch(err){
+    try{
+      localStorage.setItem(LS_E, JSON.stringify(entries.map(e=>({...e,photoData:''}))));
+      toast('Фото не помещаются в память браузера — они хранятся в GitHub');
+    }catch(e2){ toast('Память браузера переполнена'); }
+  }
+}
 function loadLocal(){ try{ entries=JSON.parse(localStorage.getItem(LS_E)||'[]'); }catch(e){ entries=[]; } }
 
 /* =============== редактор =============== */
@@ -428,19 +524,62 @@ function renderMoods(sel){
 let pickedMood='';
 function pickMood(k){ pickedMood = (pickedMood===k?'':k); renderMoods(pickedMood); }
 
+/* состояние фото в редакторе */
+let ph={path:'', data:'', dirty:false, loading:false};
+
+function renderPhoto(){
+  const b=$('photoBox');
+  if(ph.loading){ b.innerHTML='<div class="photo-load">Загружаю фото…</div>'; return; }
+  if(ph.data || ph.path){
+    b.innerHTML=
+      (ph.data?`<div class="photo-prev"><img src="${ph.data}" alt="фото записи"></div>`
+              :'<div class="photo-load">Фото есть, но не загрузилось</div>')+
+      `<div class="photo-actions">
+        <button class="btn ghost tiny" onclick="$('photoFile').click()">🔄 Заменить</button>
+        <button class="btn ghost tiny danger" onclick="removePhoto()">✕ Убрать фото</button>
+      </div>`;
+  }else{
+    b.innerHTML=`<div class="photo-drop" onclick="$('photoFile').click()">📷 Добавить фото <span style="font-weight:600">— одно на запись</span></div>`;
+  }
+}
+async function pickPhoto(input){
+  const f=input.files && input.files[0]; input.value='';
+  if(!f) return;
+  ph.loading=true; renderPhoto();
+  try{
+    ph.data=await compressImage(f); ph.dirty=true;
+  }catch(err){
+    toast('Не получилось открыть фото ('+err.message+'). Попробуй JPEG или PNG');
+  }
+  ph.loading=false; renderPhoto();
+}
+function removePhoto(){ ph.data=''; ph.dirty=true; renderPhoto(); }
+
+function resetPhoto(){ ph={path:'', data:'', dirty:false, loading:false}; renderPhoto(); }
+
 function newEntry(){
   currentFile=null; pickedMood='';
   $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
-  renderMoods(''); $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
+  renderMoods(''); resetPhoto();
+  $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
   render(); $('fTitle').focus();
 }
-function openEntry(file){
+async function openEntry(file){
   const e=entries.find(x=>x.file===file); if(!e) return;
   currentFile=file; pickedMood=e.mood||'';
   $('fTitle').value=e.title; $('fDate').value=e.date; $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
   $('editHint').textContent='Редактирую · '+fmtDate(e.date);
+
+  ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo && !e.photoData)};
+  renderPhoto();
   render(); window.scrollTo({top:0,behavior:'smooth'});
+
+  if(ph.loading){                       // фото подтягиваем из GitHub только когда открыли запись
+    const d=await fetchPhoto(e.photo);
+    if(currentFile!==file) return;       // успела переключиться — не мешаем
+    ph.data=d||''; ph.loading=false; renderPhoto();
+  }
 }
 
 async function saveEntry(){
@@ -456,12 +595,15 @@ async function saveEntry(){
   }else{
     let file=date+'-'+slug(title||body.slice(0,30))+'.md', n=2;
     while(entries.some(x=>x.file===file)) file=date+'-'+slug(title||body.slice(0,30))+'-'+(n++)+'.md';
-    e={file, title:title||'Без названия', date, tags, mood:pickedMood, body, sha:null};
+    e={file, title:title||'Без названия', date, tags, mood:pickedMood, body, photo:'', sha:null};
     entries.push(e); currentFile=file;
   }
+  if(ph.dirty){ e.photoData=ph.data; e.photoDirty=true; if(!ph.data && !hasGH()) e.photo=''; ph.dirty=false; }
+  else if(ph.data && !e.photoData) e.photoData=ph.data;
   saveLocal(); render(); $('delBtn').style.display=''; $('editHint').textContent='Сохранено · '+fmtDate(e.date);
   toast(hasGH()?'Сохранено 💾':'Сохранено локально 💾');
   await pushEntry(e);
+  if(currentFile===e.file) ph.path=e.photo||'';
 }
 
 async function deleteEntry(){
@@ -502,7 +644,7 @@ function render(){
     const m=moodBy(e.mood);
     return `<button class="item${e.file===currentFile?' on':''}" style="border-left-color:${m?m.c:'var(--gray-2)'}" onclick="openEntry('${e.file}')">
       <div class="t">${m?m.e:'📄'}<span class="txt">${esc(e.title)}</span></div>
-      <div class="d">${fmtDate(e.date)}${e.sha?' · ☁️':''}</div>
+      <div class="d">${fmtDate(e.date)}${(e.photo||e.photoData)?' · 📷':''}${e.sha?' · ☁️':''}</div>
       <div class="p">${esc((e.body||'').slice(0,140))}</div>
       ${(e.tags||[]).length?`<div class="tags-row">${e.tags.slice(0,4).map(t=>`<span class="tag mini">#${esc(t)}</span>`).join('')}</div>`:''}
     </button>`;
