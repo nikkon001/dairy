@@ -177,25 +177,23 @@ header.top{
 .hint{font-size:10px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase}
 
 /* ---------- задачи ---------- */
-.tasks{border:1px solid var(--line); padding:14px 16px}
-.tasks-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
-  font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted)}
-.tasks-head .lbl{display:flex; align-items:center; gap:7px}
-.task{display:flex; align-items:center; gap:11px; padding:7px 0; border-bottom:1px solid var(--line)}
-.tick{width:16px; height:16px; border:1px solid var(--line-dark); flex:none;
+.task{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line)}
+.tick{width:15px; height:15px; border:1px solid var(--line-dark); flex:none;
   display:grid; place-items:center; color:transparent; transition:.14s}
 .tick:hover{border-color:var(--red)}
 .tick.on{border-color:var(--red); color:var(--red)}
-.task .tx{flex:1; border:none; outline:none; background:none; font-size:13px; padding:2px 0}
+.task .tx{flex:1; min-width:0; border:none; outline:none; background:none; font-size:12.5px; padding:2px 0}
 .task .tx::placeholder{color:var(--line)}
 .task.done .tx{color:var(--muted); text-decoration:line-through}
-.task .rm{color:var(--line); display:grid; place-items:center; transition:.14s}
+.task .rm{color:transparent; display:grid; place-items:center; transition:.14s}
+.task:hover .rm{color:var(--line)}
 .task .rm:hover{color:var(--red)}
-.task-add{margin-top:12px}
+.task-acts{display:flex; gap:7px; margin-top:12px; flex-wrap:wrap}
 .task-bar{display:flex; align-items:center; gap:10px; margin-top:13px;
   font-size:9.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); font-weight:700}
 .task-bar .track{flex:1; height:1px; background:var(--line)}
 .task-bar .track i{display:block; height:1px; background:var(--red); transition:width .3s ease}
+.task-empty{font-size:11.5px; color:var(--muted); padding:6px 0 2px; letter-spacing:.3px}
 
 /* ---------- фото ---------- */
 .photo-box{display:flex; flex-direction:column; gap:10px}
@@ -276,6 +274,11 @@ header.top{
         </div>
 
         <div>
+          <p class="sect-title" id="tasksTitle">Задачи</p>
+          <div id="tasksBox"></div>
+        </div>
+
+        <div>
           <p class="sect-title">Записи</p>
           <div class="list" id="list"></div>
         </div>
@@ -289,7 +292,6 @@ header.top{
         <div class="moods" id="moods"></div>
       </div>
       <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги">
-      <div id="tasksBox"></div>
       <div class="photo-box" id="photoBox"></div>
       <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
       <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить"></textarea>
@@ -423,15 +425,10 @@ function toMd(e){
   if(e.photo) head.push('photo: '+e.photo);
   head.push('---','', '# '+(e.title||'Без названия'), '');
   if(e.photo) head.push('![фото](../'+e.photo+')','');   // относительная ссылка — видно на GitHub
-  if((e.tasks||[]).length){                              // обычные чекбоксы — GitHub их рисует
-    head.push('## Задачи','');
-    e.tasks.forEach(t=>head.push('- ['+(t.d?'x':' ')+'] '+t.t));
-    head.push('');
-  }
   return head.concat([e.body||'']).join('\n');
 }
 function fromMd(text, file){
-  const e={file, title:'Без названия', date:file.slice(0,10), mood:'', tags:[], photo:'', tasks:[], body:text};
+  const e={file, title:'Без названия', date:file.slice(0,10), mood:'', tags:[], photo:'', body:text};
   const m=text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if(m){
     m[1].split(/\r?\n/).forEach(line=>{
@@ -447,14 +444,7 @@ function fromMd(text, file){
     const h='# '+e.title;
     if(rest.startsWith(h)) rest=rest.slice(h.length).replace(/^[\r\n]+/,'');
     if(e.photo) rest=rest.replace(/^!\[[^\]]*\]\([^)]*\)[\r\n]*/,'');
-    const keep=[];                                    // вынимаем чекбоксы, где бы они ни стояли
-    rest.split(/\r?\n/).forEach(line=>{
-      const t=line.match(/^\s*[-*]\s*\[([ xX])\]\s?(.*)$/);
-      if(t){ e.tasks.push({t:t[2].trim(), d:t[1].toLowerCase()==='x'}); return; }
-      if(/^\s*##\s+Задачи\s*$/.test(line)) return;
-      keep.push(line);
-    });
-    e.body=keep.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+    e.body=rest.trim();
   }
   return e;
 }
@@ -583,6 +573,89 @@ async function fetchPhoto(path){
   mediaCache[path]=d; return d;
 }
 
+/* =============== задачи (отдельный список, вне записей) =============== */
+let tk=[], tkSha=null, tkTimer=null;
+const LS_T='diary_tasks_v1';
+const tasksFile = () => (cfg().tasksFile||'tasks.md').replace(/^\/+/,'');
+
+function tasksToMd(){
+  return ['# Задачи','', ...tk.filter(t=>t.t.trim()).map(t=>'- ['+(t.d?'x':' ')+'] '+t.t.trim()), ''].join('\n');
+}
+function tasksFromMd(text){
+  const out=[];
+  text.split(/\r?\n/).forEach(line=>{
+    const m=line.match(/^\s*[-*]\s*\[([ xX])\]\s?(.*)$/);
+    if(m) out.push({t:m[2].trim(), d:m[1].toLowerCase()==='x'});
+  });
+  return out;
+}
+function saveTasksLocal(){
+  try{ localStorage.setItem(LS_T, JSON.stringify({tk, sha:tkSha})); }catch(e){}
+}
+function loadTasksLocal(){
+  try{ const j=JSON.parse(localStorage.getItem(LS_T)||'{}'); tk=j.tk||[]; tkSha=j.sha||null; }
+  catch(e){ tk=[]; tkSha=null; }
+}
+
+async function pullTasks(){
+  if(!hasGH()) return;
+  try{
+    const r=await gh('/contents/'+encodeURI(tasksFile())+'?ref='+encodeURIComponent(branch()));
+    if(r.status===404){ tkSha=null; return; }          // файла ещё нет — создадим при первой задаче
+    if(!r.ok) return;
+    const j=await r.json();
+    tkSha=j.sha; tk=tasksFromMd(b64dec(j.content));
+    saveTasksLocal(); renderTasks();
+  }catch(e){}
+}
+function queueTasksPush(){                              // копим правки, чтобы не коммитить каждую букву
+  saveTasksLocal();
+  if(!hasGH()) return;
+  clearTimeout(tkTimer); tkTimer=setTimeout(pushTasks, 1300);
+}
+async function pushTasks(){
+  if(!hasGH()) return;
+  try{
+    setSync('busy','Сохраняю задачи');
+    tkSha=await putFile(tasksFile(), b64enc(tasksToMd()), 'diary: задачи', tkSha);
+    saveTasksLocal(); setSync('ok','Сохранено');
+  }catch(err){ setSync('err','Ошибка'); toast('Задачи: '+err.message); }
+}
+
+function renderTasks(){
+  const live=tk.filter(t=>t.t.trim()), done=live.filter(t=>t.d).length;
+  const pct=live.length?Math.round(done/live.length*100):0;
+  $('tasksTitle').innerHTML='Задачи'+(live.length?` <span style="float:right;color:var(--muted)">${done} / ${live.length}</span>`:'');
+  $('tasksBox').innerHTML=
+    (tk.length?tk.map((t,i)=>`<div class="task${t.d?' done':''}">
+        <button class="tick${t.d?' on':''}" onclick="toggleTask(${i})" title="Отметить">${icon('check',10)}</button>
+        <input class="tx" value="${esc(t.t)}" placeholder="Что нужно сделать"
+               oninput="tk[${i}].t=this.value; queueTasksPush()" onkeydown="taskKey(event,${i})">
+        <button class="rm" onclick="removeTask(${i})" title="Убрать">${icon('x',12)}</button>
+      </div>`).join('')
+     :'<div class="task-empty">Пока ничего не запланировано</div>')+
+    `<div class="task-acts">
+      <button class="btn quiet tiny" onclick="addTask()">${icon('plus',12)}Добавить</button>
+      ${done?`<button class="btn quiet tiny" onclick="clearDone()">${icon('trash',12)}Убрать сделанные</button>`:''}
+    </div>`+
+    (live.length?`<div class="task-bar"><span>${pct}%</span><span class="track"><i style="width:${pct}%"></i></span></div>`:'');
+}
+function focusTask(i){
+  const ins=$('tasksBox').querySelectorAll('input.tx');
+  if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); }
+}
+function addTask(){ tk.push({t:'',d:false}); renderTasks(); focusTask(tk.length-1); }
+function removeTask(i){ tk.splice(i,1); renderTasks(); queueTasksPush(); }
+function toggleTask(i){ tk[i].d=!tk[i].d; renderTasks(); queueTasksPush(); }
+function clearDone(){
+  if(!confirm('Убрать выполненные задачи из списка?')) return;
+  tk=tk.filter(t=>!t.d); renderTasks(); queueTasksPush();
+}
+function taskKey(ev,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); tk.splice(i+1,0,{t:'',d:false}); renderTasks(); focusTask(i+1); }
+  else if(ev.key==='Backspace' && !tk[i].t){ ev.preventDefault(); removeTask(i); focusTask(Math.max(0,i-1)); }
+}
+
 /* =============== локальное хранилище =============== */
 function saveLocal(){
   try{ localStorage.setItem(LS_E, JSON.stringify(entries)); return; }catch(err){}
@@ -604,36 +677,6 @@ function renderMoods(sel){
   ).join('');
 }
 function pickMood(k){ pickedMood=(pickedMood===k?'':k); renderMoods(pickedMood); }
-
-/* ---- задачи ---- */
-let tk=[];
-function renderTasks(){
-  const done=tk.filter(t=>t.d).length, pct=tk.length?Math.round(done/tk.length*100):0;
-  $('tasksBox').innerHTML=
-    `<div class="tasks">
-      <div class="tasks-head">
-        <span class="lbl">${icon('list',13)}Задачи на день</span>
-        ${tk.length?`<span>${done} / ${tk.length}</span>`:''}
-      </div>
-      ${tk.map((t,i)=>`<div class="task${t.d?' done':''}">
-          <button class="tick${t.d?' on':''}" onclick="toggleTask(${i})" title="Отметить">${icon('check',10)}</button>
-          <input class="tx" value="${esc(t.t)}" placeholder="Что нужно сделать"
-                 oninput="tk[${i}].t=this.value" onkeydown="taskKey(event,${i})">
-          <button class="rm" onclick="removeTask(${i})" title="Убрать">${icon('x',13)}</button>
-        </div>`).join('')}
-      <button class="btn quiet tiny task-add" onclick="addTask()">${icon('plus',12)}Добавить задачу</button>
-      ${tk.length?`<div class="task-bar"><span>${pct}%</span><span class="track"><i style="width:${pct}%"></i></span></div>`:''}
-    </div>`;
-}
-const taskInputs = () => $('tasksBox').querySelectorAll('input.tx');
-function focusTask(i){ const ins=taskInputs(); if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); } }
-function addTask(){ tk.push({t:'',d:false}); renderTasks(); focusTask(tk.length-1); }
-function removeTask(i){ tk.splice(i,1); renderTasks(); }
-function toggleTask(i){ tk[i].d=!tk[i].d; renderTasks(); }
-function taskKey(ev,i){
-  if(ev.key==='Enter'){ ev.preventDefault(); tk.splice(i+1,0,{t:'',d:false}); renderTasks(); focusTask(i+1); }
-  else if(ev.key==='Backspace' && !tk[i].t){ ev.preventDefault(); removeTask(i); focusTask(Math.max(0,i-1)); }
-}
 
 let ph={path:'', data:'', dirty:false, loading:false};
 
@@ -666,7 +709,7 @@ function resetPhoto(){ ph={path:'', data:'', dirty:false, loading:false}; render
 function newEntry(){
   currentFile=null; pickedMood='';
   $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
-  renderMoods(''); resetPhoto(); tk=[]; renderTasks();
+  renderMoods(''); resetPhoto();
   $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
   render(); $('fTitle').focus();
 }
@@ -676,7 +719,6 @@ async function openEntry(file){
   $('fTitle').value=e.title; $('fDate').value=e.date;
   $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
-  tk=(e.tasks||[]).map(t=>({...t})); renderTasks();
   $('editHint').textContent='Правка · '+fmtDate(e.date);
 
   ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo && !e.photoData)};
@@ -691,23 +733,21 @@ async function openEntry(file){
 
 async function saveEntry(){
   const title=$('fTitle').value.trim(), body=$('fBody').value.trim();
-  const tasks=tk.filter(t=>t.t.trim()).map(t=>({t:t.t.trim(), d:!!t.d}));
-  if(!title && !body && !tasks.length && !ph.data){ toast('Запись пустая'); return; }
+  if(!title && !body && !ph.data){ toast('Запись пустая'); return; }
   const date=$('fDate').value||today();
   const tags=$('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
 
   let e;
   if(currentFile){
     e=entries.find(x=>x.file===currentFile);
-    Object.assign(e,{title:title||'Без названия', date, tags, mood:pickedMood, tasks, body});
+    Object.assign(e,{title:title||'Без названия', date, tags, mood:pickedMood, body});
   }else{
-    const base=()=>date+'-'+slug(title||body.slice(0,30)||(tasks[0]||{}).t);
+    const base=()=>date+'-'+slug(title||body.slice(0,30));
     let file=base()+'.md', n=2;
     while(entries.some(x=>x.file===file)) file=base()+'-'+(n++)+'.md';
-    e={file, title:title||'Без названия', date, tags, mood:pickedMood, tasks, body, photo:'', sha:null};
+    e={file, title:title||'Без названия', date, tags, mood:pickedMood, body, photo:'', sha:null};
     entries.push(e); currentFile=file;
   }
-  tk=tasks.map(t=>({...t})); renderTasks();
   if(ph.dirty){ e.photoData=ph.data; e.photoDirty=true; if(!ph.data && !hasGH()) e.photo=''; ph.dirty=false; }
   else if(ph.data && !e.photoData) e.photoData=ph.data;
 
@@ -749,11 +789,10 @@ function render(){
 
   const list=filtered();
   $('list').innerHTML = list.length ? list.map(e=>{
-    const m=moodBy(e.mood), tt=e.tasks||[];
+    const m=moodBy(e.mood);
     return `<button class="item${e.file===currentFile?' on':''}" onclick="openEntry('${e.file}')">
       <span class="t">${icon(m?m.i:'doc',15)}<span class="txt">${esc(e.title)}</span></span>
       <span class="d">${fmtDate(e.date)}
-        ${tt.length?icon('check',12)+tt.filter(x=>x.d).length+'/'+tt.length:''}
         ${(e.photo||e.photoData)?icon('camera',12):''}${e.sha?icon('cloud',12):''}</span>
       <span class="p">${esc((e.body||'').slice(0,140))}</span>
       ${(e.tags||[]).length?`<span class="tags-row">${e.tags.slice(0,4).map(t=>`<span class="tag mini">${esc(t)}</span>`).join('')}</span>`:''}
@@ -807,8 +846,6 @@ function renderStats(list, daysUsed, daysTotal){
   list.forEach(e=>(e.tags||[]).forEach(t=>tags[t]=(tags[t]||0)+1));
   const top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,4);
   const photos=list.filter(e=>e.photo||e.photoData).length;
-  const tAll=list.reduce((s,e)=>s+(e.tasks||[]).length,0);
-  const tDone=list.reduce((s,e)=>s+(e.tasks||[]).filter(t=>t.d).length,0);
 
   box.innerHTML=
     `<div class="stat-top">
@@ -820,9 +857,7 @@ function renderStats(list, daysUsed, daysTotal){
         <span class="mb-track"><i style="width:${Math.round(counts[m.k]/max*100)}%"></i></span>
         <span class="mb-n">${counts[m.k]}</span>
       </div>`).join('')+
-    `<p class="stat-note">Чаще всего — <b>${rows[0].l.toLowerCase()}</b>`+
-      (tAll?`. Задачи: <b>${tDone} из ${tAll}</b>`:'')+
-      (photos?`. Фото: <b>${photos}</b>`:'')+`</p>`+
+    `<p class="stat-note">Чаще всего — <b>${rows[0].l.toLowerCase()}</b>${photos?`. Фото: <b>${photos}</b>`:''}</p>`+
     (top.length?`<div class="tags-row">${top.map(([t,n])=>`<span class="tag mini">${esc(t)} · ${n}</span>`).join('')}</div>`:'');
 }
 
@@ -861,7 +896,11 @@ async function saveSettings(){
     token:$('cToken').value.trim()
   }));
   closeSettings();
-  if(hasGH()){ await pullAll(); await pushUnsynced(); }
+  if(hasGH()){
+    await pullAll(); await pushUnsynced();
+    await pullTasks();
+    if(tk.length && !tkSha) await pushTasks();     // список был локальным — увозим в репозиторий
+  }
   else setSync('','Локально');
 }
 async function pushUnsynced(){
@@ -896,10 +935,12 @@ document.addEventListener('keydown', ev=>{
   if((ev.metaKey||ev.ctrlKey) && ev.key==='s'){ ev.preventDefault(); saveEntry(); }
   if(ev.key==='Escape') closeSettings();
 });
+window.addEventListener('beforeunload', ()=>{ if(tkTimer){ clearTimeout(tkTimer); pushTasks(); } });
+
 paintStaticIcons();
-loadLocal();
-newEntry();
-if(hasGH()) pullAll(); else setSync('','Локально');
+loadLocal(); loadTasksLocal();
+newEntry(); renderTasks();
+if(hasGH()) pullAll().then(pullTasks); else setSync('','Локально');
 </script>
 </body>
 </html>
