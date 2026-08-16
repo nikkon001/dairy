@@ -6,212 +6,215 @@
 <title>Дневник</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --pink:#F8DCE6; --pink-2:#F0BFD2; --pink-ink:#C97BA0;
-  --orange:#FCE3CC; --orange-2:#F7C79B; --orange-ink:#D9924E;
-  --blue:#D9EAF4; --blue-2:#B3D4E8; --blue-ink:#6A9CBE;
-  --gray:#EAE7E4; --gray-2:#D3CECA; --gray-ink:#8C8480;
-  --brown:#E8DACB; --brown-2:#D3BCA3; --brown-ink:#A17E5C;
-  --bg:#FDF9F6; --card:#FFFFFF; --ink:#5C4A42; --ink-soft:#8C7B72;
-  --shadow:0 2px 14px rgba(160,130,115,.10);
-  --shadow-lg:0 8px 34px rgba(160,130,115,.18);
-  --r:18px;
+  --bg:#FFFFFF;
+  --ink:#111111;
+  --muted:#8A8A8A;
+  --line:#E6E6E6;
+  --line-dark:#111111;
+  --red:#D91E18;
+  --wash:#FAFAFA;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  -webkit-font-smoothing:antialiased;
+  font-family:'Montserrat Alternates','Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:14px; -webkit-font-smoothing:antialiased;
 }
-body::before{
-  content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-  background:
-    radial-gradient(60vw 60vw at 8% -10%, var(--pink) 0%, transparent 60%),
-    radial-gradient(50vw 50vw at 98% 8%, var(--blue) 0%, transparent 60%),
-    radial-gradient(55vw 55vw at 80% 105%, var(--orange) 0%, transparent 60%),
-    radial-gradient(45vw 45vw at 0% 100%, var(--brown) 0%, transparent 60%);
-  opacity:.55;
-}
-button,input,textarea,select{font-family:inherit; font-size:inherit; color:inherit}
-button{cursor:pointer; border:none; background:none}
+button,input,textarea{font-family:inherit; font-size:inherit; color:inherit}
+button{cursor:pointer; border:none; background:none; padding:0}
+.ic{flex:none; display:block}
 
-/* ---------- layout ---------- */
-.app{max-width:1240px; margin:0 auto; padding:22px 20px 60px}
-header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:20px}
-.logo{display:flex; align-items:center; gap:11px; margin-right:auto}
-.logo .mark{
-  width:42px; height:42px; border-radius:14px; display:grid; place-items:center; font-size:21px;
-  background:linear-gradient(135deg,var(--pink-2),var(--orange-2)); box-shadow:var(--shadow);
+/* ---------- каркас ---------- */
+.app{max-width:1220px; margin:0 auto; padding:0 24px 80px}
+header.top{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:22px 0 16px; border-bottom:2px solid var(--red); margin-bottom:26px;
 }
-.logo h1{font-size:22px; margin:0; font-weight:700; letter-spacing:.2px}
-.logo small{display:block; font-size:12px; color:var(--ink-soft); font-weight:600}
+.logo{display:flex; align-items:center; gap:11px; margin-right:auto}
+.logo .mark{width:34px; height:34px; border:1.5px solid var(--ink); display:grid; place-items:center}
+.logo h1{margin:0; font-size:15px; font-weight:700; letter-spacing:3px; text-transform:uppercase}
+.logo small{display:block; font-size:10.5px; color:var(--muted); letter-spacing:1.2px;
+  text-transform:uppercase; margin-top:2px}
 
 .btn{
-  padding:10px 16px; border-radius:999px; font-weight:700; font-size:14px;
-  background:var(--card); box-shadow:var(--shadow); transition:transform .12s ease, box-shadow .12s ease;
-  display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+  display:inline-flex; align-items:center; gap:7px; padding:9px 14px;
+  border:1px solid var(--line-dark); background:var(--bg); font-size:11px; font-weight:600;
+  letter-spacing:1.1px; text-transform:uppercase; transition:.14s;
 }
-.btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg)}
-.btn:active{transform:translateY(0)}
-.btn.primary{background:linear-gradient(135deg,var(--pink-2),var(--orange-2)); color:#fff}
-.btn.ghost{background:rgba(255,255,255,.65)}
-.btn.tiny{padding:7px 12px; font-size:13px}
-.btn.danger{color:var(--pink-ink)}
+.btn:hover{color:var(--red); border-color:var(--red)}
+.btn.primary{background:var(--ink); color:#fff; border-color:var(--ink)}
+.btn.primary:hover{background:var(--red); border-color:var(--red); color:#fff}
+.btn.quiet{border-color:var(--line); color:var(--muted)}
+.btn.quiet:hover{border-color:var(--red); color:var(--red)}
+.btn.tiny{padding:6px 10px; font-size:10px; gap:5px}
+.btn.danger:hover{color:var(--red); border-color:var(--red)}
 
-.sync{
-  font-size:12.5px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; gap:7px;
-  background:rgba(255,255,255,.7); padding:8px 14px; border-radius:999px; box-shadow:var(--shadow);
+.sync{display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
+.dot{width:7px; height:7px; background:var(--line); flex:none}
+.dot.ok{background:var(--ink)} .dot.err{background:var(--red)}
+.dot.busy{background:var(--red); animation:blink 1s steps(2,end) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.grid{display:grid; grid-template-columns:320px 1fr; gap:0; align-items:start}
+.grid>aside{padding-right:26px; border-right:1px solid var(--line)}
+.grid>main{padding-left:30px}
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .grid>aside{padding-right:0; border-right:none; border-bottom:1px solid var(--line); padding-bottom:26px}
+  .grid>main{padding-left:0; padding-top:26px}
 }
-.dot{width:9px; height:9px; border-radius:50%; background:var(--gray-2); flex:none}
-.dot.ok{background:#9BC9A5} .dot.busy{background:var(--orange-2); animation:pulse 1s infinite}
-.dot.err{background:var(--pink-2)}
-@keyframes pulse{50%{opacity:.35}}
-
-.grid{display:grid; grid-template-columns:330px 1fr; gap:20px; align-items:start}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-
-.panel{background:var(--card); border-radius:var(--r); box-shadow:var(--shadow); padding:18px}
-
-/* ---------- sidebar ---------- */
-.side{display:flex; flex-direction:column; gap:16px; position:sticky; top:20px}
+.side{display:flex; flex-direction:column; gap:30px; position:sticky; top:22px}
 @media(max-width:900px){.side{position:static}}
-.search{
-  width:100%; padding:11px 15px; border-radius:999px; border:1.5px solid var(--gray);
-  background:var(--bg); outline:none; transition:border-color .15s;
-}
-.search:focus{border-color:var(--blue-2)}
-.tags-row{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px}
-.tag{
-  font-size:12.5px; font-weight:700; padding:5px 11px; border-radius:999px;
-  background:var(--blue); color:var(--blue-ink); transition:.15s;
-}
-.tag:hover{filter:brightness(.96)}
-.tag.on{background:var(--blue-2); color:#fff}
-.tag.mini{background:var(--gray); color:var(--gray-ink); padding:3px 9px; font-size:11.5px}
 
-.sect-title{font-size:12px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; color:var(--ink-soft); margin:0 0 10px}
+.sect-title{
+  font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  margin:0 0 13px; padding-bottom:7px; border-bottom:1px solid var(--line); position:relative;
+}
+.sect-title::after{content:''; position:absolute; left:0; bottom:-1px; width:34px; height:1px; background:var(--red)}
 
-.list{display:flex; flex-direction:column; gap:9px; max-height:46vh; overflow:auto; padding-right:4px; margin:0 -4px 0 0}
-.list::-webkit-scrollbar{width:7px}
-.list::-webkit-scrollbar-thumb{background:var(--gray-2); border-radius:9px}
+/* ---------- поиск, теги ---------- */
+.search-wrap{display:flex; align-items:center; gap:9px; border-bottom:1px solid var(--line-dark); padding-bottom:9px}
+.search-wrap .ic{color:var(--muted)}
+.search{flex:1; border:none; outline:none; background:none; font-size:13px; padding:0}
+.search::placeholder{color:var(--muted)}
+.tags-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.tag{font-size:10.5px; font-weight:600; letter-spacing:.6px; padding:4px 9px;
+  border:1px solid var(--line); color:var(--muted); background:none; transition:.14s}
+.tag:hover{border-color:var(--ink); color:var(--ink)}
+.tag.on{border-color:var(--red); color:var(--red)}
+.tag.mini{padding:3px 7px; font-size:10px}
+
+/* ---------- список записей ---------- */
+.list{display:flex; flex-direction:column; max-height:44vh; overflow:auto}
+.list::-webkit-scrollbar{width:3px}
+.list::-webkit-scrollbar-thumb{background:var(--line-dark)}
 .item{
-  text-align:left; width:100%; padding:12px 14px; border-radius:14px; background:var(--bg);
-  border-left:5px solid var(--gray-2); transition:.15s; display:block;
+  text-align:left; width:100%; display:block; padding:13px 0 13px 14px;
+  border-bottom:1px solid var(--line); border-left:1px solid transparent; transition:.14s;
 }
-.item:hover{background:#fff; box-shadow:var(--shadow)}
-.item.on{background:#fff; box-shadow:var(--shadow-lg)}
-.item .t{font-weight:700; font-size:14.5px; display:flex; gap:7px; align-items:center}
+.item:hover{border-left-color:var(--ink); background:var(--wash)}
+.item.on{border-left:2px solid var(--red); background:var(--wash); padding-left:13px}
+.item .t{display:flex; gap:8px; align-items:center; font-weight:600; font-size:13px}
+.item .t .ic{color:var(--muted)}
+.item.on .t .ic{color:var(--red)}
 .item .t span.txt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.item .d{font-size:12px; color:var(--ink-soft); margin-top:3px; font-weight:600}
-.item .p{font-size:12.5px; color:var(--ink-soft); margin-top:5px; line-height:1.45;
+.item .d{display:flex; align-items:center; gap:6px; font-size:10px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--muted); margin-top:5px}
+.item .d .ic{color:var(--muted)}
+.item .p{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.5;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
-.empty{color:var(--ink-soft); font-size:13.5px; text-align:center; padding:22px 8px; line-height:1.6}
+.empty{color:var(--muted); font-size:12px; text-align:center; padding:26px 8px; line-height:1.7;
+  letter-spacing:.4px}
 
-/* ---------- calendar ---------- */
-.cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
-.cal-head b{font-size:14.5px; text-transform:capitalize}
-.cal-nav{width:30px; height:30px; border-radius:10px; background:var(--bg); font-weight:700; color:var(--ink-soft)}
-.cal-nav:hover{background:var(--gray)}
-.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
-.cal .wd{font-size:10.5px; text-align:center; color:var(--ink-soft); font-weight:700; padding-bottom:3px}
+/* ---------- календарь ---------- */
+.cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+.cal-head b{font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase}
+.cal-nav{width:26px; height:26px; border:1px solid var(--line); display:grid; place-items:center; color:var(--muted)}
+.cal-nav:hover{border-color:var(--red); color:var(--red)}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:3px}
+.cal .wd{font-size:9px; text-align:center; color:var(--muted); font-weight:700;
+  letter-spacing:.8px; text-transform:uppercase; padding-bottom:5px}
 .cal .day{
-  aspect-ratio:1; border-radius:11px; font-weight:700; color:var(--ink-soft);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
-  position:relative; background:transparent; transition:transform .12s ease;
+  aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2px; font-size:11.5px; font-weight:500; color:var(--muted);
+  border:1px solid transparent; position:relative; transition:.14s;
 }
-.cal .day .n{font-size:12.5px; line-height:1}
-.cal .day .m{font-size:10.5px; line-height:1}
 .cal .day.pad{visibility:hidden}
-.cal .day.has{background:var(--gray); color:var(--ink); cursor:pointer}
-.cal .day.has:hover{transform:scale(1.09)}
-.cal .day.today{outline:2px solid var(--orange-ink); outline-offset:-2px}
-.cal .day .more{position:absolute; top:2px; right:4px; font-size:8.5px; opacity:.75}
+.cal .day.has{border-color:var(--line); color:var(--ink); font-weight:600; cursor:pointer}
+.cal .day.has:hover{border-color:var(--red); color:var(--red)}
+.cal .day.today{border-color:var(--red)}
+.cal .day.today::after{content:''; position:absolute; bottom:-1px; left:-1px; right:-1px; height:2px; background:var(--red)}
+.cal .day .more{position:absolute; top:1px; right:3px; font-size:8px; color:var(--red); font-weight:700}
 
-/* ---------- статистика месяца ---------- */
-.stats{margin-top:16px; padding-top:15px; border-top:1.5px solid var(--gray)}
-.stat-top{display:flex; gap:10px; margin-bottom:13px}
-.stat-top div{flex:1; background:var(--bg); border-radius:12px; padding:9px 11px}
-.stat-top b{display:block; font-size:19px; line-height:1.2}
-.stat-top span{font-size:11px; color:var(--ink-soft); font-weight:600}
-.mb{display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; font-weight:600}
-.mb-l{width:96px; flex:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.mb-track{flex:1; height:9px; background:var(--bg); border-radius:99px; overflow:hidden}
-.mb-track i{display:block; height:100%; border-radius:99px; transition:width .35s ease}
-.mb-n{width:16px; flex:none; text-align:right; color:var(--ink-soft); font-weight:700}
-.stat-note{font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:11px 0 0; line-height:1.55}
+/* ---------- статистика ---------- */
+.stats{margin-top:20px; padding-top:16px; border-top:1px solid var(--line)}
+.stat-top{display:flex; margin-bottom:16px; border:1px solid var(--line)}
+.stat-top div{flex:1; padding:10px 12px}
+.stat-top div+div{border-left:1px solid var(--line)}
+.stat-top b{display:block; font-size:20px; font-weight:700; line-height:1.1}
+.stat-top span{font-size:9.5px; color:var(--muted); letter-spacing:1px; text-transform:uppercase}
+.mb{display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:11px; font-weight:500}
+.mb-l{display:flex; align-items:center; gap:6px; width:104px; flex:none}
+.mb-l span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mb-track{flex:1; height:1px; background:var(--line)}
+.mb-track i{display:block; height:1px; background:var(--ink); transition:width .35s ease}
+.mb.top .mb-track i{height:2px; margin-top:-.5px; background:var(--red)}
+.mb.top .mb-l{color:var(--red)}
+.mb-n{width:16px; flex:none; text-align:right; font-weight:700; font-size:11px}
+.stat-note{font-size:11px; color:var(--muted); margin:14px 0 0; line-height:1.6; letter-spacing:.3px}
+.stat-note b{color:var(--ink); font-weight:600}
 
-/* ---------- editor ---------- */
-.editor{display:flex; flex-direction:column; gap:14px; min-height:60vh}
-.title-in{
-  width:100%; border:none; outline:none; background:transparent; font-size:26px; font-weight:700;
-  letter-spacing:-.3px; padding:2px 0;
-}
-.title-in::placeholder{color:var(--gray-2)}
-.meta{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
-.date-in{
-  border:1.5px solid var(--gray); background:var(--bg); border-radius:999px; padding:8px 14px;
-  outline:none; font-weight:600; font-size:13.5px; color:var(--ink-soft);
-}
+/* ---------- редактор ---------- */
+.editor{display:flex; flex-direction:column; gap:20px; min-height:64vh}
+.title-in{width:100%; border:none; border-bottom:1px solid var(--line-dark); outline:none;
+  background:none; font-size:26px; font-weight:700; letter-spacing:-.4px; padding:0 0 12px}
+.title-in::placeholder{color:var(--line)}
+.meta{display:flex; flex-wrap:wrap; gap:20px; align-items:center}
+.date-in{border:none; border-bottom:1px solid var(--line); background:none; padding:5px 0;
+  outline:none; font-weight:600; font-size:11px; letter-spacing:1px; color:var(--muted)}
+.date-in:focus{border-color:var(--red); color:var(--ink)}
 .moods{display:flex; gap:6px; flex-wrap:wrap}
-.mood{
-  padding:7px 12px; border-radius:999px; font-size:13px; font-weight:700; background:var(--bg);
-  display:inline-flex; gap:6px; align-items:center; transition:.15s; color:var(--ink-soft);
-}
-.mood:hover{filter:brightness(.97)}
-.mood.on{color:#fff; box-shadow:var(--shadow)}
-.tag-in{
-  flex:1; min-width:180px; border:1.5px solid var(--gray); background:var(--bg);
-  border-radius:999px; padding:9px 15px; outline:none; font-size:13.5px;
-}
-.tag-in:focus{border-color:var(--pink-2)}
-.body-in{
-  flex:1; min-height:340px; width:100%; border:none; outline:none; resize:vertical;
-  background:var(--bg); border-radius:14px; padding:18px 20px; line-height:1.8; font-size:15px;
-  font-weight:400;
-}
-.body-in::placeholder{color:var(--gray-2)}
-.photo-box{display:flex; flex-direction:column; gap:9px}
-.photo-prev{border-radius:14px; overflow:hidden; background:var(--gray); box-shadow:var(--shadow)}
-.photo-prev img{display:block; width:100%; max-height:340px; object-fit:cover}
-.photo-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-.photo-drop{
-  border:2px dashed var(--gray-2); border-radius:14px; padding:15px; text-align:center;
-  color:var(--ink-soft); font-weight:700; font-size:13.5px; cursor:pointer;
-  background:var(--bg); transition:.15s;
-}
-.photo-drop:hover{border-color:var(--pink-2); color:var(--pink-ink); background:#fff}
-.photo-load{padding:15px; text-align:center; color:var(--ink-soft); font-weight:700; font-size:13.5px;
-  background:var(--bg); border-radius:14px}
-.foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.mood{display:inline-flex; align-items:center; gap:6px; padding:7px 11px; border:1px solid var(--line);
+  font-size:10.5px; font-weight:600; letter-spacing:.7px; text-transform:uppercase;
+  color:var(--muted); transition:.14s}
+.mood:hover{border-color:var(--ink); color:var(--ink)}
+.mood.on{background:var(--ink); border-color:var(--ink); color:#fff}
+.tag-in{width:100%; border:none; border-bottom:1px solid var(--line); background:none;
+  padding:8px 0; outline:none; font-size:12.5px}
+.tag-in:focus{border-bottom-color:var(--red)}
+.tag-in::placeholder{color:var(--muted)}
+.body-in{flex:1; min-height:320px; width:100%; border:1px solid var(--line); outline:none;
+  resize:vertical; background:none; padding:18px; line-height:1.85; font-size:14px}
+.body-in:focus{border-color:var(--line-dark)}
+.body-in::placeholder{color:var(--muted)}
+.foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  padding-top:18px; border-top:1px solid var(--line)}
 .foot .spacer{margin-left:auto}
-.hint{font-size:12.5px; color:var(--ink-soft); font-weight:600}
+.hint{font-size:10px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase}
 
-/* ---------- modal ---------- */
-.mask{position:fixed; inset:0; background:rgba(92,74,66,.35); backdrop-filter:blur(4px);
-  display:none; place-items:center; padding:20px; z-index:50}
+/* ---------- фото ---------- */
+.photo-box{display:flex; flex-direction:column; gap:10px}
+.photo-prev{border:1px solid var(--line); line-height:0}
+.photo-prev img{display:block; width:100%; max-height:340px; object-fit:cover;
+  filter:grayscale(1) contrast(1.04); transition:filter .3s}
+.photo-prev:hover img{filter:none}
+.photo-actions{display:flex; gap:8px; flex-wrap:wrap}
+.photo-drop{display:flex; align-items:center; justify-content:center; gap:9px;
+  border:1px dashed var(--line); padding:16px; color:var(--muted); cursor:pointer;
+  font-size:10.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; transition:.14s}
+.photo-drop:hover{border-color:var(--red); color:var(--red)}
+.photo-load{border:1px solid var(--line); padding:16px; text-align:center; color:var(--muted);
+  font-size:10.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase}
+
+/* ---------- окно настроек ---------- */
+.mask{position:fixed; inset:0; background:rgba(17,17,17,.55); display:none; place-items:center;
+  padding:20px; z-index:50}
 .mask.open{display:grid}
-.modal{background:var(--card); border-radius:22px; box-shadow:var(--shadow-lg); padding:26px;
-  width:min(520px,100%); max-height:88vh; overflow:auto}
-.modal h2{margin:0 0 4px; font-size:20px}
-.modal p.sub{margin:0 0 18px; color:var(--ink-soft); font-size:13.5px; line-height:1.6}
-.field{margin-bottom:13px}
-.field label{display:block; font-size:12px; font-weight:700; text-transform:uppercase;
-  letter-spacing:.6px; color:var(--ink-soft); margin-bottom:5px}
-.field input{width:100%; padding:11px 14px; border-radius:12px; border:1.5px solid var(--gray);
-  background:var(--bg); outline:none}
-.field input:focus{border-color:var(--blue-2)}
-.field .note{font-size:12px; color:var(--ink-soft); margin-top:5px; line-height:1.5}
-.tok-btns{display:flex; gap:7px; margin-top:8px}
-.field .note a{color:var(--blue-ink)}
-.note-box{background:var(--blue); border-radius:14px; padding:13px 15px; font-size:12.5px;
-  line-height:1.6; color:var(--blue-ink); font-weight:600; margin-bottom:16px}
+.modal{background:var(--bg); border:1px solid var(--ink); padding:28px; width:min(520px,100%);
+  max-height:88vh; overflow:auto}
+.modal h2{margin:0 0 6px; font-size:13px; font-weight:700; letter-spacing:2.4px; text-transform:uppercase}
+.modal .rule{height:2px; background:var(--red); width:40px; margin-bottom:16px}
+.modal p.sub{margin:0 0 18px; color:var(--muted); font-size:12px; line-height:1.65}
+.field{margin-bottom:15px}
+.field label{display:block; font-size:9.5px; font-weight:700; letter-spacing:1.4px;
+  text-transform:uppercase; color:var(--muted); margin-bottom:6px}
+.field input{width:100%; padding:9px 0; border:none; border-bottom:1px solid var(--line);
+  background:none; outline:none; font-size:13px}
+.field input:focus{border-bottom-color:var(--red)}
+.field .note{font-size:11px; color:var(--muted); margin-top:7px; line-height:1.6}
+.field .note a{color:var(--ink)}
+.note-box{border-left:2px solid var(--red); padding:2px 0 2px 13px; font-size:11.5px;
+  line-height:1.65; color:var(--muted); margin-bottom:20px}
+.tok-btns{display:flex; gap:7px; margin-top:10px}
 
-.toast{position:fixed; left:50%; bottom:26px; transform:translate(-50%,80px); z-index:99;
-  background:var(--ink); color:#fff; padding:12px 22px; border-radius:999px; font-weight:700;
-  font-size:14px; opacity:0; transition:.3s; pointer-events:none; max-width:90vw; text-align:center}
+.toast{position:fixed; left:50%; bottom:28px; transform:translate(-50%,90px); z-index:99;
+  background:var(--ink); color:#fff; padding:12px 20px; font-size:10.5px; font-weight:600;
+  letter-spacing:1.2px; text-transform:uppercase; opacity:0; transition:.28s;
+  pointer-events:none; max-width:90vw; text-align:center; border-left:2px solid var(--red)}
 .toast.show{transform:translate(-50%,0); opacity:1}
 </style>
 </head>
@@ -220,84 +223,86 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
 
   <header class="top">
     <div class="logo">
-      <div class="mark">🌸</div>
+      <div class="mark" id="logoMark"></div>
       <div>
-        <h1>Мой дневник</h1>
+        <h1>Дневник</h1>
         <small id="counter">0 записей</small>
       </div>
     </div>
-    <div class="sync" id="sync"><span class="dot" id="syncDot"></span><span id="syncText">Только на этом устройстве</span></div>
-    <button class="btn ghost" onclick="openSettings()">⚙️ Настройки</button>
-    <button class="btn primary" onclick="newEntry()">✏️ Новая запись</button>
+    <div class="sync"><span class="dot" id="syncDot"></span><span id="syncText">Локально</span></div>
+    <button class="btn quiet" id="setBtn" onclick="openSettings()">Настройки</button>
+    <button class="btn primary" id="newBtn" onclick="newEntry()">Новая запись</button>
   </header>
 
   <div class="grid">
-    <!-- SIDEBAR -->
-    <aside class="side">
-      <div class="panel">
-        <input class="search" id="search" placeholder="🔍 Поиск по записям…" oninput="render()">
-        <div class="tags-row" id="tagFilters"></div>
-      </div>
-
-      <div class="panel">
-        <div class="cal-head">
-          <button class="cal-nav" onclick="shiftMonth(-1)">‹</button>
-          <b id="calLabel"></b>
-          <button class="cal-nav" onclick="shiftMonth(1)">›</button>
+    <aside>
+      <div class="side">
+        <div>
+          <div class="search-wrap" id="searchWrap">
+            <input class="search" id="search" placeholder="Поиск по записям" oninput="render()">
+          </div>
+          <div class="tags-row" id="tagFilters"></div>
         </div>
-        <div class="cal" id="cal"></div>
-        <div class="stats" id="stats"></div>
-      </div>
 
-      <div class="panel">
-        <p class="sect-title">Записи</p>
-        <div class="list" id="list"></div>
+        <div>
+          <div class="cal-head">
+            <button class="cal-nav" id="prevBtn" onclick="shiftMonth(-1)"></button>
+            <b id="calLabel"></b>
+            <button class="cal-nav" id="nextBtn" onclick="shiftMonth(1)"></button>
+          </div>
+          <div class="cal" id="cal"></div>
+          <div class="stats" id="stats"></div>
+        </div>
+
+        <div>
+          <p class="sect-title">Записи</p>
+          <div class="list" id="list"></div>
+        </div>
       </div>
     </aside>
 
-    <!-- EDITOR -->
-    <main class="panel editor">
-      <input class="title-in" id="fTitle" placeholder="Название записи…">
+    <main class="editor">
+      <input class="title-in" id="fTitle" placeholder="Название записи">
       <div class="meta">
         <input class="date-in" id="fDate" type="date">
         <div class="moods" id="moods"></div>
       </div>
-      <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги…">
+      <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги">
       <div class="photo-box" id="photoBox"></div>
       <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
-      <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить…"></textarea>
+      <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить"></textarea>
       <div class="foot">
-        <button class="btn primary" onclick="saveEntry()">💾 Сохранить</button>
-        <button class="btn ghost danger" id="delBtn" onclick="deleteEntry()" style="display:none">🗑 Удалить</button>
+        <button class="btn primary" id="saveBtn" onclick="saveEntry()">Сохранить</button>
+        <button class="btn danger" id="delBtn" onclick="deleteEntry()" style="display:none">Удалить</button>
         <span class="hint spacer" id="editHint">Новая запись</span>
       </div>
     </main>
   </div>
 </div>
 
-<!-- SETTINGS -->
 <div class="mask" id="mask" onclick="if(event.target===this)closeSettings()">
   <div class="modal">
-    <h2>Синхронизация с GitHub</h2>
-    <p class="sub">Записи будут сохраняться отдельными .md файлами в папку <b>entries/</b>. Указывай тут свой <b>приватный</b> репозиторий — тот, что с записями, а не тот, где лежит само приложение.</p>
-    <div class="note-box">Токен хранится только в этом браузере и никуда больше не отправляется — только напрямую в GitHub.</div>
-    <div class="field"><label>Владелец (твой ник на GitHub)</label><input id="cOwner" placeholder="nika"></div>
-    <div class="field"><label>Репозиторий</label><input id="cRepo" placeholder="dairy"></div>
+    <h2>Синхронизация</h2>
+    <div class="rule"></div>
+    <p class="sub">Записи сохраняются отдельными .md файлами в папку <b>entries/</b>. Указывай здесь свой <b>приватный</b> репозиторий — тот, что с записями, а не тот, где лежит приложение.</p>
+    <div class="note-box">Токен хранится только в этом браузере и уходит напрямую в GitHub — больше никуда.</div>
+    <div class="field"><label>Владелец</label><input id="cOwner" placeholder="ник на GitHub"></div>
+    <div class="field"><label>Репозиторий</label><input id="cRepo" placeholder="diary-entries"></div>
     <div class="field"><label>Ветка</label><input id="cBranch" placeholder="main"></div>
     <div class="field"><label>Папка для записей</label><input id="cPath" placeholder="entries"></div>
     <div class="field">
       <label>Personal access token</label>
       <input id="cToken" type="password" placeholder="github_pat_…">
       <div class="tok-btns">
-        <button class="btn ghost tiny" id="eyeBtn" onclick="toggleToken()">👁 Показать</button>
-        <button class="btn ghost tiny" onclick="copyToken()">📋 Копировать</button>
+        <button class="btn quiet tiny" id="eyeBtn" onclick="toggleToken()">Показать</button>
+        <button class="btn quiet tiny" id="copyBtn" onclick="copyToken()">Копировать</button>
       </div>
-      <div class="note">Создай на <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>, дай доступ к своему репозиторию и права <b>Contents: Read and write</b>.</div>
+      <div class="note">Создай на <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>, дай доступ к репозиторию и права <b>Contents: Read and write</b>.</div>
     </div>
-    <div class="foot" style="margin-top:18px">
-      <button class="btn primary" onclick="saveSettings()">Сохранить и синхронизировать</button>
-      <button class="btn ghost" onclick="closeSettings()">Отмена</button>
-      <button class="btn ghost spacer" onclick="exportAll()">⬇️ Скачать все записи</button>
+    <div class="foot" style="margin-top:22px">
+      <button class="btn primary" onclick="saveSettings()">Подключить</button>
+      <button class="btn quiet" onclick="closeSettings()">Отмена</button>
+      <button class="btn quiet spacer" id="expBtn" onclick="exportAll()">Скачать всё</button>
     </div>
   </div>
 </div>
@@ -305,21 +310,49 @@ header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bo
 <div class="toast" id="toast"></div>
 
 <script>
+/* =============== иконки =============== */
+const I={
+  book:'<path d="M5 3h11a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17h13"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/>',
+  pen:'<path d="M4 20h4L20 8a2.83 2.83 0 0 0-4-4L4 16z"/><path d="M14.5 5.5l4 4"/>',
+  search:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-3.7-3.7"/>',
+  check:'<path d="M4 12.5l5 5L20 6.5"/>',
+  trash:'<path d="M4 7h16M9.5 7V4h5v3M6.5 7l1 13h9l1-13"/>',
+  camera:'<path d="M3 8h4l1.6-2.2h6.8L17 8h4v12H3z"/><circle cx="12" cy="13.6" r="3.4"/>',
+  swap:'<path d="M20.5 12a8.5 8.5 0 1 1-2.4-5.9"/><path d="M20.5 3.5v5h-5"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  eye:'<path d="M2 12s3.7-6.2 10-6.2S22 12 22 12s-3.7 6.2-10 6.2S2 12 2 12z"/><circle cx="12" cy="12" r="2.4"/>',
+  eyeOff:'<path d="M4 4l16 16"/><path d="M10 5.9a10.6 10.6 0 0 1 2-.1c6.3 0 10 6.2 10 6.2a17.6 17.6 0 0 1-3.4 4M6.6 7.9A17.4 17.4 0 0 0 2 12s3.7 6.2 10 6.2a10 10 0 0 0 3.5-.6"/>',
+  copy:'<rect x="9" y="9" width="11" height="11"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/>',
+  left:'<path d="M14.5 5l-7 7 7 7"/>',
+  right:'<path d="M9.5 5l7 7-7 7"/>',
+  cloud:'<path d="M7 18h10a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.5 3.5 0 0 0 7 18z"/>',
+  download:'<path d="M12 3v12M7.5 11l4.5 4.5L16.5 11M4 20.5h16"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
+  plus:'<path d="M12 5.5v13M5.5 12h13"/>',
+  /* настроения */
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>',
+  wave:'<path d="M2.5 9.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/><path d="M2.5 15.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/>',
+  bolt:'<path d="M13.5 2.5L4.5 14h6l-1 7.5 9-11.5h-6z"/>',
+  leaf:'<path d="M20.5 3.5C10 3.5 4 8.5 4 15.5c0 2 .9 3.9.9 3.9s6.1-.9 9.1-3.9 6.5-8 6.5-12z"/><path d="M4.9 19.4C7.7 13.6 11.6 10.3 15.5 8.5"/>',
+  rain:'<path d="M7 15h10a3.9 3.9 0 0 0 .4-7.8A5.9 5.9 0 0 0 5.8 8.7 3.5 3.5 0 0 0 7 15z"/><path d="M9 18.5l-.9 2.5M13 18.5l-.9 2.5M17 18.5l-.9 2.5"/>'
+};
+const icon=(n,s=17)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${I[n]||''}</svg>`;
+
 /* =============== настроения =============== */
-const MOODS = [
-  {k:'joy',   e:'🌸', l:'Радость',      c:'var(--pink-2)'},
-  {k:'calm',  e:'🌤', l:'Спокойствие',  c:'var(--blue-2)'},
-  {k:'energy',e:'🔥', l:'Энергия',      c:'var(--orange-2)'},
-  {k:'cozy',  e:'🍂', l:'Уют',          c:'var(--brown-2)'},
-  {k:'sad',   e:'🌫', l:'Грусть',       c:'var(--gray-2)'}
+const MOODS=[
+  {k:'joy',    i:'sun',  l:'Радость'},
+  {k:'calm',   i:'wave', l:'Спокойствие'},
+  {k:'energy', i:'bolt', l:'Энергия'},
+  {k:'cozy',   i:'leaf', l:'Уют'},
+  {k:'sad',    i:'rain', l:'Грусть'}
 ];
+const NO_MOOD={k:'none', i:'doc', l:'Без настроения'};
 const moodBy = k => MOODS.find(m=>m.k===k);
 
 /* =============== состояние =============== */
-let entries = [];          // {file, title, date, mood, tags[], body, sha}
-let currentFile = null;    // редактируемая запись
-let activeTags = new Set();
-let calDate = new Date();
+let entries=[], currentFile=null, activeTags=new Set(), calDate=new Date();
 const LS_E='diary_entries_v1', LS_C='diary_cfg_v1';
 
 const $ = id => document.getElementById(id);
@@ -347,9 +380,15 @@ function slug(s){
 }
 function fmtDate(d){
   const dt=new Date(d+'T12:00:00');
-  if(isNaN(dt)) return d;
-  return dt.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  return isNaN(dt) ? d : dt.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
 }
+function plural(n,one,few,many){
+  const a=Math.abs(n)%100, b=a%10;
+  if(a>10&&a<20) return many;
+  if(b>1&&b<5) return few;
+  return b===1?one:many;
+}
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* =============== markdown <-> объект =============== */
 function toMd(e){
@@ -360,8 +399,7 @@ function toMd(e){
     'tags: '+(e.tags||[]).join(', ')];
   if(e.photo) head.push('photo: '+e.photo);
   head.push('---','', '# '+(e.title||'Без названия'), '');
-  // относительная ссылка — так фото видно прямо на GitHub
-  if(e.photo) head.push('![фото](../'+e.photo+')','');
+  if(e.photo) head.push('![фото](../'+e.photo+')','');   // относительная ссылка — видно на GitHub
   return head.concat([e.body||'']).join('\n');
 }
 function fromMd(text, file){
@@ -378,34 +416,32 @@ function fromMd(text, file){
       else if(k==='tags') e.tags=v.replace(/^\[|\]$/g,'').split(',').map(t=>t.trim()).filter(Boolean);
     });
     let rest=text.slice(m[0].length).replace(/^[\r\n]+/,'');
-    const h='# '+e.title;                       // убираем дублирующий заголовок
+    const h='# '+e.title;
     if(rest.startsWith(h)) rest=rest.slice(h.length).replace(/^[\r\n]+/,'');
-    if(e.photo) rest=rest.replace(/^!\[[^\]]*\]\([^)]*\)[\r\n]*/,'');   // и картинку-дубль
+    if(e.photo) rest=rest.replace(/^!\[[^\]]*\]\([^)]*\)[\r\n]*/,'');
     e.body=rest.trim();
   }
   return e;
 }
 
-/* =============== GitHub API =============== */
+/* =============== GitHub =============== */
 async function gh(path, opts={}){
   const c=cfg();
-  const res=await fetch('https://api.github.com/repos/'+c.owner+'/'+c.repo+path,{
+  return fetch('https://api.github.com/repos/'+c.owner+'/'+c.repo+path,{
     ...opts,
     headers:{Authorization:'Bearer '+c.token, Accept:'application/vnd.github+json', ...(opts.headers||{})}
   });
-  return res;
 }
 const dirPath  = () => (cfg().path||'entries').replace(/^\/+|\/+$/g,'');
 const mediaDir = () => (cfg().media||'media').replace(/^\/+|\/+$/g,'');
 const branch   = () => cfg().branch||'main';
 
-/* положить файл; если sha устарел или неизвестен — подтянуть свежий и повторить */
 async function putFile(path, contentB64, message, sha){
   const body={message, content:contentB64, branch:branch()};
   if(sha) body.sha=sha;
   const send=()=>gh('/contents/'+encodeURI(path),{method:'PUT',body:JSON.stringify(body)});
   let res=await send();
-  if(!res.ok && (res.status===409 || res.status===422)){
+  if(!res.ok && (res.status===409 || res.status===422)){      // sha устарел — берём свежий
     const g=await gh('/contents/'+encodeURI(path)+'?ref='+encodeURIComponent(branch()));
     if(g.ok){ body.sha=(await g.json()).sha; res=await send(); }
   }
@@ -422,11 +458,11 @@ async function delFile(path, sha, message){
 }
 
 async function pullAll(){
-  if(!hasGH()) { setSync('', 'Только на этом устройстве'); return; }
-  setSync('busy','Загружаю из GitHub…');
+  if(!hasGH()){ setSync('','Локально'); return; }
+  setSync('busy','Загружаю');
   try{
     const res=await gh('/contents/'+dirPath()+'?ref='+encodeURIComponent(branch()));
-    if(res.status===404){ setSync('ok','GitHub подключён'); return; }   // папки ещё нет — нормально
+    if(res.status===404){ setSync('ok','GitHub подключён'); return; }
     if(!res.ok) throw new Error((await res.json()).message||res.status);
     const files=(await res.json()).filter(f=>f.type==='file' && f.name.endsWith('.md'));
     const loaded=[];
@@ -437,22 +473,20 @@ async function pullAll(){
       const e=fromMd(b64dec(j.content), f.name);
       e.sha=j.sha; loaded.push(e);
     }
-    // сливаем: GitHub — источник правды, локальные новые записи оставляем
     const names=new Set(loaded.map(e=>e.file));
     entries=loaded.concat(entries.filter(e=>!names.has(e.file) && !e.sha));
     saveLocal(); render();
     setSync('ok','Синхронизировано · '+loaded.length);
   }catch(err){
-    setSync('err','Ошибка: '+err.message);
-    toast('Не удалось загрузить из GitHub: '+err.message);
+    setSync('err','Ошибка');
+    toast('Не удалось загрузить: '+err.message);
   }
 }
 
 async function pushEntry(e){
   if(!hasGH()) return;
-  setSync('busy', e.photoDirty&&e.photoData ? 'Загружаю фото…' : 'Сохраняю в GitHub…');
+  setSync('busy', e.photoDirty&&e.photoData ? 'Загружаю фото' : 'Сохраняю');
   try{
-    // 1) фото — отдельным файлом, чтобы оно было видно и на самом GitHub
     if(e.photoDirty){
       if(e.photoData){
         const path=mediaDir()+'/'+e.file.replace(/\.md$/,'')+'.jpg';
@@ -462,17 +496,15 @@ async function pushEntry(e){
         await delFile(e.photo, e.photoSha, 'diary: удалено фото '+e.date);
         delete mediaCache[e.photo]; e.photo=''; e.photoSha=null;
       }
-      e.photoDirty=false;
-      setSync('busy','Сохраняю в GitHub…');
+      e.photoDirty=false; setSync('busy','Сохраняю');
     }
-    // 2) сама запись
     e.sha=await putFile(dirPath()+'/'+e.file, b64enc(toMd(e)),
                         'diary: '+e.date+' — '+(e.title||'запись'), e.sha);
-    e.photoData='';                       // уже в GitHub — не держим копию в хранилище
-    saveLocal(); render(); setSync('ok','Сохранено в GitHub');
+    e.photoData='';
+    saveLocal(); render(); setSync('ok','Сохранено');
   }catch(err){
-    setSync('err','Ошибка сохранения');
-    toast('GitHub: '+err.message+' (запись сохранена локально)');
+    setSync('err','Ошибка');
+    toast('GitHub: '+err.message+' — запись сохранена локально');
   }
 }
 
@@ -481,11 +513,11 @@ async function pushDelete(e){
   try{
     if(e.photo){ await delFile(e.photo, e.photoSha, 'diary: удалено фото '+e.date); delete mediaCache[e.photo]; }
     if(e.sha) await delFile(dirPath()+'/'+e.file, e.sha, 'diary: удалена запись '+e.file);
-    setSync('ok','Удалено в GitHub');
+    setSync('ok','Удалено');
   }catch(err){ toast('Не удалось удалить в GitHub: '+err.message); }
 }
 
-/* ---- фото: сжатие и подгрузка ---- */
+/* =============== фото =============== */
 const mediaCache={};
 
 function compressImage(file, maxDim=1400){
@@ -506,7 +538,6 @@ function compressImage(file, maxDim=1400){
     img.src=url;
   });
 }
-
 async function fetchPhoto(path){
   if(mediaCache[path]) return mediaCache[path];
   if(!hasGH()) return null;
@@ -520,10 +551,8 @@ async function fetchPhoto(path){
 /* =============== локальное хранилище =============== */
 function saveLocal(){
   try{ localStorage.setItem(LS_E, JSON.stringify(entries)); return; }catch(err){}
-  // не влезло — фото уже уехавших записей можно не хранить, они есть в GitHub
-  try{
-    localStorage.setItem(LS_E, JSON.stringify(entries.map(e=> e.sha?{...e,photoData:''}:e)));
-  }catch(err){
+  try{ localStorage.setItem(LS_E, JSON.stringify(entries.map(e=> e.sha?{...e,photoData:''}:e))); }
+  catch(err){
     try{
       localStorage.setItem(LS_E, JSON.stringify(entries.map(e=>({...e,photoData:''}))));
       toast('Фото не помещаются в память браузера — они хранятся в GitHub');
@@ -533,45 +562,40 @@ function saveLocal(){
 function loadLocal(){ try{ entries=JSON.parse(localStorage.getItem(LS_E)||'[]'); }catch(e){ entries=[]; } }
 
 /* =============== редактор =============== */
+let pickedMood='';
 function renderMoods(sel){
   $('moods').innerHTML = MOODS.map(m=>
-    `<button class="mood${m.k===sel?' on':''}" style="${m.k===sel?'background:'+m.c:''}" onclick="pickMood('${m.k}')">${m.e} ${m.l}</button>`
+    `<button class="mood${m.k===sel?' on':''}" onclick="pickMood('${m.k}')">${icon(m.i,14)}${m.l}</button>`
   ).join('');
 }
-let pickedMood='';
-function pickMood(k){ pickedMood = (pickedMood===k?'':k); renderMoods(pickedMood); }
+function pickMood(k){ pickedMood=(pickedMood===k?'':k); renderMoods(pickedMood); }
 
-/* состояние фото в редакторе */
 let ph={path:'', data:'', dirty:false, loading:false};
 
 function renderPhoto(){
   const b=$('photoBox');
-  if(ph.loading){ b.innerHTML='<div class="photo-load">Загружаю фото…</div>'; return; }
+  if(ph.loading){ b.innerHTML='<div class="photo-load">Загружаю фото</div>'; return; }
   if(ph.data || ph.path){
     b.innerHTML=
       (ph.data?`<div class="photo-prev"><img src="${ph.data}" alt="фото записи"></div>`
-              :'<div class="photo-load">Фото есть, но не загрузилось</div>')+
+              :'<div class="photo-load">Фото не загрузилось</div>')+
       `<div class="photo-actions">
-        <button class="btn ghost tiny" onclick="$('photoFile').click()">🔄 Заменить</button>
-        <button class="btn ghost tiny danger" onclick="removePhoto()">✕ Убрать фото</button>
+        <button class="btn quiet tiny" onclick="$('photoFile').click()">${icon('swap',13)}Заменить</button>
+        <button class="btn quiet tiny" onclick="removePhoto()">${icon('x',13)}Убрать</button>
       </div>`;
   }else{
-    b.innerHTML=`<div class="photo-drop" onclick="$('photoFile').click()">📷 Добавить фото <span style="font-weight:600">— одно на запись</span></div>`;
+    b.innerHTML=`<div class="photo-drop" onclick="$('photoFile').click()">${icon('camera',16)}Добавить фото — одно на запись</div>`;
   }
 }
 async function pickPhoto(input){
   const f=input.files && input.files[0]; input.value='';
   if(!f) return;
   ph.loading=true; renderPhoto();
-  try{
-    ph.data=await compressImage(f); ph.dirty=true;
-  }catch(err){
-    toast('Не получилось открыть фото ('+err.message+'). Попробуй JPEG или PNG');
-  }
+  try{ ph.data=await compressImage(f); ph.dirty=true; }
+  catch(err){ toast('Не получилось открыть фото — попробуй JPEG или PNG'); }
   ph.loading=false; renderPhoto();
 }
 function removePhoto(){ ph.data=''; ph.dirty=true; renderPhoto(); }
-
 function resetPhoto(){ ph={path:'', data:'', dirty:false, loading:false}; renderPhoto(); }
 
 function newEntry(){
@@ -584,24 +608,24 @@ function newEntry(){
 async function openEntry(file){
   const e=entries.find(x=>x.file===file); if(!e) return;
   currentFile=file; pickedMood=e.mood||'';
-  $('fTitle').value=e.title; $('fDate').value=e.date; $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
+  $('fTitle').value=e.title; $('fDate').value=e.date;
+  $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
-  $('editHint').textContent='Редактирую · '+fmtDate(e.date);
+  $('editHint').textContent='Правка · '+fmtDate(e.date);
 
   ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo && !e.photoData)};
-  renderPhoto();
-  render(); window.scrollTo({top:0,behavior:'smooth'});
+  renderPhoto(); render(); window.scrollTo({top:0,behavior:'smooth'});
 
-  if(ph.loading){                       // фото подтягиваем из GitHub только когда открыли запись
+  if(ph.loading){
     const d=await fetchPhoto(e.photo);
-    if(currentFile!==file) return;       // успела переключиться — не мешаем
+    if(currentFile!==file) return;
     ph.data=d||''; ph.loading=false; renderPhoto();
   }
 }
 
 async function saveEntry(){
   const title=$('fTitle').value.trim(), body=$('fBody').value.trim();
-  if(!title && !body){ toast('Запись пустая 🙂'); return; }
+  if(!title && !body){ toast('Запись пустая'); return; }
   const date=$('fDate').value||today();
   const tags=$('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
 
@@ -610,15 +634,18 @@ async function saveEntry(){
     e=entries.find(x=>x.file===currentFile);
     Object.assign(e,{title:title||'Без названия', date, tags, mood:pickedMood, body});
   }else{
-    let file=date+'-'+slug(title||body.slice(0,30))+'.md', n=2;
-    while(entries.some(x=>x.file===file)) file=date+'-'+slug(title||body.slice(0,30))+'-'+(n++)+'.md';
+    const base=()=>date+'-'+slug(title||body.slice(0,30));
+    let file=base()+'.md', n=2;
+    while(entries.some(x=>x.file===file)) file=base()+'-'+(n++)+'.md';
     e={file, title:title||'Без названия', date, tags, mood:pickedMood, body, photo:'', sha:null};
     entries.push(e); currentFile=file;
   }
   if(ph.dirty){ e.photoData=ph.data; e.photoDirty=true; if(!ph.data && !hasGH()) e.photo=''; ph.dirty=false; }
   else if(ph.data && !e.photoData) e.photoData=ph.data;
-  saveLocal(); render(); $('delBtn').style.display=''; $('editHint').textContent='Сохранено · '+fmtDate(e.date);
-  toast(hasGH()?'Сохранено 💾':'Сохранено локально 💾');
+
+  saveLocal(); render();
+  $('delBtn').style.display=''; $('editHint').textContent='Сохранено · '+fmtDate(e.date);
+  toast(hasGH()?'Сохранено':'Сохранено локально');
   await pushEntry(e);
   if(currentFile===e.file) ph.path=e.photo||'';
 }
@@ -647,28 +674,25 @@ function filtered(){
 function render(){
   $('counter').textContent = entries.length+' '+plural(entries.length,'запись','записи','записей');
 
-  // теги
   const all=[...new Set(entries.flatMap(e=>e.tags||[]))].sort((a,b)=>a.localeCompare(b,'ru'));
   $('tagFilters').innerHTML = all.length
-    ? all.map(t=>`<button class="tag${activeTags.has(t)?' on':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">#${t}</button>`).join('')
-    : '<span class="hint">Теги появятся, когда добавишь их к записям</span>';
+    ? all.map(t=>`<button class="tag${activeTags.has(t)?' on':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">${esc(t)}</button>`).join('')
+    : '<span class="empty" style="padding:6px 0">Теги появятся вместе с записями</span>';
 
-  // список
   const list=filtered();
   $('list').innerHTML = list.length ? list.map(e=>{
     const m=moodBy(e.mood);
-    return `<button class="item${e.file===currentFile?' on':''}" style="border-left-color:${m?m.c:'var(--gray-2)'}" onclick="openEntry('${e.file}')">
-      <div class="t">${m?m.e:'📄'}<span class="txt">${esc(e.title)}</span></div>
-      <div class="d">${fmtDate(e.date)}${(e.photo||e.photoData)?' · 📷':''}${e.sha?' · ☁️':''}</div>
-      <div class="p">${esc((e.body||'').slice(0,140))}</div>
-      ${(e.tags||[]).length?`<div class="tags-row">${e.tags.slice(0,4).map(t=>`<span class="tag mini">#${esc(t)}</span>`).join('')}</div>`:''}
+    return `<button class="item${e.file===currentFile?' on':''}" onclick="openEntry('${e.file}')">
+      <span class="t">${icon(m?m.i:'doc',15)}<span class="txt">${esc(e.title)}</span></span>
+      <span class="d">${fmtDate(e.date)}
+        ${(e.photo||e.photoData)?icon('camera',12):''}${e.sha?icon('cloud',12):''}</span>
+      <span class="p">${esc((e.body||'').slice(0,140))}</span>
+      ${(e.tags||[]).length?`<span class="tags-row">${e.tags.slice(0,4).map(t=>`<span class="tag mini">${esc(t)}</span>`).join('')}</span>`:''}
     </button>`;
-  }).join('')
-    : '<div class="empty">Пока пусто.<br>Нажми «Новая запись» ✏️</div>';
+  }).join('') : '<div class="empty">Пока пусто<br>Нажми «Новая запись»</div>';
 
   renderCal();
 }
-function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 function toggleTag(t){ activeTags.has(t)?activeTags.delete(t):activeTags.add(t); render(); }
 function shiftMonth(n){ calDate=new Date(calDate.getFullYear(), calDate.getMonth()+n, 1); renderCal(); }
@@ -676,7 +700,7 @@ function shiftMonth(n){ calDate=new Date(calDate.getFullYear(), calDate.getMonth
 function renderCal(){
   const y=calDate.getFullYear(), mo=calDate.getMonth();
   const pref=`${y}-${String(mo+1).padStart(2,'0')}`;
-  $('calLabel').textContent = calDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+  $('calLabel').textContent=calDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
   const pad=(new Date(y,mo,1).getDay()+6)%7, days=new Date(y,mo+1,0).getDate();
 
   const byDay={}, monthEntries=[];
@@ -691,11 +715,10 @@ function renderCal(){
   for(let d=1;d<=days;d++){
     const iso=`${pref}-${String(d).padStart(2,'0')}`;
     const list=byDay[d]||[], m=list.length?moodBy(list[0].mood):null;
-    const tip=list.length ? (m?m.l+' · ':'')+list.map(x=>x.title).join(' · ') : '';
+    const tip=list.length?(m?m.l+' · ':'')+list.map(x=>x.title).join(' · '):'';
     html+=`<div class="day${list.length?' has':''}${iso===t?' today':''}"
-      ${list.length?`onclick="openEntry('${list[0].file}')" title="${esc(tip)}"`:''}
-      style="${m?'background:'+m.c+';color:#fff':''}">
-      <span class="n">${d}</span>${m?`<span class="m">${m.e}</span>`:''}
+      ${list.length?`onclick="openEntry('${list[0].file}')" title="${esc(tip)}"`:''}>
+      <span>${d}</span>${list.length?icon(m?m.i:'doc',11):''}
       ${list.length>1?`<span class="more">${list.length}</span>`:''}</div>`;
   }
   $('cal').innerHTML=html;
@@ -704,42 +727,30 @@ function renderCal(){
 
 function renderStats(list, daysUsed, daysTotal){
   const box=$('stats');
-  if(!list.length){
-    box.innerHTML='<p class="stat-note" style="text-align:center;margin:0">В этом месяце записей пока нет 🌱</p>';
-    return;
-  }
+  if(!list.length){ box.innerHTML='<p class="stat-note" style="text-align:center;margin:0">В этом месяце записей нет</p>'; return; }
+
   const counts={};
   list.forEach(e=>{ const k=e.mood||'none'; counts[k]=(counts[k]||0)+1; });
-  const rows=MOODS.concat([{k:'none',e:'✧',l:'Без настроения',c:'var(--gray-2)'}])
-    .filter(m=>counts[m.k]).sort((a,b)=>counts[b.k]-counts[a.k]);
+  const rows=MOODS.concat([NO_MOOD]).filter(m=>counts[m.k]).sort((a,b)=>counts[b.k]-counts[a.k]);
   const max=Math.max(...rows.map(m=>counts[m.k]));
 
   const tags={};
   list.forEach(e=>(e.tags||[]).forEach(t=>tags[t]=(tags[t]||0)+1));
   const top=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,4);
   const photos=list.filter(e=>e.photo||e.photoData).length;
-  const best=rows[0];
 
   box.innerHTML=
     `<div class="stat-top">
        <div><b>${list.length}</b><span>${plural(list.length,'запись','записи','записей')}</span></div>
        <div><b>${daysUsed}</b><span>${plural(daysUsed,'день','дня','дней')} из ${daysTotal}</span></div>
      </div>`+
-    rows.map(m=>`<div class="mb">
-        <span class="mb-l">${m.e} ${m.l}</span>
-        <span class="mb-track"><i style="width:${Math.round(counts[m.k]/max*100)}%;background:${m.c}"></i></span>
+    rows.map((m,i)=>`<div class="mb${i===0?' top':''}">
+        <span class="mb-l">${icon(m.i,13)}<span>${m.l}</span></span>
+        <span class="mb-track"><i style="width:${Math.round(counts[m.k]/max*100)}%"></i></span>
         <span class="mb-n">${counts[m.k]}</span>
       </div>`).join('')+
-    `<p class="stat-note">Чаще всего — <b>${best.l.toLowerCase()}</b> ${best.e}` +
-      (photos?`, фото: ${photos}`:'') + `</p>` +
-    (top.length?`<div class="tags-row">${top.map(([t,n])=>`<span class="tag mini">#${esc(t)} · ${n}</span>`).join('')}</div>`:'');
-}
-
-function plural(n,one,few,many){
-  const a=Math.abs(n)%100, b=a%10;
-  if(a>10&&a<20) return many;
-  if(b>1&&b<5) return few;
-  return b===1?one:many;
+    `<p class="stat-note">Чаще всего — <b>${rows[0].l.toLowerCase()}</b>${photos?`. Фото: <b>${photos}</b>`:''}</p>`+
+    (top.length?`<div class="tags-row">${top.map(([t,n])=>`<span class="tag mini">${esc(t)} · ${n}</span>`).join('')}</div>`:'');
 }
 
 /* =============== настройки =============== */
@@ -751,22 +762,22 @@ function openSettings(){
 }
 function closeSettings(){
   $('mask').classList.remove('open');
-  $('cToken').type='password'; $('eyeBtn').textContent='👁 Показать';   // прячем обратно
+  $('cToken').type='password'; $('eyeBtn').innerHTML=icon('eye',13)+'Показать';
 }
 function toggleToken(){
   const i=$('cToken'), show=i.type==='password';
-  i.type = show?'text':'password';
-  $('eyeBtn').textContent = show?'🙈 Скрыть':'👁 Показать';
+  i.type=show?'text':'password';
+  $('eyeBtn').innerHTML=(show?icon('eyeOff',13)+'Скрыть':icon('eye',13)+'Показать');
 }
 function copyToken(){
   const v=$('cToken').value.trim();
   if(!v){ toast('Токен пока не сохранён'); return; }
-  const done=()=>toast('Токен скопирован 📋');
+  const done=()=>toast('Токен скопирован');
   if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(v).then(done, fallback);
   else fallback();
   function fallback(){
     const t=$('cToken'), was=t.type; t.type='text'; t.select(); t.setSelectionRange(0,99999);
-    try{ document.execCommand('copy'); done(); }catch(e){ toast('Не вышло — выдели и скопируй вручную'); }
+    try{ document.execCommand('copy'); done(); }catch(e){ toast('Не вышло — скопируй вручную'); }
     t.type=was; t.blur();
   }
 }
@@ -778,7 +789,7 @@ async function saveSettings(){
   }));
   closeSettings();
   if(hasGH()){ await pullAll(); await pushUnsynced(); }
-  else setSync('','Только на этом устройстве');
+  else setSync('','Локально');
 }
 async function pushUnsynced(){
   for(const e of entries.filter(x=>!x.sha)) await pushEntry(e);
@@ -795,13 +806,27 @@ function exportAll(){
 }
 
 /* =============== старт =============== */
+function paintStaticIcons(){
+  $('logoMark').innerHTML   = icon('book',18);
+  $('setBtn').innerHTML     = icon('gear',14)+'Настройки';
+  $('newBtn').innerHTML     = icon('pen',14)+'Новая запись';
+  $('saveBtn').innerHTML    = icon('check',14)+'Сохранить';
+  $('delBtn').innerHTML     = icon('trash',14)+'Удалить';
+  $('prevBtn').innerHTML    = icon('left',14);
+  $('nextBtn').innerHTML    = icon('right',14);
+  $('eyeBtn').innerHTML     = icon('eye',13)+'Показать';
+  $('copyBtn').innerHTML    = icon('copy',13)+'Копировать';
+  $('expBtn').innerHTML     = icon('download',13)+'Скачать всё';
+  $('searchWrap').insertAdjacentHTML('afterbegin', icon('search',15));
+}
 document.addEventListener('keydown', ev=>{
   if((ev.metaKey||ev.ctrlKey) && ev.key==='s'){ ev.preventDefault(); saveEntry(); }
   if(ev.key==='Escape') closeSettings();
 });
+paintStaticIcons();
 loadLocal();
 newEntry();
-if(hasGH()) pullAll(); else setSync('','Только на этом устройстве');
+if(hasGH()) pullAll(); else setSync('','Локально');
 </script>
 </body>
 </html>
