@@ -148,6 +148,12 @@ header.top{
 .stat-note{font-size:11px; color:var(--muted); margin:14px 0 0; line-height:1.6; letter-spacing:.3px}
 .stat-note b{color:var(--ink); font-weight:600}
 
+/* ---------- цитата дня ---------- */
+.quote{border-left:2px solid var(--red); padding:3px 0 3px 17px; margin-bottom:26px}
+.quote p{margin:0 0 7px; font-size:14px; line-height:1.6; font-weight:500}
+.quote span{font-size:9.5px; font-weight:700; letter-spacing:1.4px;
+  text-transform:uppercase; color:var(--muted)}
+
 /* ---------- сворачиваемые блоки ---------- */
 .block{border:1px solid var(--line); margin-bottom:24px}
 .block-head{display:flex; align-items:center; gap:10px; padding:13px 18px;
@@ -202,6 +208,49 @@ header.top{
   color:var(--line); text-align:left; padding:1px 0; transition:.14s}
 .pl-tcol:hover .pl-add{color:var(--muted)}
 .pl-add:hover{color:var(--red)}
+
+/* ---------- проекты ---------- */
+.proj{padding:15px 0; border-bottom:1px solid var(--line)}
+.proj:first-child{padding-top:0}
+.proj:last-of-type{border-bottom:none}
+.proj-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.proj-name{flex:1; min-width:130px; border:none; outline:none; background:none;
+  font-size:13.5px; font-weight:600; padding:0}
+.proj-name::placeholder{color:var(--line)}
+.proj-dates{display:flex; align-items:center; gap:5px; color:var(--muted); font-size:9.5px}
+.proj-dates input{border:none; border-bottom:1px solid var(--line); background:none; outline:none;
+  font-size:9.5px; letter-spacing:.4px; color:var(--muted); padding:2px 0; width:104px;
+  font-family:inherit; text-transform:uppercase}
+.proj-dates input:focus{border-bottom-color:var(--red); color:var(--ink)}
+.proj-cnt{font-size:9.5px; font-weight:700; letter-spacing:1.2px; color:var(--muted); white-space:nowrap}
+.proj-cnt.late{color:var(--red)}
+.proj-rm{color:transparent; display:grid; place-items:center; transition:.14s}
+.proj:hover .proj-rm{color:var(--line)}
+.proj-rm:hover{color:var(--red)}
+
+.proj-line{display:flex; align-items:center; gap:4px; margin:12px 0 10px}
+.seg{flex:1; height:9px; border:1px solid var(--red); background:none; transition:.2s; padding:0}
+.seg:hover{transform:scaleY(1.35)}
+.seg.on{background:var(--red)}
+.proj-line .star{flex:none; color:var(--red); margin-left:3px}
+
+.proj-stages{display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center}
+.stage{display:flex; align-items:center; gap:6px}
+.stage .tick{width:12px; height:12px}
+.stage .tick svg{width:8px; height:8px}
+.stage input{border:none; outline:none; background:none; font-size:11px; padding:0; width:112px}
+.stage input::placeholder{color:var(--line)}
+.stage.done input{color:var(--muted); text-decoration:line-through}
+.stage-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--line); transition:.14s}
+.proj:hover .stage-add{color:var(--muted)}
+.stage-add:hover{color:var(--red)}
+
+.proj.done .proj-name{color:var(--muted); text-decoration:line-through}
+.proj.done .seg{border-color:#C4C4C4; background:#C4C4C4}
+.proj.done .star{color:var(--muted)}
+.proj.done .stage input,.proj.done .proj-cnt{color:var(--muted)}
+.proj.done .tick.on{border-color:var(--muted); color:var(--muted)}
 
 /* ---------- редактор ---------- */
 .editor{display:flex; flex-direction:column; gap:20px}
@@ -341,6 +390,11 @@ header.top{
     </aside>
 
     <main>
+      <div class="quote">
+        <p id="qText"></p>
+        <span id="qAuthor"></span>
+      </div>
+
       <section class="block" id="blkPlanner">
         <div class="block-head" onclick="toggleBlock('planner')">
           <span id="plIcon"></span>
@@ -356,6 +410,21 @@ header.top{
             <button class="btn quiet tiny sp" onclick="thisWeek()">Текущая неделя</button>
           </div>
           <div class="pl-wrap"><div class="pl-inner" id="planner"></div></div>
+        </div>
+      </section>
+
+      <section class="block" id="blkProjects">
+        <div class="block-head" onclick="toggleBlock('projects')">
+          <span id="pjIcon"></span>
+          <h2>Проекты</h2>
+          <span class="meta-lbl" id="pjTag"></span>
+          <span class="chev" id="pjChev"></span>
+        </div>
+        <div class="block-body">
+          <div id="projects"></div>
+          <div class="task-acts">
+            <button class="btn quiet tiny" id="pjAddBtn" onclick="pjAdd()">Новый проект</button>
+          </div>
         </div>
       </section>
 
@@ -439,6 +508,8 @@ const I={
   list:'<path d="M9 6.5h11M9 12h11M9 17.5h11M4 6.5h1.2M4 12h1.2M4 17.5h1.2"/>',
   down:'<path d="M6 9.5l6 6 6-6"/>',
   grid:'<path d="M3.5 3.5h17v17h-17z"/><path d="M3.5 9h17M3.5 15h17M9 3.5v17M15 3.5v17"/>',
+  star:'<path d="M12 3.2l2.7 5.7 6.2.9-4.5 4.4 1.1 6.2-5.5-3-5.5 3 1.1-6.2L3.1 9.8l6.2-.9z"/>',
+  flag:'<path d="M5.5 21V4M5.5 4.5h11l-2 3.5 2 3.5h-11"/>',
   /* настроения */
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>',
   wave:'<path d="M2.5 9.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/><path d="M2.5 15.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/>',
@@ -740,6 +811,63 @@ function taskKey(ev,i){
   else if(ev.key==='Backspace' && !tk[i].t){ ev.preventDefault(); removeTask(i); focusTask(Math.max(0,i-1)); }
 }
 
+/* =============== цитата дня =============== */
+const QUOTES=[
+ ['Путь в тысячу ли начинается с одного шага','Лао-цзы'],
+ ['Единственный способ делать великие дела — любить то, что делаешь','Стив Джобс'],
+ ['Ваше время ограничено, не тратьте его, проживая чужую жизнь','Стив Джобс'],
+ ['Ты имеешь власть над своим умом, а не над внешними событиями','Марк Аврелий'],
+ ['Наша жизнь есть то, что мы думаем о ней','Марк Аврелий'],
+ ['Мы страдаем чаще в воображении, чем в реальности','Сенека'],
+ ['Пока мы откладываем жизнь, она проходит','Сенека'],
+ ['Нет попутного ветра для того, кто не знает, куда плыть','Сенека'],
+ ['Не события расстраивают людей, а их мнения о событиях','Эпиктет'],
+ ['Сначала скажи себе, кем ты хочешь быть, а потом делай то, что должен','Эпиктет'],
+ ['Начало — половина дела','Гораций'],
+ ['Начало — больше половины целого','Аристотель'],
+ ['Капля точит камень не силой, а частым падением','Овидий'],
+ ['Всё течёт, всё меняется','Гераклит'],
+ ['Тот, кто имеет зачем жить, вынесет почти любое как','Фридрих Ницше'],
+ ['У человека можно отнять всё, кроме одного — свободы выбирать своё отношение к обстоятельствам','Виктор Франкл'],
+ ['Всё кажется невозможным, пока не будет сделано','Нельсон Мандела'],
+ ['В жизни нет ничего, чего стоило бы бояться, есть только то, что нужно понять','Мария Склодовская-Кюри'],
+ ['Я не терпел неудач. Я просто нашёл десять тысяч способов, которые не работают','Томас Эдисон'],
+ ['Считаешь ли ты, что можешь, или считаешь, что не можешь, — ты прав в обоих случаях','Генри Форд'],
+ ['Вдохновение существует, но оно должно застать тебя за работой','Пабло Пикассо'],
+ ['Любители ждут вдохновения, остальные просто встают и идут работать','Стивен Кинг'],
+ ['Сначала прыгай, крылья вырастут потом','Рэй Брэдбери'],
+ ['Пробовал. Терпел неудачу. Неважно. Пробуй снова. Провались лучше','Сэмюэл Беккет'],
+ ['Невозможно жить, ничего не проваливая','Джоан Роулинг'],
+ ['Если есть книга, которую ты хочешь прочесть, но она ещё не написана — ты должен её написать','Тони Моррисон'],
+ ['Боль неизбежна. Страдание — выбор','Харуки Мураками'],
+ ['Мы то, чем притворяемся, поэтому надо осторожнее выбирать, кем притворяться','Курт Воннегут'],
+ ['Жизнь — это то, что происходит, пока ты строишь другие планы','Джон Леннон'],
+ ['Как мы проводим свои дни — так мы и проводим свою жизнь','Энни Диллард'],
+ ['Ты не поднимаешься до уровня своих целей, ты падаешь до уровня своих систем','Джеймс Клир'],
+ ['Первый принцип: нельзя обманывать себя, а себя обмануть проще всего','Ричард Фейнман'],
+ ['Не откладывай на завтра то, что можно сделать сегодня','Бенджамин Франклин'],
+ ['Лучшее — враг хорошего','Вольтер'],
+ ['Величайшее в мире — уметь принадлежать себе','Мишель Монтень'],
+ ['Достаточно знать — надо и применять; достаточно хотеть — надо и делать','Иоганн Вольфганг Гёте'],
+ ['Учиться и не размышлять — напрасно, размышлять и не учиться — губительно','Конфуций'],
+ ['Знающий других мудр, знающий себя просветлён','Лао-цзы'],
+ ['Я не боюсь того, кто изучает десять тысяч ударов. Я боюсь того, кто изучает один удар десять тысяч раз','Брюс Ли'],
+ ['Начни там, где ты есть. Используй то, что имеешь. Делай, что можешь','Артур Эш'],
+ ['Оптимизм — это вера, ведущая к достижениям','Хелен Келлер'],
+ ['Будущее принадлежит тем, кто верит в красоту своей мечты','Элеонора Рузвельт'],
+ ['Никогда, никогда, никогда не сдавайтесь','Уинстон Черчилль'],
+ ['Чтобы умно поступать, одного ума мало','Фёдор Достоевский'],
+ ['Если хочешь быть счастливым — будь им','Козьма Прутков'],
+ ['Дорогу осилит идущий','латинская пословица']
+];
+function renderQuote(){
+  const d=new Date();
+  const n=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000);
+  const [t,a]=QUOTES[((n%QUOTES.length)+QUOTES.length)%QUOTES.length];
+  $('qText').textContent='«'+t+'»';
+  $('qAuthor').textContent=a;
+}
+
 /* =============== планер =============== */
 const PL_FROM=6, PL_TO=23;                       // диапазон часов в сетке
 const PL_HOURS=Array.from({length:PL_TO-PL_FROM+1},(_,i)=>String(PL_FROM+i).padStart(2,'0')+':00');
@@ -906,17 +1034,155 @@ function plTaskKey(ev,k,i){
   else if(ev.key==='Backspace' && !plDay(k).tasks[i].t){ ev.preventDefault(); plRemove(k,i); plFocus(k,Math.max(0,i-1)); }
 }
 
+/* =============== проекты =============== */
+let pj=[], pjSha=null, pjTimer=null;
+const LS_J='diary_projects_v1';
+const pjFile = () => (cfg().projectsFile||'projects.md').replace(/^\/+/,'');
+const pjDone = p => (p.s||[]).length>0 && p.s.every(x=>x.d);
+
+function pjToMd(){
+  const out=['# Проекты',''];
+  pj.filter(p=>(p.n||'').trim()||(p.s||[]).length).forEach(p=>{
+    out.push('## '+((p.n||'').trim()||'Без названия'),'');
+    if(p.from||p.to) out.push('Сроки: '+(p.from||'…')+' — '+(p.to||'…'),'');
+    (p.s||[]).filter(x=>(x.t||'').trim()).forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+x.t.trim()));
+    out.push('');
+  });
+  return out.join('\n');
+}
+function pjFromMd(text){
+  const out=[]; let cur=null;
+  text.split(/\r?\n/).forEach(line=>{
+    const h=line.match(/^##\s+(.*)$/);
+    if(h){ cur={n:h[1].trim(), from:'', to:'', s:[]}; out.push(cur); return; }
+    if(!cur) return;
+    const d=line.match(/^\s*-?\s*Сроки:\s*(\S*)\s*[—–-]\s*(\S*)\s*$/i);
+    if(d){ cur.from=/\d{4}-\d{2}-\d{2}/.test(d[1])?d[1]:''; cur.to=/\d{4}-\d{2}-\d{2}/.test(d[2])?d[2]:''; return; }
+    const s=line.match(/^\s*[-*]\s*\[([ xX])\]\s?(.*)$/);
+    if(s) cur.s.push({t:s[2].trim(), d:s[1].toLowerCase()==='x'});
+  });
+  return out;
+}
+function savePjLocal(){ try{ localStorage.setItem(LS_J, JSON.stringify({pj, sha:pjSha})); }catch(e){} }
+function loadPjLocal(){
+  try{ const j=JSON.parse(localStorage.getItem(LS_J)||'{}'); pj=j.pj||[]; pjSha=j.sha||null; }
+  catch(e){ pj=[]; pjSha=null; }
+}
+async function pullProjects(){
+  if(!hasGH()) return;
+  try{
+    const r=await gh('/contents/'+encodeURI(pjFile())+'?ref='+encodeURIComponent(branch()));
+    if(r.status===404){ pjSha=null; return; }
+    if(!r.ok) return;
+    const j=await r.json();
+    pjSha=j.sha; pj=pjFromMd(b64dec(j.content));
+    savePjLocal(); renderProjects();
+  }catch(e){}
+}
+function queuePjPush(){
+  savePjLocal();
+  if(!hasGH()) return;
+  clearTimeout(pjTimer); pjTimer=setTimeout(pushProjects, 1300);
+}
+async function pushProjects(){
+  if(!hasGH()) return;
+  try{
+    setSync('busy','Сохраняю проекты');
+    pjSha=await putFile(pjFile(), b64enc(pjToMd()), 'diary: проекты', pjSha);
+    savePjLocal(); setSync('ok','Сохранено');
+  }catch(err){ setSync('err','Ошибка'); toast('Проекты: '+err.message); }
+}
+
+function pjDeadline(p){
+  if(!p.to) return {txt:'', late:false};
+  const d=new Date(p.to+'T23:59:59');
+  const left=Math.ceil((d-new Date())/86400000);
+  if(pjDone(p)) return {txt:'', late:false};
+  if(left<0)  return {txt:'просрочен', late:true};
+  if(left===0) return {txt:'сегодня', late:true};
+  if(left<=7) return {txt:left+' '+plural(left,'день','дня','дней'), late:false};
+  return {txt:'', late:false};
+}
+
+function renderProjects(){
+  const active=pj.filter(p=>!pjDone(p)).length;
+  $('pjTag').textContent = pj.length ? `${active} в работе · ${pj.length-active} завершено` : '';
+
+  $('projects').innerHTML = pj.length ? pj.map((p,i)=>{
+    const st=p.s||[], done=st.filter(x=>x.d).length, fin=pjDone(p), dl=pjDeadline(p);
+    return `<div class="proj${fin?' done':''}">
+      <div class="proj-top">
+        <input class="proj-name" value="${esc(p.n||'')}" placeholder="Название проекта"
+               oninput="pj[${i}].n=this.value; queuePjPush()">
+        <span class="proj-dates">
+          <input type="date" value="${p.from||''}" title="Начало"
+                 onchange="pj[${i}].from=this.value; queuePjPush(); renderProjects()">
+          —
+          <input type="date" value="${p.to||''}" title="Дедлайн"
+                 onchange="pj[${i}].to=this.value; queuePjPush(); renderProjects()">
+        </span>
+        <span class="proj-cnt${dl.late?' late':''}">${st.length?done+' / '+st.length:'нет этапов'}${dl.txt?' · '+dl.txt:''}</span>
+        <button class="proj-rm" onclick="pjRemove(${i})" title="Удалить проект">${icon('x',13)}</button>
+      </div>
+      <div class="proj-line">
+        ${st.length
+          ? st.map((x,j)=>`<button class="seg${x.d?' on':''}" onclick="pjToggle(${i},${j})"
+              title="${esc(x.t||'Этап '+(j+1))}"></button>`).join('')
+          : '<span class="seg" style="pointer-events:none"></span>'}
+        ${fin?`<span class="star">${icon('star',15)}</span>`:''}
+      </div>
+      <div class="proj-stages">
+        ${st.map((x,j)=>`<span class="stage${x.d?' done':''}">
+            <button class="tick${x.d?' on':''}" onclick="pjToggle(${i},${j})">${icon('check',8)}</button>
+            <input value="${esc(x.t)}" placeholder="этап"
+                   oninput="pj[${i}].s[${j}].t=this.value; queuePjPush()"
+                   onkeydown="pjStageKey(event,${i},${j})">
+          </span>`).join('')}
+        <button class="stage-add" onclick="pjAddStage(${i})">+ этап</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="task-empty">Проектов пока нет</div>';
+}
+
+function pjAdd(){
+  pj.push({n:'', from:'', to:'', s:[]});
+  openBlock('projects'); renderProjects(); queuePjPush();
+  const ins=$('projects').querySelectorAll('.proj-name');
+  if(ins.length) ins[ins.length-1].focus();
+}
+function pjRemove(i){
+  if((pj[i].n||'').trim() && !confirm('Удалить проект «'+pj[i].n+'»?')) return;
+  pj.splice(i,1); renderProjects(); queuePjPush();
+}
+function pjToggle(i,j){ pj[i].s[j].d=!pj[i].s[j].d; renderProjects(); queuePjPush(); }
+function pjAddStage(i){
+  pj[i].s=pj[i].s||[]; pj[i].s.push({t:'',d:false});
+  renderProjects(); pjFocusStage(i, pj[i].s.length-1);
+}
+function pjFocusStage(i,j){
+  const box=$('projects').querySelectorAll('.proj')[i];
+  if(!box) return;
+  const ins=box.querySelectorAll('.stage input');
+  if(ins[j]){ ins[j].focus(); ins[j].setSelectionRange(99,99); }
+}
+function pjStageKey(ev,i,j){
+  if(ev.key==='Enter'){ ev.preventDefault(); pjAddStage(i); }
+  else if(ev.key==='Backspace' && !pj[i].s[j].t){
+    ev.preventDefault(); pj[i].s.splice(j,1); renderProjects(); queuePjPush(); pjFocusStage(i,Math.max(0,j-1));
+  }
+}
+
 /* =============== сворачивание блоков =============== */
 const LS_UI='diary_ui_v1';
+const BLOCKS={planner:'blkPlanner', projects:'blkProjects', entry:'blkEntry'};
 function uiState(){ try{ return JSON.parse(localStorage.getItem(LS_UI)||'{}'); }catch(e){ return {}; } }
 function applyBlocks(){
   const s=uiState();
-  $('blkPlanner').classList.toggle('closed', s.planner===true);
-  $('blkEntry').classList.toggle('closed', s.entry===true);
+  Object.entries(BLOCKS).forEach(([k,id])=>$(id).classList.toggle('closed', s[k]===true));
 }
 function toggleBlock(name){
-  const s=uiState(), id=name==='planner'?'blkPlanner':'blkEntry';
-  s[name]=!$(id).classList.contains('closed');
+  const s=uiState();
+  s[name]=!$(BLOCKS[name]).classList.contains('closed');
   localStorage.setItem(LS_UI, JSON.stringify(s));
   applyBlocks();
 }
@@ -1173,6 +1439,9 @@ async function saveSettings(){
     const hadPlan=Object.keys(plData).length;
     await pullPlanner();
     if(hadPlan && !plSha) await pushPlanner();
+    const hadProj=pj.length;
+    await pullProjects();
+    if(hadProj && !pjSha) await pushProjects();
   }
   else setSync('','Локально');
 }
@@ -1202,9 +1471,12 @@ function paintStaticIcons(){
   $('plPrev').innerHTML     = icon('left',14);
   $('plNext').innerHTML     = icon('right',14);
   $('plIcon').innerHTML     = icon('grid',15);
+  $('pjIcon').innerHTML     = icon('flag',15);
   $('enIcon').innerHTML     = icon('pen',15);
   $('plChev').innerHTML     = icon('down',15);
+  $('pjChev').innerHTML     = icon('down',15);
   $('enChev').innerHTML     = icon('down',15);
+  $('pjAddBtn').innerHTML   = icon('plus',12)+'Новый проект';
   $('eyeBtn').innerHTML     = icon('eye',13)+'Показать';
   $('copyBtn').innerHTML    = icon('copy',13)+'Копировать';
   $('expBtn').innerHTML     = icon('download',13)+'Скачать всё';
@@ -1217,13 +1489,16 @@ document.addEventListener('keydown', ev=>{
 window.addEventListener('beforeunload', ()=>{
   if(tkTimer){ clearTimeout(tkTimer); pushTasks(); }
   if(plTimer){ clearTimeout(plTimer); pushPlanner(); }
+  if(pjTimer){ clearTimeout(pjTimer); pushProjects(); }
 });
 
 paintStaticIcons();
-loadLocal(); loadTasksLocal(); loadPlannerLocal();
+loadLocal(); loadTasksLocal(); loadPlannerLocal(); loadPjLocal();
 applyBlocks();
-newEntry(); renderTasks(); renderPlanner();
-if(hasGH()) pullAll().then(pullTasks).then(pullPlanner); else setSync('','Локально');
+renderQuote();
+newEntry(); renderTasks(); renderPlanner(); renderProjects();
+if(hasGH()) pullAll().then(pullTasks).then(pullPlanner).then(pullProjects);
+else setSync('','Локально');
 </script>
 </body>
 </html>
