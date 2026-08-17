@@ -148,8 +148,63 @@ header.top{
 .stat-note{font-size:11px; color:var(--muted); margin:14px 0 0; line-height:1.6; letter-spacing:.3px}
 .stat-note b{color:var(--ink); font-weight:600}
 
+/* ---------- сворачиваемые блоки ---------- */
+.block{border:1px solid var(--line); margin-bottom:24px}
+.block-head{display:flex; align-items:center; gap:10px; padding:13px 18px;
+  cursor:pointer; border-bottom:1px solid var(--line); user-select:none; transition:.14s}
+.block-head:hover{color:var(--red)}
+.block-head h2{margin:0; font-size:11px; font-weight:700; letter-spacing:2.2px; text-transform:uppercase}
+.block-head .meta-lbl{font-size:9.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted)}
+.block-head .chev{margin-left:auto; color:var(--muted); transition:transform .2s ease}
+.block.closed .block-head{border-bottom:none}
+.block.closed .block-body{display:none}
+.block.closed .chev{transform:rotate(-90deg)}
+.block-body{padding:20px 18px}
+
+/* ---------- планер ---------- */
+.pl-nav{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+.pl-nav b{font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase}
+.pl-nav .sp{margin-left:auto}
+.pl-wrap{overflow-x:auto}
+.pl-inner{min-width:600px}
+.pl-scroll{max-height:310px; overflow-y:auto; border:1px solid var(--line); border-bottom:none}
+.pl-scroll::-webkit-scrollbar{width:3px}
+.pl-scroll::-webkit-scrollbar-thumb{background:var(--line-dark)}
+.pl-head,.pl-row,.pl-tasks{display:grid; grid-template-columns:44px repeat(7,minmax(0,1fr))}
+.pl-head{position:sticky; top:0; z-index:2; background:var(--bg); border-bottom:1px solid var(--line-dark)}
+.pl-dh{padding:7px 3px; text-align:center; border-left:1px solid var(--line);
+  font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
+.pl-dh b{display:block; font-size:13px; color:var(--ink); letter-spacing:0; margin-top:3px}
+.pl-dh.today{color:var(--red); box-shadow:inset 0 -2px 0 var(--red)}
+.pl-dh.today b{color:var(--red)}
+.pl-row{border-bottom:1px solid var(--line)}
+.pl-row:last-child{border-bottom:none}
+.pl-h{font-size:8.5px; color:var(--muted); font-weight:700; letter-spacing:.5px;
+  display:flex; align-items:center; justify-content:flex-end; padding:0 6px}
+.pl-cell{border-left:1px solid var(--line)}
+.pl-cell input{width:100%; height:26px; border:none; outline:none; background:none;
+  font-size:11px; padding:0 5px}
+.pl-cell input::placeholder{color:transparent}
+.pl-cell input:focus{background:var(--wash); box-shadow:inset 0 0 0 1px var(--red)}
+.pl-cell.on input{font-weight:600}
+.pl-cell.now{box-shadow:inset 2px 0 0 var(--red)}
+.pl-tasks{border:1px solid var(--line); border-top:1px solid var(--line-dark)}
+.pl-lbl{font-size:8.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+  color:var(--muted); display:flex; align-items:flex-start; justify-content:flex-end; padding:9px 6px 0}
+.pl-tcol{border-left:1px solid var(--line); padding:7px 5px 9px; display:flex; flex-direction:column; gap:4px}
+.pl-t{display:flex; align-items:flex-start; gap:5px}
+.pl-t .tick{width:11px; height:11px; margin-top:2px}
+.pl-t .tick svg{width:8px; height:8px}
+.pl-t input{flex:1; min-width:0; border:none; outline:none; background:none;
+  font-size:10.5px; line-height:1.4; padding:0}
+.pl-t.done input{text-decoration:line-through; color:var(--muted)}
+.pl-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--line); text-align:left; padding:1px 0; transition:.14s}
+.pl-tcol:hover .pl-add{color:var(--muted)}
+.pl-add:hover{color:var(--red)}
+
 /* ---------- редактор ---------- */
-.editor{display:flex; flex-direction:column; gap:20px; min-height:64vh}
+.editor{display:flex; flex-direction:column; gap:20px}
 .title-in{width:100%; border:none; border-bottom:1px solid var(--line-dark); outline:none;
   background:none; font-size:26px; font-weight:700; letter-spacing:-.4px; padding:0 0 12px}
 .title-in::placeholder{color:var(--line)}
@@ -167,7 +222,7 @@ header.top{
   padding:8px 0; outline:none; font-size:12.5px}
 .tag-in:focus{border-bottom-color:var(--red)}
 .tag-in::placeholder{color:var(--muted)}
-.body-in{flex:1; min-height:320px; width:100%; border:1px solid var(--line); outline:none;
+.body-in{flex:1; min-height:270px; width:100%; border:1px solid var(--line); outline:none;
   resize:vertical; background:none; padding:18px; line-height:1.85; font-size:14px}
 .body-in:focus{border-color:var(--line-dark)}
 .body-in::placeholder{color:var(--muted)}
@@ -285,21 +340,48 @@ header.top{
       </div>
     </aside>
 
-    <main class="editor">
-      <input class="title-in" id="fTitle" placeholder="Название записи">
-      <div class="meta">
-        <input class="date-in" id="fDate" type="date">
-        <div class="moods" id="moods"></div>
-      </div>
-      <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги">
-      <div class="photo-box" id="photoBox"></div>
-      <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
-      <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить"></textarea>
-      <div class="foot">
-        <button class="btn primary" id="saveBtn" onclick="saveEntry()">Сохранить</button>
-        <button class="btn danger" id="delBtn" onclick="deleteEntry()" style="display:none">Удалить</button>
-        <span class="hint spacer" id="editHint">Новая запись</span>
-      </div>
+    <main>
+      <section class="block" id="blkPlanner">
+        <div class="block-head" onclick="toggleBlock('planner')">
+          <span id="plIcon"></span>
+          <h2>Планер</h2>
+          <span class="meta-lbl" id="plWeekTag"></span>
+          <span class="chev" id="plChev"></span>
+        </div>
+        <div class="block-body">
+          <div class="pl-nav">
+            <button class="cal-nav" id="plPrev" onclick="shiftWeek(-1)"></button>
+            <b id="plLabel"></b>
+            <button class="cal-nav" id="plNext" onclick="shiftWeek(1)"></button>
+            <button class="btn quiet tiny sp" onclick="thisWeek()">Текущая неделя</button>
+          </div>
+          <div class="pl-wrap"><div class="pl-inner" id="planner"></div></div>
+        </div>
+      </section>
+
+      <section class="block" id="blkEntry">
+        <div class="block-head" onclick="toggleBlock('entry')">
+          <span id="enIcon"></span>
+          <h2>Запись</h2>
+          <span class="meta-lbl" id="editHint">Новая запись</span>
+          <span class="chev" id="enChev"></span>
+        </div>
+        <div class="block-body editor">
+          <input class="title-in" id="fTitle" placeholder="Название записи">
+          <div class="meta">
+            <input class="date-in" id="fDate" type="date">
+            <div class="moods" id="moods"></div>
+          </div>
+          <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги">
+          <div class="photo-box" id="photoBox"></div>
+          <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
+          <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить"></textarea>
+          <div class="foot">
+            <button class="btn primary" id="saveBtn" onclick="saveEntry()">Сохранить</button>
+            <button class="btn danger" id="delBtn" onclick="deleteEntry()" style="display:none">Удалить</button>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -355,6 +437,8 @@ const I={
   doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
   plus:'<path d="M12 5.5v13M5.5 12h13"/>',
   list:'<path d="M9 6.5h11M9 12h11M9 17.5h11M4 6.5h1.2M4 12h1.2M4 17.5h1.2"/>',
+  down:'<path d="M6 9.5l6 6 6-6"/>',
+  grid:'<path d="M3.5 3.5h17v17h-17z"/><path d="M3.5 9h17M3.5 15h17M9 3.5v17M15 3.5v17"/>',
   /* настроения */
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>',
   wave:'<path d="M2.5 9.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/><path d="M2.5 15.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/>',
@@ -656,6 +740,192 @@ function taskKey(ev,i){
   else if(ev.key==='Backspace' && !tk[i].t){ ev.preventDefault(); removeTask(i); focusTask(Math.max(0,i-1)); }
 }
 
+/* =============== планер =============== */
+const PL_FROM=6, PL_TO=23;                       // диапазон часов в сетке
+const PL_HOURS=Array.from({length:PL_TO-PL_FROM+1},(_,i)=>String(PL_FROM+i).padStart(2,'0')+':00');
+const WD=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const LS_P='diary_planner_v1';
+
+let plMon=mondayOf(new Date());                  // понедельник открытой недели
+let plData={}, plSha=null, plTimer=null;
+
+function mondayOf(d){
+  const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  x.setDate(x.getDate()-((x.getDay()+6)%7));
+  return x;
+}
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const weekDays = () => Array.from({length:7},(_,i)=>{ const d=new Date(plMon); d.setDate(d.getDate()+i); return d; });
+const plKey  = () => iso(plMon);
+const plFile = () => 'planner/'+plKey()+'.md';
+const plDay  = k => (plData[k] = plData[k] || {slots:{}, tasks:[]});
+
+function weekLabel(){
+  const a=plMon, b=new Date(plMon); b.setDate(b.getDate()+6);
+  const DM=d=>d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});   // «17 августа»
+  return a.getMonth()===b.getMonth()
+    ? `${a.getDate()}–${DM(b)} ${b.getFullYear()}`
+    : `${DM(a)} – ${DM(b)} ${b.getFullYear()}`;
+}
+
+function plToMd(){
+  const out=['# Планер · '+weekLabel(),''];
+  weekDays().forEach((d,i)=>{
+    const k=iso(d), day=plData[k];
+    if(!day) return;
+    const slots=Object.keys(day.slots||{}).filter(h=>(day.slots[h]||'').trim()).sort();
+    const tasks=(day.tasks||[]).filter(t=>(t.t||'').trim());
+    if(!slots.length && !tasks.length) return;
+    out.push(`## ${WD[i]} · ${k}`,'');
+    slots.forEach(h=>out.push(`**${h}** ${day.slots[h].trim()}`));
+    if(slots.length) out.push('');
+    tasks.forEach(t=>out.push('- ['+(t.d?'x':' ')+'] '+t.t.trim()));
+    if(tasks.length) out.push('');
+  });
+  return out.join('\n');
+}
+function plFromMd(text){
+  const data={}; let cur=null;
+  text.split(/\r?\n/).forEach(line=>{
+    const h=line.match(/^##\s+.*?(\d{4}-\d{2}-\d{2})/);
+    if(h){ cur=h[1]; data[cur]={slots:{},tasks:[]}; return; }
+    if(!cur) return;
+    const s=line.match(/^\*\*(\d{1,2}:\d{2})\*\*\s*(.*)$/);
+    if(s){ data[cur].slots[s[1].padStart(5,'0')]=s[2].trim(); return; }
+    const t=line.match(/^\s*[-*]\s*\[([ xX])\]\s?(.*)$/);
+    if(t) data[cur].tasks.push({t:t[2].trim(), d:t[1].toLowerCase()==='x'});
+  });
+  return data;
+}
+
+function savePlannerLocal(){
+  try{
+    const all=JSON.parse(localStorage.getItem(LS_P)||'{}');
+    all[plKey()]={d:plData, sha:plSha};
+    localStorage.setItem(LS_P, JSON.stringify(all));
+  }catch(e){}
+}
+function loadPlannerLocal(){
+  try{
+    const all=JSON.parse(localStorage.getItem(LS_P)||'{}');
+    const w=all[plKey()]||{};
+    plData=w.d||{}; plSha=w.sha||null;
+  }catch(e){ plData={}; plSha=null; }
+}
+async function pullPlanner(){
+  if(!hasGH()) return;
+  try{
+    const r=await gh('/contents/'+encodeURI(plFile())+'?ref='+encodeURIComponent(branch()));
+    if(r.status===404){ plSha=null; return; }      // недели ещё нет — это нормально
+    if(!r.ok) return;
+    const j=await r.json();
+    plSha=j.sha; plData=plFromMd(b64dec(j.content));
+    savePlannerLocal(); renderPlanner();
+  }catch(e){}
+}
+function queuePlannerPush(){
+  savePlannerLocal();
+  if(!hasGH()) return;
+  clearTimeout(plTimer); plTimer=setTimeout(pushPlanner, 1300);
+}
+async function pushPlanner(){
+  if(!hasGH()) return;
+  const key=plKey(), file='planner/'+key+'.md', body=plToMd(), sha=plSha;
+  try{
+    setSync('busy','Сохраняю планер');
+    const newSha=await putFile(file, b64enc(body), 'diary: планер '+key, sha);
+    if(plKey()===key){ plSha=newSha; savePlannerLocal(); }
+    setSync('ok','Сохранено');
+  }catch(err){ setSync('err','Ошибка'); toast('Планер: '+err.message); }
+}
+
+function shiftWeek(n){
+  if(plTimer){ clearTimeout(plTimer); pushPlanner(); }
+  plMon=new Date(plMon.getFullYear(), plMon.getMonth(), plMon.getDate()+n*7);
+  loadPlannerLocal(); renderPlanner(); pullPlanner();
+}
+function thisWeek(){
+  const m=mondayOf(new Date());
+  if(iso(m)===plKey()) return;
+  shiftWeek(Math.round((m-plMon)/604800000));
+}
+
+function renderPlanner(){
+  const days=weekDays(), t=today();
+  $('plLabel').textContent=weekLabel();
+  $('plWeekTag').textContent=weekLabel();
+
+  let head='<div class="pl-head"><div></div>'+days.map((d,i)=>
+    `<div class="pl-dh${iso(d)===t?' today':''}">${WD[i]}<b>${d.getDate()}</b></div>`).join('')+'</div>';
+
+  const nowH=new Date().getHours();
+  let rows='';
+  PL_HOURS.forEach(h=>{
+    rows+=`<div class="pl-row"><div class="pl-h">${h}</div>`+
+      days.map(d=>{
+        const k=iso(d), v=((plData[k]||{}).slots||{})[h]||'';
+        const now = k===t && +h.slice(0,2)===nowH;
+        return `<div class="pl-cell${v?' on':''}${now?' now':''}">
+          <input value="${esc(v)}" oninput="setSlot('${k}','${h}',this.value)"
+                 onkeydown="slotKey(event)" title="${WD[days.indexOf(d)]} ${h}"></div>`;
+      }).join('')+'</div>';
+  });
+
+  let tasks='<div class="pl-tasks"><div class="pl-lbl">Дела</div>'+days.map(d=>{
+    const k=iso(d), list=(plData[k]||{}).tasks||[];
+    return `<div class="pl-tcol">`+
+      list.map((x,i)=>`<div class="pl-t${x.d?' done':''}">
+          <button class="tick${x.d?' on':''}" onclick="plToggle('${k}',${i})">${icon('check',8)}</button>
+          <input value="${esc(x.t)}" oninput="plSetTask('${k}',${i},this.value)"
+                 onkeydown="plTaskKey(event,'${k}',${i})" placeholder="дело">
+        </div>`).join('')+
+      `<button class="pl-add" onclick="plAdd('${k}')">+ дело</button></div>`;
+  }).join('')+'</div>';
+
+  $('planner').innerHTML=`<div class="pl-scroll">${head}${rows}</div>${tasks}`;
+}
+
+function setSlot(k,h,v){
+  const day=plDay(k);
+  if(v.trim()) day.slots[h]=v; else delete day.slots[h];
+  queuePlannerPush();
+}
+function slotKey(ev){ if(ev.key==='Enter') ev.target.blur(); }
+function plAdd(k){ plDay(k).tasks.push({t:'',d:false}); renderPlanner(); plFocus(k,plDay(k).tasks.length-1); }
+function plSetTask(k,i,v){ plDay(k).tasks[i].t=v; queuePlannerPush(); }
+function plToggle(k,i){ const x=plDay(k).tasks[i]; x.d=!x.d; renderPlanner(); queuePlannerPush(); }
+function plRemove(k,i){ plDay(k).tasks.splice(i,1); renderPlanner(); queuePlannerPush(); }
+function plFocus(k,i){
+  const col=[...$('planner').querySelectorAll('.pl-tcol')][weekDays().findIndex(d=>iso(d)===k)];
+  if(!col) return;
+  const ins=col.querySelectorAll('input');
+  if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); }
+}
+function plTaskKey(ev,k,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); plAdd(k); }
+  else if(ev.key==='Backspace' && !plDay(k).tasks[i].t){ ev.preventDefault(); plRemove(k,i); plFocus(k,Math.max(0,i-1)); }
+}
+
+/* =============== сворачивание блоков =============== */
+const LS_UI='diary_ui_v1';
+function uiState(){ try{ return JSON.parse(localStorage.getItem(LS_UI)||'{}'); }catch(e){ return {}; } }
+function applyBlocks(){
+  const s=uiState();
+  $('blkPlanner').classList.toggle('closed', s.planner===true);
+  $('blkEntry').classList.toggle('closed', s.entry===true);
+}
+function toggleBlock(name){
+  const s=uiState(), id=name==='planner'?'blkPlanner':'blkEntry';
+  s[name]=!$(id).classList.contains('closed');
+  localStorage.setItem(LS_UI, JSON.stringify(s));
+  applyBlocks();
+}
+function openBlock(name){
+  const s=uiState(); s[name]=false;
+  localStorage.setItem(LS_UI, JSON.stringify(s));
+  applyBlocks();
+}
+
 /* =============== локальное хранилище =============== */
 function saveLocal(){
   try{ localStorage.setItem(LS_E, JSON.stringify(entries)); return; }catch(err){}
@@ -711,7 +981,7 @@ function newEntry(){
   $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
   renderMoods(''); resetPhoto();
   $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
-  render(); $('fTitle').focus();
+  openBlock('entry'); render(); $('fTitle').focus();
 }
 async function openEntry(file){
   const e=entries.find(x=>x.file===file); if(!e) return;
@@ -719,7 +989,7 @@ async function openEntry(file){
   $('fTitle').value=e.title; $('fDate').value=e.date;
   $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
-  $('editHint').textContent='Правка · '+fmtDate(e.date);
+  $('editHint').textContent='Правка · '+fmtDate(e.date); openBlock('entry');
 
   ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo && !e.photoData)};
   renderPhoto(); render(); window.scrollTo({top:0,behavior:'smooth'});
@@ -900,6 +1170,9 @@ async function saveSettings(){
     await pullAll(); await pushUnsynced();
     await pullTasks();
     if(tk.length && !tkSha) await pushTasks();     // список был локальным — увозим в репозиторий
+    const hadPlan=Object.keys(plData).length;
+    await pullPlanner();
+    if(hadPlan && !plSha) await pushPlanner();
   }
   else setSync('','Локально');
 }
@@ -926,6 +1199,12 @@ function paintStaticIcons(){
   $('delBtn').innerHTML     = icon('trash',14)+'Удалить';
   $('prevBtn').innerHTML    = icon('left',14);
   $('nextBtn').innerHTML    = icon('right',14);
+  $('plPrev').innerHTML     = icon('left',14);
+  $('plNext').innerHTML     = icon('right',14);
+  $('plIcon').innerHTML     = icon('grid',15);
+  $('enIcon').innerHTML     = icon('pen',15);
+  $('plChev').innerHTML     = icon('down',15);
+  $('enChev').innerHTML     = icon('down',15);
   $('eyeBtn').innerHTML     = icon('eye',13)+'Показать';
   $('copyBtn').innerHTML    = icon('copy',13)+'Копировать';
   $('expBtn').innerHTML     = icon('download',13)+'Скачать всё';
@@ -935,12 +1214,16 @@ document.addEventListener('keydown', ev=>{
   if((ev.metaKey||ev.ctrlKey) && ev.key==='s'){ ev.preventDefault(); saveEntry(); }
   if(ev.key==='Escape') closeSettings();
 });
-window.addEventListener('beforeunload', ()=>{ if(tkTimer){ clearTimeout(tkTimer); pushTasks(); } });
+window.addEventListener('beforeunload', ()=>{
+  if(tkTimer){ clearTimeout(tkTimer); pushTasks(); }
+  if(plTimer){ clearTimeout(plTimer); pushPlanner(); }
+});
 
 paintStaticIcons();
-loadLocal(); loadTasksLocal();
-newEntry(); renderTasks();
-if(hasGH()) pullAll().then(pullTasks); else setSync('','Локально');
+loadLocal(); loadTasksLocal(); loadPlannerLocal();
+applyBlocks();
+newEntry(); renderTasks(); renderPlanner();
+if(hasGH()) pullAll().then(pullTasks).then(pullPlanner); else setSync('','Локально');
 </script>
 </body>
 </html>
