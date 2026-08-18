@@ -26,6 +26,8 @@ body{
 button,input,textarea{font-family:inherit; font-size:inherit; color:inherit}
 button{cursor:pointer; border:none; background:none; padding:0}
 .ic{flex:none; display:block}
+/* растущие поля: длинный текст переносится вниз, а не обрезается */
+.grow{resize:none; overflow:hidden; font-family:inherit; display:block; word-break:break-word}
 
 /* ---------- каркас ---------- */
 .app{max-width:1220px; margin:0 auto; padding:0 24px 80px}
@@ -82,8 +84,9 @@ header.top{
 .search{flex:1; border:none; outline:none; background:none; font-size:13px; padding:0}
 .search::placeholder{color:var(--muted)}
 .tags-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
-.tag{font-size:10.5px; font-weight:600; letter-spacing:.6px; padding:4px 9px;
-  border:1px solid var(--line); color:var(--muted); background:none; transition:.14s}
+.tag{font-size:10.5px; font-weight:600; letter-spacing:.6px; padding:4px 9px; text-align:left;
+  border:1px solid var(--line); color:var(--muted); background:none; transition:.14s;
+  overflow-wrap:anywhere; max-width:100%}
 .tag:hover{border-color:var(--ink); color:var(--ink)}
 .tag.on{border-color:var(--red); color:var(--red)}
 .tag.mini{padding:3px 7px; font-size:10px}
@@ -98,11 +101,11 @@ header.top{
 }
 .item:hover{border-left-color:var(--ink); background:var(--wash)}
 .item.on{border-left:2px solid var(--red); background:var(--wash); padding-left:13px}
-.item .t{display:flex; gap:8px; align-items:center; font-weight:600; font-size:13px}
-.item .t .ic{color:var(--muted)}
+.item .t{display:flex; gap:8px; align-items:flex-start; font-weight:600; font-size:13px; line-height:1.4}
+.item .t .ic{color:var(--muted); margin-top:2px}
 .item.on .t .ic{color:var(--red)}
-.item .t span.txt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.item .d{display:flex; align-items:center; gap:6px; font-size:10px; letter-spacing:1px;
+.item .t span.txt{overflow-wrap:anywhere}
+.item .d{display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:10px; letter-spacing:1px;
   text-transform:uppercase; color:var(--muted); margin-top:5px}
 .item .d .ic{color:var(--muted)}
 .item .p{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.5;
@@ -138,8 +141,9 @@ header.top{
 .stat-top b{display:block; font-size:20px; font-weight:700; line-height:1.1}
 .stat-top span{font-size:9.5px; color:var(--muted); letter-spacing:1px; text-transform:uppercase}
 .mb{display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:11px; font-weight:500}
-.mb-l{display:flex; align-items:center; gap:6px; width:104px; flex:none}
-.mb-l span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mb-l{display:flex; align-items:center; gap:6px; width:104px; flex:none; line-height:1.3}
+.mb-l .ic{flex:none}
+.mb-l span{overflow-wrap:anywhere}
 .mb-track{flex:1; height:1px; background:var(--line)}
 .mb-track i{display:block; height:1px; background:var(--ink); transition:width .35s ease}
 .mb.top .mb-track i{height:2px; margin-top:-.5px; background:var(--red)}
@@ -156,7 +160,9 @@ header.top{
 .wn{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; transition:.14s}
 .wn .ic{color:var(--muted); flex:none}
 .wish:hover .wn .ic{color:var(--red)}
-.wn span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.wn{align-items:flex-start; line-height:1.4}
+.wn .ic{margin-top:2px}
+.wn span{overflow-wrap:anywhere}
 .wl-line{display:flex; gap:3px; margin-top:8px}
 .wl-line i{flex:1; height:4px; border:1px solid var(--red)}
 .wl-line i.on{background:var(--red)}
@@ -213,11 +219,10 @@ header.top{
 .pl-h{font-size:8.5px; color:var(--muted); font-weight:700; letter-spacing:.5px;
   display:flex; align-items:center; justify-content:flex-end; padding:0 6px}
 .pl-cell{border-left:1px solid var(--line)}
-.pl-cell input{width:100%; height:26px; border:none; outline:none; background:none;
-  font-size:11px; padding:0 5px}
-.pl-cell input::placeholder{color:transparent}
-.pl-cell input:focus{background:var(--wash); box-shadow:inset 0 0 0 1px var(--red)}
-.pl-cell.on input{font-weight:600}
+.pl-cell textarea{width:100%; min-height:26px; border:none; outline:none; background:none;
+  font-size:11px; padding:5px; line-height:1.35}
+.pl-cell textarea:focus{background:var(--wash); box-shadow:inset 0 0 0 1px var(--red)}
+.pl-cell.on textarea{font-weight:600}
 .pl-cell.now{box-shadow:inset 2px 0 0 var(--red)}
 .pl-tasks{border:1px solid var(--line); border-top:1px solid var(--line-dark)}
 .pl-lbl{font-size:8.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
@@ -226,9 +231,9 @@ header.top{
 .pl-t{display:flex; align-items:flex-start; gap:5px}
 .pl-t .tick{width:11px; height:11px; margin-top:2px}
 .pl-t .tick svg{width:8px; height:8px}
-.pl-t input{flex:1; min-width:0; border:none; outline:none; background:none;
+.pl-t textarea{flex:1; min-width:0; border:none; outline:none; background:none;
   font-size:10.5px; line-height:1.4; padding:0}
-.pl-t.done input{text-decoration:line-through; color:var(--muted)}
+.pl-t.done textarea{text-decoration:line-through; color:var(--muted)}
 .pl-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--line); text-align:left; padding:1px 0; transition:.14s}
 .pl-tcol:hover .pl-add{color:var(--muted)}
@@ -240,7 +245,7 @@ header.top{
 .proj:last-of-type{border-bottom:none}
 .proj-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 .proj-name{flex:1; min-width:130px; border:none; outline:none; background:none;
-  font-size:13.5px; font-weight:600; padding:0}
+  font-size:13.5px; font-weight:600; padding:0; line-height:1.4}
 .proj-name::placeholder{color:var(--line)}
 .proj-dates{display:flex; align-items:center; gap:5px; color:var(--muted); font-size:9.5px}
 .proj-dates input{border:none; border-bottom:1px solid var(--line); background:none; outline:none;
@@ -259,13 +264,14 @@ header.top{
 .seg.on{background:var(--red)}
 .proj-line .star{flex:none; color:var(--red); margin-left:3px}
 
-.proj-stages{display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center}
-.stage{display:flex; align-items:center; gap:6px}
-.stage .tick{width:12px; height:12px}
+.proj-stages{display:flex; flex-wrap:wrap; gap:7px 14px; align-items:flex-start}
+.stage{display:flex; align-items:flex-start; gap:6px; max-width:100%}
+.stage .tick{width:12px; height:12px; margin-top:1px}
 .stage .tick svg{width:8px; height:8px}
-.stage input{border:none; outline:none; background:none; font-size:11px; padding:0; width:112px}
-.stage input::placeholder{color:var(--line)}
-.stage.done input{color:var(--muted); text-decoration:line-through}
+.stage textarea{border:none; outline:none; background:none; font-size:11px; padding:0;
+  width:118px; max-width:100%; line-height:1.4}
+.stage textarea::placeholder{color:var(--line)}
+.stage.done textarea{color:var(--muted); text-decoration:line-through}
 .stage-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--line); transition:.14s}
 .proj:hover .stage-add{color:var(--muted)}
@@ -280,7 +286,8 @@ header.top{
 /* ---------- редактор ---------- */
 .editor{display:flex; flex-direction:column; gap:20px}
 .title-in{width:100%; border:none; border-bottom:1px solid var(--line-dark); outline:none;
-  background:none; font-size:26px; font-weight:700; letter-spacing:-.4px; padding:0 0 12px}
+  background:none; font-size:26px; font-weight:700; letter-spacing:-.4px; padding:0 0 12px;
+  line-height:1.25; min-height:44px}
 .title-in::placeholder{color:var(--line)}
 .meta{display:flex; flex-wrap:wrap; gap:20px; align-items:center}
 .date-in{border:none; border-bottom:1px solid var(--line); background:none; padding:5px 0;
@@ -306,15 +313,16 @@ header.top{
 .hint{font-size:10px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase}
 
 /* ---------- задачи ---------- */
-.task{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--line)}
-.tick{width:15px; height:15px; border:1px solid var(--line-dark); flex:none;
+.task{display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid var(--line)}
+.tick{width:15px; height:15px; border:1px solid var(--line-dark); flex:none; margin-top:2px;
   display:grid; place-items:center; color:transparent; transition:.14s}
 .tick:hover{border-color:var(--red)}
 .tick.on{border-color:var(--red); color:var(--red)}
-.task .tx{flex:1; min-width:0; border:none; outline:none; background:none; font-size:12.5px; padding:2px 0}
+.task .tx{flex:1; min-width:0; border:none; outline:none; background:none;
+  font-size:12.5px; padding:1px 0; line-height:1.45}
 .task .tx::placeholder{color:var(--line)}
 .task.done .tx{color:var(--muted); text-decoration:line-through}
-.task .rm{color:transparent; display:grid; place-items:center; transition:.14s}
+.task .rm{color:transparent; display:grid; place-items:center; transition:.14s; margin-top:2px}
 .task:hover .rm{color:var(--line)}
 .task .rm:hover{color:var(--red)}
 .task-acts{display:flex; gap:7px; margin-top:12px; flex-wrap:wrap}
@@ -469,7 +477,8 @@ header.top{
           <span class="chev" id="enChev"></span>
         </div>
         <div class="block-body editor">
-          <input class="title-in" id="fTitle" placeholder="Название записи">
+              <textarea class="title-in grow" id="fTitle" rows="1" placeholder="Название записи"
+                    oninput="autoGrow(this)"></textarea>
           <div class="meta">
             <input class="date-in" id="fDate" type="date">
             <div class="moods" id="moods"></div>
@@ -522,16 +531,16 @@ header.top{
     <div class="field"><label>Желание</label>
       <input id="wName" placeholder="Чего я хочу"></div>
     <div class="field"><label>1 · Почему для меня это важно?</label>
-      <textarea id="wWhy" placeholder="Что стоит за этим желанием"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wWhy" placeholder="Что стоит за этим желанием"></textarea></div>
     <div class="field"><label>2 · Что я получу, добившись этого?</label>
-      <textarea id="wGain" placeholder="Как изменится жизнь"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wGain" placeholder="Как изменится жизнь"></textarea></div>
     <div class="field"><label>3 · Что мне нужно сделать для этого?</label>
       <div class="q-steps" id="wSteps"></div>
       <button class="btn quiet tiny" style="margin-top:10px" onclick="wAddStep()">+ шаг</button></div>
     <div class="field"><label>4 · Какого результата я хочу?</label>
-      <textarea id="wResult" placeholder="Как я пойму, что дошла"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wResult" placeholder="Как я пойму, что дошла"></textarea></div>
     <div class="field"><label>5 · Какой приз я получу?</label>
-      <textarea id="wPrize" placeholder="Чем себя награжу"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wPrize" placeholder="Чем себя награжу"></textarea></div>
     <div class="foot" style="margin-top:22px">
       <button class="btn primary" onclick="saveWish()">Сохранить</button>
       <button class="btn quiet" onclick="closeWish()">Отмена</button>
@@ -628,6 +637,16 @@ function plural(n,one,few,many){
   return b===1?one:many;
 }
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* поле подстраивает высоту под текст — длинная строка переносится вниз */
+function autoGrow(el){
+  if(!el) return;
+  el.style.height='auto';
+  el.style.height=(el.scrollHeight||0)+'px';
+}
+function growAll(root){
+  ((root&&root.querySelectorAll)?root:document).querySelectorAll('textarea.grow').forEach(autoGrow);
+}
 
 /* =============== markdown <-> объект =============== */
 function toMd(e){
@@ -843,8 +862,9 @@ function renderTasks(){
   $('tasksBox').innerHTML=
     (tk.length?tk.map((t,i)=>`<div class="task${t.d?' done':''}">
         <button class="tick${t.d?' on':''}" onclick="toggleTask(${i})" title="Отметить">${icon('check',10)}</button>
-        <input class="tx" value="${esc(t.t)}" placeholder="Что нужно сделать"
-               oninput="tk[${i}].t=this.value; queueTasksPush()" onkeydown="taskKey(event,${i})">
+        <textarea class="tx grow" rows="1" placeholder="Что нужно сделать"
+               oninput="tk[${i}].t=this.value; autoGrow(this); queueTasksPush()"
+               onkeydown="taskKey(event,${i})">${esc(t.t)}</textarea>
         <button class="rm" onclick="removeTask(${i})" title="Убрать">${icon('x',12)}</button>
       </div>`).join('')
      :'<div class="task-empty">Пока ничего не запланировано</div>')+
@@ -853,9 +873,10 @@ function renderTasks(){
       ${done?`<button class="btn quiet tiny" onclick="clearDone()">${icon('trash',12)}Убрать сделанные</button>`:''}
     </div>`+
     (live.length?`<div class="task-bar"><span>${pct}%</span><span class="track"><i style="width:${pct}%"></i></span></div>`:'');
+  growAll($('tasksBox'));
 }
 function focusTask(i){
-  const ins=$('tasksBox').querySelectorAll('input.tx');
+  const ins=$('tasksBox').querySelectorAll('.tx');
   if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); }
 }
 function addTask(){ tk.push({t:'',d:false}); renderTasks(); focusTask(tk.length-1); }
@@ -959,21 +980,23 @@ function fillWish(head){
   $('wName').value=wDraft.n; $('wWhy').value=wDraft.why; $('wGain').value=wDraft.gain;
   $('wResult').value=wDraft.result; $('wPrize').value=wDraft.prize;
   $('wDelBtn').style.display = wIdx>=0 ? '' : 'none';
-  renderWishSteps();
-  $('wMask').classList.add('open');
+  $('wMask').classList.add('open');       // сначала показать, потом мерить высоту полей
+  renderWishSteps(); growAll($('wMask'));
   setTimeout(()=>$('wName').focus(),30);
 }
 function renderWishSteps(){
   $('wSteps').innerHTML = wDraft.steps.length ? wDraft.steps.map((s,i)=>
     `<div class="task${s.d?' done':''}">
       <button class="tick${s.d?' on':''}" onclick="wToggleStep(${i})">${icon('check',10)}</button>
-      <input class="tx" value="${esc(s.t)}" placeholder="Шаг ${i+1}"
-             oninput="wDraft.steps[${i}].t=this.value" onkeydown="wStepKey(event,${i})">
+      <textarea class="tx grow" rows="1" placeholder="Шаг ${i+1}"
+             oninput="wDraft.steps[${i}].t=this.value; autoGrow(this)"
+             onkeydown="wStepKey(event,${i})">${esc(s.t)}</textarea>
       <button class="rm" onclick="wRemoveStep(${i})">${icon('x',12)}</button>
     </div>`).join('') : '<div class="task-empty">Разбей путь на шаги</div>';
+  growAll($('wSteps'));
 }
 function wStepFocus(i){
-  const ins=$('wSteps').querySelectorAll('input.tx');
+  const ins=$('wSteps').querySelectorAll('.tx');
   if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); }
 }
 function wAddStep(){ wDraft.steps.push({t:'',d:false}); renderWishSteps(); wStepFocus(wDraft.steps.length-1); }
@@ -1184,8 +1207,9 @@ function renderPlanner(){
         const k=iso(d), v=((plData[k]||{}).slots||{})[h]||'';
         const now = k===t && +h.slice(0,2)===nowH;
         return `<div class="pl-cell${v?' on':''}${now?' now':''}">
-          <input value="${esc(v)}" oninput="setSlot('${k}','${h}',this.value)"
-                 onkeydown="slotKey(event)" title="${WD[days.indexOf(d)]} ${h}"></div>`;
+          <textarea class="grow" rows="1" title="${WD[days.indexOf(d)]} ${h}"
+                 oninput="setSlot('${k}','${h}',this.value); autoGrow(this)"
+                 onkeydown="slotKey(event)">${esc(v)}</textarea></div>`;
       }).join('')+'</div>';
   });
 
@@ -1194,13 +1218,15 @@ function renderPlanner(){
     return `<div class="pl-tcol">`+
       list.map((x,i)=>`<div class="pl-t${x.d?' done':''}">
           <button class="tick${x.d?' on':''}" onclick="plToggle('${k}',${i})">${icon('check',8)}</button>
-          <input value="${esc(x.t)}" oninput="plSetTask('${k}',${i},this.value)"
-                 onkeydown="plTaskKey(event,'${k}',${i})" placeholder="дело">
+          <textarea class="grow" rows="1" placeholder="дело"
+                 oninput="plSetTask('${k}',${i},this.value); autoGrow(this)"
+                 onkeydown="plTaskKey(event,'${k}',${i})">${esc(x.t)}</textarea>
         </div>`).join('')+
       `<button class="pl-add" onclick="plAdd('${k}')">+ дело</button></div>`;
   }).join('')+'</div>';
 
   $('planner').innerHTML=`<div class="pl-scroll">${head}${rows}</div>${tasks}`;
+  growAll($('planner'));
 }
 
 function setSlot(k,h,v){
@@ -1216,7 +1242,7 @@ function plRemove(k,i){ plDay(k).tasks.splice(i,1); renderPlanner(); queuePlanne
 function plFocus(k,i){
   const col=[...$('planner').querySelectorAll('.pl-tcol')][weekDays().findIndex(d=>iso(d)===k)];
   if(!col) return;
-  const ins=col.querySelectorAll('input');
+  const ins=col.querySelectorAll('textarea');
   if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); }
 }
 function plTaskKey(ev,k,i){
@@ -1302,8 +1328,8 @@ function renderProjects(){
     const st=p.s||[], done=st.filter(x=>x.d).length, fin=pjDone(p), dl=pjDeadline(p);
     return `<div class="proj${fin?' done':''}">
       <div class="proj-top">
-        <input class="proj-name" value="${esc(p.n||'')}" placeholder="Название проекта"
-               oninput="pj[${i}].n=this.value; queuePjPush()">
+        <textarea class="proj-name grow" rows="1" placeholder="Название проекта"
+               oninput="pj[${i}].n=this.value; autoGrow(this); queuePjPush()">${esc(p.n||'')}</textarea>
         <span class="proj-dates">
           <input type="date" value="${p.from||''}" title="Начало"
                  onchange="pj[${i}].from=this.value; queuePjPush(); renderProjects()">
@@ -1324,14 +1350,15 @@ function renderProjects(){
       <div class="proj-stages">
         ${st.map((x,j)=>`<span class="stage${x.d?' done':''}">
             <button class="tick${x.d?' on':''}" onclick="pjToggle(${i},${j})">${icon('check',8)}</button>
-            <input value="${esc(x.t)}" placeholder="этап"
-                   oninput="pj[${i}].s[${j}].t=this.value; queuePjPush()"
-                   onkeydown="pjStageKey(event,${i},${j})">
+            <textarea class="grow" rows="1" placeholder="этап"
+                   oninput="pj[${i}].s[${j}].t=this.value; autoGrow(this); queuePjPush()"
+                   onkeydown="pjStageKey(event,${i},${j})">${esc(x.t)}</textarea>
           </span>`).join('')}
         <button class="stage-add" onclick="pjAddStage(${i})">+ этап</button>
       </div>
     </div>`;
   }).join('') : '<div class="task-empty">Проектов пока нет</div>';
+  growAll($('projects'));
 }
 
 function pjAdd(){
@@ -1352,7 +1379,7 @@ function pjAddStage(i){
 function pjFocusStage(i,j){
   const box=$('projects').querySelectorAll('.proj')[i];
   if(!box) return;
-  const ins=box.querySelectorAll('.stage input');
+  const ins=box.querySelectorAll('.stage textarea');
   if(ins[j]){ ins[j].focus(); ins[j].setSelectionRange(99,99); }
 }
 function pjStageKey(ev,i,j){
@@ -1369,6 +1396,7 @@ function uiState(){ try{ return JSON.parse(localStorage.getItem(LS_UI)||'{}'); }
 function applyBlocks(){
   const s=uiState();
   Object.entries(BLOCKS).forEach(([k,id])=>$(id).classList.toggle('closed', s[k]===true));
+  growAll();                              // развернули блок — пересчитать высоту полей
 }
 function toggleBlock(name){
   const s=uiState();
@@ -1437,7 +1465,7 @@ function newEntry(){
   $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
   renderMoods(''); resetPhoto();
   $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
-  openBlock('entry'); render(); $('fTitle').focus();
+  openBlock('entry'); autoGrow($('fTitle')); render(); $('fTitle').focus();
 }
 async function openEntry(file){
   const e=entries.find(x=>x.file===file); if(!e) return;
@@ -1445,7 +1473,8 @@ async function openEntry(file){
   $('fTitle').value=e.title; $('fDate').value=e.date;
   $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
-  $('editHint').textContent='Правка · '+fmtDate(e.date); openBlock('entry');
+  $('editHint').textContent='Правка · '+fmtDate(e.date);
+  openBlock('entry'); autoGrow($('fTitle'));
 
   ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo && !e.photoData)};
   renderPhoto(); render(); window.scrollTo({top:0,behavior:'smooth'});
