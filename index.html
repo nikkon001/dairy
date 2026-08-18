@@ -148,6 +148,31 @@ header.top{
 .stat-note{font-size:11px; color:var(--muted); margin:14px 0 0; line-height:1.6; letter-spacing:.3px}
 .stat-note b{color:var(--ink); font-weight:600}
 
+/* ---------- желания ---------- */
+.wish{width:100%; text-align:left; display:block; padding:11px 0;
+  border-bottom:1px solid var(--line); transition:.14s}
+.wish:last-of-type{border-bottom:none}
+.wish:hover .wn{color:var(--red)}
+.wn{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; transition:.14s}
+.wn .ic{color:var(--muted); flex:none}
+.wish:hover .wn .ic{color:var(--red)}
+.wn span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.wl-line{display:flex; gap:3px; margin-top:8px}
+.wl-line i{flex:1; height:4px; border:1px solid var(--red)}
+.wl-line i.on{background:var(--red)}
+.wish.done .wn{color:var(--muted); text-decoration:line-through}
+.wish.done .wn .ic{color:var(--muted)}
+.wish.done .wl-line i{border-color:#C4C4C4; background:#C4C4C4}
+.wm{font-size:9px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); margin-top:6px}
+
+.field textarea{width:100%; padding:9px 0; border:none; border-bottom:1px solid var(--line);
+  background:none; outline:none; font-size:13px; font-family:inherit; resize:vertical;
+  min-height:46px; line-height:1.6}
+.field textarea:focus{border-bottom-color:var(--red)}
+.q-steps{padding-top:2px}
+.q-steps .task{padding:6px 0}
+.q-steps .task .tx{font-size:12.5px}
+
 /* ---------- цитата дня ---------- */
 .quote{border-left:2px solid var(--red); padding:3px 0 3px 17px; margin-bottom:26px}
 .quote p{margin:0 0 7px; font-size:14px; line-height:1.6; font-weight:500}
@@ -383,6 +408,14 @@ header.top{
         </div>
 
         <div>
+          <p class="sect-title" id="wishTitle">Желания</p>
+          <div id="wishes"></div>
+          <div class="task-acts">
+            <button class="btn quiet tiny" id="wAddBtn" onclick="newWish()">Новое желание</button>
+          </div>
+        </div>
+
+        <div>
           <p class="sect-title">Записи</p>
           <div class="list" id="list"></div>
         </div>
@@ -482,6 +515,31 @@ header.top{
   </div>
 </div>
 
+<div class="mask" id="wMask" onclick="if(event.target===this)closeWish()">
+  <div class="modal">
+    <h2 id="wHead">Новое желание</h2>
+    <div class="rule"></div>
+    <div class="field"><label>Желание</label>
+      <input id="wName" placeholder="Чего я хочу"></div>
+    <div class="field"><label>1 · Почему для меня это важно?</label>
+      <textarea id="wWhy" placeholder="Что стоит за этим желанием"></textarea></div>
+    <div class="field"><label>2 · Что я получу, добившись этого?</label>
+      <textarea id="wGain" placeholder="Как изменится жизнь"></textarea></div>
+    <div class="field"><label>3 · Что мне нужно сделать для этого?</label>
+      <div class="q-steps" id="wSteps"></div>
+      <button class="btn quiet tiny" style="margin-top:10px" onclick="wAddStep()">+ шаг</button></div>
+    <div class="field"><label>4 · Какого результата я хочу?</label>
+      <textarea id="wResult" placeholder="Как я пойму, что дошла"></textarea></div>
+    <div class="field"><label>5 · Какой приз я получу?</label>
+      <textarea id="wPrize" placeholder="Чем себя награжу"></textarea></div>
+    <div class="foot" style="margin-top:22px">
+      <button class="btn primary" onclick="saveWish()">Сохранить</button>
+      <button class="btn quiet" onclick="closeWish()">Отмена</button>
+      <button class="btn quiet spacer" id="wDelBtn" onclick="deleteWish()">Удалить</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -510,6 +568,7 @@ const I={
   grid:'<path d="M3.5 3.5h17v17h-17z"/><path d="M3.5 9h17M3.5 15h17M9 3.5v17M15 3.5v17"/>',
   star:'<path d="M12 3.2l2.7 5.7 6.2.9-4.5 4.4 1.1 6.2-5.5-3-5.5 3 1.1-6.2L3.1 9.8l6.2-.9z"/>',
   flag:'<path d="M5.5 21V4M5.5 4.5h11l-2 3.5 2 3.5h-11"/>',
+  spark:'<path d="M12 3l1.9 5.6L19.5 10l-5.6 1.4L12 17l-1.9-5.6L4.5 10l5.6-1.4z"/><path d="M18 16.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
   /* настроения */
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>',
   wave:'<path d="M2.5 9.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/><path d="M2.5 15.5c2.4-2.6 4.9-2.6 7.3 0s4.9 2.6 7.3 0 2.4-2.6 4.4-1.6"/>',
@@ -809,6 +868,137 @@ function clearDone(){
 function taskKey(ev,i){
   if(ev.key==='Enter'){ ev.preventDefault(); tk.splice(i+1,0,{t:'',d:false}); renderTasks(); focusTask(i+1); }
   else if(ev.key==='Backspace' && !tk[i].t){ ev.preventDefault(); removeTask(i); focusTask(Math.max(0,i-1)); }
+}
+
+/* =============== желания =============== */
+let wl=[], wlSha=null, wlTimer=null, wIdx=-1, wDraft=null;
+const LS_W='diary_wishes_v1';
+const wFile = () => (cfg().wishesFile||'wishes.md').replace(/^\/+/,'');
+const wDone = w => (w.steps||[]).length>0 && w.steps.every(s=>s.d);
+const W_Q=[['why','Почему это важно'],['gain','Что я получу'],
+           ['result','Какого результата хочу'],['prize','Какой приз получу']];
+
+function wToMd(){
+  const out=['# Желания',''];
+  wl.filter(w=>(w.n||'').trim()).forEach(w=>{
+    out.push('## '+w.n.trim(),'');
+    W_Q.slice(0,2).forEach(([k,l])=>{ if((w[k]||'').trim()) out.push('**'+l+':** '+w[k].trim(),''); });
+    const st=(w.steps||[]).filter(s=>(s.t||'').trim());
+    if(st.length){
+      out.push('**Что нужно сделать:**','');
+      st.forEach(s=>out.push('- ['+(s.d?'x':' ')+'] '+s.t.trim()));
+      out.push('');
+    }
+    W_Q.slice(2).forEach(([k,l])=>{ if((w[k]||'').trim()) out.push('**'+l+':** '+w[k].trim(),''); });
+  });
+  return out.join('\n');
+}
+function wFromMd(text){
+  const byLabel={}; W_Q.forEach(([k,l])=>byLabel[l.toLowerCase()]=k);
+  const out=[]; let cur=null;
+  text.split(/\r?\n/).forEach(line=>{
+    const h=line.match(/^##\s+(.*)$/);
+    if(h){ cur={n:h[1].trim(), why:'', gain:'', result:'', prize:'', steps:[]}; out.push(cur); return; }
+    if(!cur) return;
+    const f=line.match(/^\*\*(.+?):\*\*\s*(.*)$/);
+    if(f){ const k=byLabel[f[1].trim().toLowerCase()]; if(k) cur[k]=f[2].trim(); return; }
+    const s=line.match(/^\s*[-*]\s*\[([ xX])\]\s?(.*)$/);
+    if(s) cur.steps.push({t:s[2].trim(), d:s[1].toLowerCase()==='x'});
+  });
+  return out;
+}
+function saveWlLocal(){ try{ localStorage.setItem(LS_W, JSON.stringify({wl, sha:wlSha})); }catch(e){} }
+function loadWlLocal(){
+  try{ const j=JSON.parse(localStorage.getItem(LS_W)||'{}'); wl=j.wl||[]; wlSha=j.sha||null; }
+  catch(e){ wl=[]; wlSha=null; }
+}
+async function pullWishes(){
+  if(!hasGH()) return;
+  try{
+    const r=await gh('/contents/'+encodeURI(wFile())+'?ref='+encodeURIComponent(branch()));
+    if(r.status===404){ wlSha=null; return; }
+    if(!r.ok) return;
+    const j=await r.json();
+    wlSha=j.sha; wl=wFromMd(b64dec(j.content));
+    saveWlLocal(); renderWishes();
+  }catch(e){}
+}
+function queueWlPush(){
+  saveWlLocal();
+  if(!hasGH()) return;
+  clearTimeout(wlTimer); wlTimer=setTimeout(pushWishes, 1300);
+}
+async function pushWishes(){
+  if(!hasGH()) return;
+  try{
+    setSync('busy','Сохраняю желания');
+    wlSha=await putFile(wFile(), b64enc(wToMd()), 'diary: желания', wlSha);
+    saveWlLocal(); setSync('ok','Сохранено');
+  }catch(err){ setSync('err','Ошибка'); toast('Желания: '+err.message); }
+}
+
+function renderWishes(){
+  const live=wl.filter(w=>!wDone(w)).length;
+  $('wishTitle').innerHTML='Желания'+(wl.length?` <span style="float:right;color:var(--muted)">${live} в пути</span>`:'');
+  $('wishes').innerHTML = wl.length ? wl.map((w,i)=>{
+    const st=w.steps||[], done=st.filter(s=>s.d).length, fin=wDone(w);
+    return `<button class="wish${fin?' done':''}" onclick="openWish(${i})">
+      <span class="wn">${icon(fin?'star':'spark',14)}<span>${esc(w.n||'Без названия')}</span></span>
+      ${st.length?`<span class="wl-line">${st.map(s=>`<i class="${s.d?'on':''}"></i>`).join('')}</span>`:''}
+      <span class="wm">${st.length?done+' из '+st.length+' шагов':'шаги не заданы'}${fin?' · исполнено':''}</span>
+    </button>`;
+  }).join('') : '<div class="task-empty">Здесь будет то, чего хочется</div>';
+}
+
+/* ---- окно желания ---- */
+function blankWish(){ return {n:'', why:'', gain:'', result:'', prize:'', steps:[]}; }
+function newWish(){ wIdx=-1; wDraft=blankWish(); fillWish('Новое желание'); }
+function openWish(i){ wIdx=i; wDraft=JSON.parse(JSON.stringify(wl[i])); fillWish('Желание'); }
+function fillWish(head){
+  $('wHead').textContent=head;
+  $('wName').value=wDraft.n; $('wWhy').value=wDraft.why; $('wGain').value=wDraft.gain;
+  $('wResult').value=wDraft.result; $('wPrize').value=wDraft.prize;
+  $('wDelBtn').style.display = wIdx>=0 ? '' : 'none';
+  renderWishSteps();
+  $('wMask').classList.add('open');
+  setTimeout(()=>$('wName').focus(),30);
+}
+function renderWishSteps(){
+  $('wSteps').innerHTML = wDraft.steps.length ? wDraft.steps.map((s,i)=>
+    `<div class="task${s.d?' done':''}">
+      <button class="tick${s.d?' on':''}" onclick="wToggleStep(${i})">${icon('check',10)}</button>
+      <input class="tx" value="${esc(s.t)}" placeholder="Шаг ${i+1}"
+             oninput="wDraft.steps[${i}].t=this.value" onkeydown="wStepKey(event,${i})">
+      <button class="rm" onclick="wRemoveStep(${i})">${icon('x',12)}</button>
+    </div>`).join('') : '<div class="task-empty">Разбей путь на шаги</div>';
+}
+function wStepFocus(i){
+  const ins=$('wSteps').querySelectorAll('input.tx');
+  if(ins[i]){ ins[i].focus(); ins[i].setSelectionRange(99,99); }
+}
+function wAddStep(){ wDraft.steps.push({t:'',d:false}); renderWishSteps(); wStepFocus(wDraft.steps.length-1); }
+function wRemoveStep(i){ wDraft.steps.splice(i,1); renderWishSteps(); }
+function wToggleStep(i){ wDraft.steps[i].d=!wDraft.steps[i].d; renderWishSteps(); }
+function wStepKey(ev,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); wDraft.steps.splice(i+1,0,{t:'',d:false}); renderWishSteps(); wStepFocus(i+1); }
+  else if(ev.key==='Backspace' && !wDraft.steps[i].t){ ev.preventDefault(); wRemoveStep(i); wStepFocus(Math.max(0,i-1)); }
+}
+function closeWish(){ $('wMask').classList.remove('open'); wDraft=null; wIdx=-1; }
+function saveWish(){
+  const w={
+    n:$('wName').value.trim(), why:$('wWhy').value.trim(), gain:$('wGain').value.trim(),
+    result:$('wResult').value.trim(), prize:$('wPrize').value.trim(),
+    steps:wDraft.steps.filter(s=>s.t.trim()).map(s=>({t:s.t.trim(), d:!!s.d}))
+  };
+  if(!w.n){ toast('Напиши, чего хочешь'); $('wName').focus(); return; }
+  if(wIdx>=0) wl[wIdx]=w; else wl.push(w);
+  closeWish(); renderWishes(); queueWlPush();
+  toast(wDone(w)?'Исполнено':'Сохранено');
+}
+function deleteWish(){
+  if(wIdx<0) return;
+  if(!confirm('Удалить желание «'+(wl[wIdx].n||'')+'»?')) return;
+  wl.splice(wIdx,1); closeWish(); renderWishes(); queueWlPush();
 }
 
 /* =============== цитата дня =============== */
@@ -1442,6 +1632,9 @@ async function saveSettings(){
     const hadProj=pj.length;
     await pullProjects();
     if(hadProj && !pjSha) await pushProjects();
+    const hadWish=wl.length;
+    await pullWishes();
+    if(hadWish && !wlSha) await pushWishes();
   }
   else setSync('','Локально');
 }
@@ -1477,27 +1670,33 @@ function paintStaticIcons(){
   $('pjChev').innerHTML     = icon('down',15);
   $('enChev').innerHTML     = icon('down',15);
   $('pjAddBtn').innerHTML   = icon('plus',12)+'Новый проект';
+  $('wAddBtn').innerHTML    = icon('plus',12)+'Новое желание';
   $('eyeBtn').innerHTML     = icon('eye',13)+'Показать';
   $('copyBtn').innerHTML    = icon('copy',13)+'Копировать';
   $('expBtn').innerHTML     = icon('download',13)+'Скачать всё';
   $('searchWrap').insertAdjacentHTML('afterbegin', icon('search',15));
 }
 document.addEventListener('keydown', ev=>{
-  if((ev.metaKey||ev.ctrlKey) && ev.key==='s'){ ev.preventDefault(); saveEntry(); }
-  if(ev.key==='Escape') closeSettings();
+  const wOpen=$('wMask').classList.contains('open');
+  if((ev.metaKey||ev.ctrlKey) && ev.key==='s'){
+    ev.preventDefault();
+    wOpen ? saveWish() : saveEntry();
+  }
+  if(ev.key==='Escape'){ closeSettings(); closeWish(); }
 });
 window.addEventListener('beforeunload', ()=>{
   if(tkTimer){ clearTimeout(tkTimer); pushTasks(); }
   if(plTimer){ clearTimeout(plTimer); pushPlanner(); }
   if(pjTimer){ clearTimeout(pjTimer); pushProjects(); }
+  if(wlTimer){ clearTimeout(wlTimer); pushWishes(); }
 });
 
 paintStaticIcons();
-loadLocal(); loadTasksLocal(); loadPlannerLocal(); loadPjLocal();
+loadLocal(); loadTasksLocal(); loadPlannerLocal(); loadPjLocal(); loadWlLocal();
 applyBlocks();
 renderQuote();
-newEntry(); renderTasks(); renderPlanner(); renderProjects();
-if(hasGH()) pullAll().then(pullTasks).then(pullPlanner).then(pullProjects);
+newEntry(); renderTasks(); renderPlanner(); renderProjects(); renderWishes();
+if(hasGH()) pullAll().then(pullTasks).then(pullPlanner).then(pullProjects).then(pullWishes);
 else setSync('','Локально');
 </script>
 </body>
