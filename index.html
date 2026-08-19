@@ -519,7 +519,8 @@ header.top{
     <div class="foot" style="margin-top:22px">
       <button class="btn primary" onclick="saveSettings()">Подключить</button>
       <button class="btn quiet" onclick="closeSettings()">Отмена</button>
-      <button class="btn quiet spacer" id="expBtn" onclick="exportAll()">Скачать всё</button>
+      <button class="btn quiet" id="expBtn" onclick="exportAll()">Скачать всё</button>
+      <button class="btn quiet spacer" id="outBtn" onclick="signOut()">Выйти</button>
     </div>
   </div>
 </div>
@@ -616,6 +617,31 @@ function setSync(state, text){
   $('syncText').textContent=text;
 }
 
+/* что ещё не доехало до GitHub */
+const pending=new Set();
+const pendingCount = () => entries.filter(e=>!e.sha).length + pending.size;
+function syncLabel(){
+  if(!hasGH()){ setSync('','Локально'); return; }
+  const n=pendingCount();
+  if(n) setSync('err', 'Не отправлено: '+n);
+  else  setSync('ok','Синхронизировано');
+}
+
+let syncing=false;
+async function syncPending(){                       // досылаем всё, что застряло
+  if(!hasGH() || syncing || !navigator.onLine) return;
+  if(!pendingCount()) return;
+  syncing=true;
+  try{
+    for(const e of entries.filter(x=>!x.sha)) await pushEntry(e);
+    if(pending.has('tasks'))    await pushTasks();
+    if(pending.has('planner'))  await pushPlanner();
+    if(pending.has('projects')) await pushProjects();
+    if(pending.has('wishes'))   await pushWishes();
+    render(); syncLabel();
+  } finally{ syncing=false; }
+}
+
 /* =============== утилиты =============== */
 function b64enc(s){ const b=new TextEncoder().encode(s); let x=''; b.forEach(c=>x+=String.fromCharCode(c)); return btoa(x); }
 function b64dec(s){ const bin=atob(s.replace(/\s/g,'')); return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))); }
@@ -694,17 +720,41 @@ const dirPath  = () => (cfg().path||'entries').replace(/^\/+|\/+$/g,'');
 const mediaDir = () => (cfg().media||'media').replace(/^\/+|\/+$/g,'');
 const branch   = () => cfg().branch||'main';
 
-async function putFile(path, contentB64, message, sha){
+class Conflict extends Error{}                    // файл изменили с другого устройства
+
+async function putFile(path, contentB64, message, sha, strict){
   const body={message, content:contentB64, branch:branch()};
   if(sha) body.sha=sha;
   const send=()=>gh('/contents/'+encodeURI(path),{method:'PUT',body:JSON.stringify(body)});
   let res=await send();
-  if(!res.ok && (res.status===409 || res.status===422)){      // sha устарел — берём свежий
+  if(!res.ok && (res.status===409 || res.status===422)){
+    if(strict) throw new Conflict();              // общий файл — молча не перезаписываем
     const g=await gh('/contents/'+encodeURI(path)+'?ref='+encodeURIComponent(branch()));
     if(g.ok){ body.sha=(await g.json()).sha; res=await send(); }
   }
   if(!res.ok) throw new Error((await res.json()).message||res.status);
   return (await res.json()).content.sha;
+}
+
+/* Общий файл (задачи, планер, проекты, желания) хранится целиком,
+   поэтому при расхождении версий спрашиваем, какую оставить. */
+async function putShared(file, text, message, sha, label, applyRemote){
+  try{
+    return await putFile(file, b64enc(text), message, sha, true);
+  }catch(err){
+    if(!(err instanceof Conflict)) throw err;
+    const g=await gh('/contents/'+encodeURI(file)+'?ref='+encodeURIComponent(branch()));
+    if(!g.ok) throw err;
+    const j=await g.json();
+    const mine=confirm(
+      label+': на другом устройстве этот список изменили.\n\n'+
+      'ОК — оставить версию с этого устройства\n'+
+      'Отмена — взять версию из GitHub (правки здесь пропадут)');
+    if(mine) return await putFile(file, b64enc(text), message, j.sha);
+    applyRemote(b64dec(j.content), j.sha);
+    toast(label+': взята версия из GitHub');
+    return j.sha;
+  }
 }
 async function delFile(path, sha, message){
   if(!sha){
@@ -733,8 +783,7 @@ async function pullAll(){
     }
     const names=new Set(loaded.map(e=>e.file));
     entries=loaded.concat(entries.filter(e=>!names.has(e.file) && !e.sha));
-    saveLocal(); render();
-    setSync('ok','Синхронизировано · '+loaded.length);
+    saveLocal(); render(); syncLabel();
   }catch(err){
     setSync('err','Ошибка');
     toast('Не удалось загрузить: '+err.message);
@@ -759,9 +808,9 @@ async function pushEntry(e){
     e.sha=await putFile(dirPath()+'/'+e.file, b64enc(toMd(e)),
                         'diary: '+e.date+' — '+(e.title||'запись'), e.sha);
     e.photoData='';
-    saveLocal(); render(); setSync('ok','Сохранено');
+    saveLocal(); render(); syncLabel();
   }catch(err){
-    setSync('err','Ошибка');
+    syncLabel();
     toast('GitHub: '+err.message+' — запись сохранена локально');
   }
 }
@@ -850,9 +899,10 @@ async function pushTasks(){
   if(!hasGH()) return;
   try{
     setSync('busy','Сохраняю задачи');
-    tkSha=await putFile(tasksFile(), b64enc(tasksToMd()), 'diary: задачи', tkSha);
-    saveTasksLocal(); setSync('ok','Сохранено');
-  }catch(err){ setSync('err','Ошибка'); toast('Задачи: '+err.message); }
+    tkSha=await putShared(tasksFile(), tasksToMd(), 'diary: задачи', tkSha, 'Задачи',
+      (text,sha)=>{ tk=tasksFromMd(text); tkSha=sha; saveTasksLocal(); renderTasks(); });
+    pending.delete('tasks'); saveTasksLocal(); syncLabel();
+  }catch(err){ pending.add('tasks'); syncLabel(); toast('Задачи: '+err.message); }
 }
 
 function renderTasks(){
@@ -953,9 +1003,10 @@ async function pushWishes(){
   if(!hasGH()) return;
   try{
     setSync('busy','Сохраняю желания');
-    wlSha=await putFile(wFile(), b64enc(wToMd()), 'diary: желания', wlSha);
-    saveWlLocal(); setSync('ok','Сохранено');
-  }catch(err){ setSync('err','Ошибка'); toast('Желания: '+err.message); }
+    wlSha=await putShared(wFile(), wToMd(), 'diary: желания', wlSha, 'Желания',
+      (text,sha)=>{ wl=wFromMd(text); wlSha=sha; saveWlLocal(); renderWishes(); });
+    pending.delete('wishes'); saveWlLocal(); syncLabel();
+  }catch(err){ pending.add('wishes'); syncLabel(); toast('Желания: '+err.message); }
 }
 
 function renderWishes(){
@@ -1174,10 +1225,11 @@ async function pushPlanner(){
   const key=plKey(), file='planner/'+key+'.md', body=plToMd(), sha=plSha;
   try{
     setSync('busy','Сохраняю планер');
-    const newSha=await putFile(file, b64enc(body), 'diary: планер '+key, sha);
+    const newSha=await putShared(file, body, 'diary: планер '+key, sha, 'Планер',
+      (text,s)=>{ if(plKey()===key){ plData=plFromMd(text); plSha=s; savePlannerLocal(); renderPlanner(); } });
     if(plKey()===key){ plSha=newSha; savePlannerLocal(); }
-    setSync('ok','Сохранено');
-  }catch(err){ setSync('err','Ошибка'); toast('Планер: '+err.message); }
+    pending.delete('planner'); syncLabel();
+  }catch(err){ pending.add('planner'); syncLabel(); toast('Планер: '+err.message); }
 }
 
 function shiftWeek(n){
@@ -1304,9 +1356,10 @@ async function pushProjects(){
   if(!hasGH()) return;
   try{
     setSync('busy','Сохраняю проекты');
-    pjSha=await putFile(pjFile(), b64enc(pjToMd()), 'diary: проекты', pjSha);
-    savePjLocal(); setSync('ok','Сохранено');
-  }catch(err){ setSync('err','Ошибка'); toast('Проекты: '+err.message); }
+    pjSha=await putShared(pjFile(), pjToMd(), 'diary: проекты', pjSha, 'Проекты',
+      (text,sha)=>{ pj=pjFromMd(text); pjSha=sha; savePjLocal(); renderProjects(); });
+    pending.delete('projects'); savePjLocal(); syncLabel();
+  }catch(err){ pending.add('projects'); syncLabel(); toast('Проекты: '+err.message); }
 }
 
 function pjDeadline(p){
@@ -1671,6 +1724,16 @@ async function pushUnsynced(){
   for(const e of entries.filter(x=>!x.sha)) await pushEntry(e);
   render();
 }
+function signOut(){
+  const n=pendingCount();
+  const warn = n
+    ? '⚠ Не отправлено в GitHub: '+n+'. Эти правки пропадут.\n\n'
+    : '';
+  if(!confirm(warn+'Стереть токен и все локальные копии с этого устройства?\n\nВсё, что уже уехало в GitHub, останется на месте.')) return;
+  [LS_C,LS_E,LS_T,LS_P,LS_J,LS_W,LS_UI].forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+  location.reload();
+}
+
 function exportAll(){
   if(!entries.length){ toast('Записей пока нет'); return; }
   entries.forEach((e,i)=>setTimeout(()=>{
@@ -1703,6 +1766,7 @@ function paintStaticIcons(){
   $('eyeBtn').innerHTML     = icon('eye',13)+'Показать';
   $('copyBtn').innerHTML    = icon('copy',13)+'Копировать';
   $('expBtn').innerHTML     = icon('download',13)+'Скачать всё';
+  $('outBtn').innerHTML     = icon('x',13)+'Выйти';
   $('searchWrap').insertAdjacentHTML('afterbegin', icon('search',15));
 }
 document.addEventListener('keydown', ev=>{
@@ -1725,8 +1789,15 @@ loadLocal(); loadTasksLocal(); loadPlannerLocal(); loadPjLocal(); loadWlLocal();
 applyBlocks();
 renderQuote();
 newEntry(); renderTasks(); renderPlanner(); renderProjects(); renderWishes();
-if(hasGH()) pullAll().then(pullTasks).then(pullPlanner).then(pullProjects).then(pullWishes);
-else setSync('','Локально');
+
+window.addEventListener('online',  ()=>{ toast('Связь вернулась — досылаю'); syncPending(); });
+window.addEventListener('offline', ()=>setSync('err','Нет связи'));
+setInterval(syncPending, 60000);                  // и просто время от времени
+
+if(hasGH()){
+  pullAll().then(pullTasks).then(pullPlanner).then(pullProjects).then(pullWishes)
+           .then(syncPending).then(syncLabel);
+} else setSync('','Локально');
 </script>
 </body>
 </html>
