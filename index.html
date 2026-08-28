@@ -94,7 +94,47 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 [data-view]{display:none}
 body[data-tab="planner"]  [data-view="planner"],
 body[data-tab="projects"] [data-view="projects"],
+body[data-tab="swot"]     [data-view="swot"],
 body[data-tab="diary"]    [data-view="diary"]{display:block}
+
+/* ---------- SWOT ---------- */
+.sw-meta{display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap; margin-bottom:20px}
+.sw-name{flex:1; min-width:180px; border:none; border-bottom:1px solid var(--line-dark);
+  background:none; outline:none; font-size:19px; font-weight:700; padding:0 0 9px; line-height:1.3}
+.sw-name::placeholder{color:var(--dim)}
+.sw-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.sw-q{border:1px solid var(--line); padding:14px 15px 12px; min-width:0}
+.sw-q.neg{border-color:var(--line-dark)}
+.sw-h{display:flex; align-items:center; gap:9px; margin-bottom:10px}
+.sw-b{width:22px; height:22px; flex:none; display:grid; place-items:center; font-size:11px;
+  font-weight:700; background:var(--ink); color:#fff}
+.sw-q.neg .sw-b{background:var(--red)}
+.sw-h b{font-size:10px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase}
+.sw-h .n{margin-left:auto; font-size:9px; font-weight:700; color:var(--muted)}
+.sw-i{display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid var(--line)}
+.sw-i:last-of-type{border-bottom:none}
+.sw-i .d{width:5px; height:5px; margin-top:7px; flex:none; background:var(--ink)}
+.sw-q.neg .sw-i .d{background:var(--red)}
+.sw-i textarea{flex:1; min-width:0; border:none; outline:none; background:none;
+  font-size:12.5px; line-height:1.45; padding:1px 0}
+.sw-i textarea::placeholder{color:var(--dim)}
+.sw-i .rm{color:transparent; flex:none; margin-top:2px; display:grid; place-items:center}
+.sw-i:hover .rm{color:var(--dim)}
+.sw-i .rm:hover{color:var(--red)}
+.sw-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--dim); margin-top:8px; min-height:24px; text-align:left}
+.sw-add:hover{color:var(--red)}
+.sw-draft{border-left:2px solid var(--red); padding:3px 0 3px 13px; margin-bottom:18px;
+  font-size:11.5px; line-height:1.55; color:var(--muted)}
+.sw-draft b{color:var(--ink); font-weight:700}
+.sw-item{width:100%; text-align:left; display:block; padding:11px 0;
+  border-bottom:1px solid var(--line); transition:.14s}
+.sw-item:last-of-type{border-bottom:none}
+.sw-item:hover .t{color:var(--red)}
+.sw-item .t{display:flex; align-items:flex-start; gap:8px; font-size:12.5px; font-weight:600; line-height:1.4}
+.sw-item .t .ic{color:var(--muted); flex:none; margin-top:2px}
+.sw-item.on .t{color:var(--red)}
+.sw-item .m{font-size:9px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); margin-top:6px}
 
 /* ---------- секции ---------- */
 .sect-title{font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
@@ -305,41 +345,64 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
 
 /* ---------- roadmap ---------- */
 .rm-wrap{overflow-x:auto}
-.rm-grid{display:grid; min-width:640px}
-.rm-corner,.rm-w{border-bottom:1px solid var(--line-dark); padding:0 0 7px}
-.rm-w{text-align:center; font-size:8.5px; font-weight:700; letter-spacing:.6px;
-  text-transform:uppercase; color:var(--muted); border-left:1px solid var(--line)}
-.rm-w b{display:block; font-size:11px; color:var(--ink); letter-spacing:0; margin-top:2px}
-.rm-w.mstart{color:var(--ink)}
-.rm-name{display:flex; align-items:flex-start; gap:7px; padding:11px 12px 11px 0; min-width:0;
-  border-bottom:1px solid var(--line); font-size:11.5px; font-weight:600; line-height:1.35}
-.rm-name span{overflow-wrap:anywhere; min-width:0}
-.rm-name .n{font-size:9px; color:var(--muted); font-weight:700; margin-left:auto; padding-top:1px}
-.rm-track{position:relative; border-bottom:1px solid var(--line); min-height:42px;
+.rm{min-width:760px}
+.rm-row{display:grid; grid-template-columns:158px minmax(0,1fr); align-items:stretch}
+.rm-l{padding:9px 12px 9px 0; font-size:11px; line-height:1.35; min-width:0;
+  border-bottom:1px solid var(--line); display:flex; align-items:flex-start; gap:6px;
+  overflow-wrap:anywhere; color:var(--muted)}
+.rm-t{position:relative; border-left:1px solid var(--line-dark); border-bottom:1px solid var(--line);
   background-image:repeating-linear-gradient(to right,var(--line) 0 1px,transparent 1px var(--wk))}
-.rm-bar{position:absolute; top:14px; height:11px; border:1px solid var(--red); background:var(--bg)}
-.rm-fill{position:absolute; left:0; top:0; bottom:0; background:var(--red)}
-.rm-cap{position:absolute; top:-1px; bottom:-1px; width:2px; background:var(--red)}
-.rm-row.done .rm-bar{border-color:var(--dim)}
-.rm-row.done .rm-fill{background:var(--dim)}
-.rm-row.done .rm-cap{background:var(--dim)}
-.rm-row.done .rm-name{color:var(--muted); text-decoration:line-through}
-.rm-star{position:absolute; top:9px; color:var(--muted)}
-.rm-mk{position:absolute; top:11px; width:9px; height:9px; margin-left:-5px; border:1.5px solid var(--red);
-  background:var(--bg); transform:rotate(45deg); cursor:default}
-.rm-mk.on{background:var(--red)}
-.rm-mk.late{border-color:var(--red); background:var(--red); box-shadow:0 0 0 3px rgba(217,30,24,.16)}
-.rm-lbl{position:absolute; top:27px; font-size:8.5px; color:var(--muted); line-height:1.3;
-  transform:translateX(-50%); width:86px; text-align:center; overflow-wrap:anywhere}
-.rm-now{position:absolute; top:0; bottom:0; width:1px; background:var(--red); opacity:.55}
+
+/* шапка со шкалой */
+.rm-head .rm-l,.rm-head .rm-t{border-bottom:1px solid var(--line-dark); background:none}
+.rm-months,.rm-weeks{display:flex}
+.rm-months div{font-size:9px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase;
+  padding:5px 6px 4px; border-left:1px solid var(--line); color:var(--ink); overflow:hidden}
+.rm-months div:first-child{border-left:none}
+.rm-weeks div{flex:1; text-align:center; font-size:9px; font-weight:600; color:var(--muted);
+  padding:3px 0 6px; border-left:1px solid var(--line)}
+.rm-weeks div:first-child{border-left:none}
+
+/* группа проекта */
+.rm-row.grp .rm-l{background:var(--ink); color:#fff; font-size:10px; font-weight:700;
+  letter-spacing:1.4px; text-transform:uppercase; padding:10px 12px; align-items:center}
+.rm-row.grp .rm-l .n{margin-left:auto; opacity:.6; letter-spacing:.6px; white-space:nowrap}
+.rm-row.grp.done .rm-l{background:var(--dim)}
+.rm-sum{position:absolute; top:50%; height:3px; margin-top:-1.5px; background:var(--ink); opacity:.55}
+.rm-row.grp.done .rm-sum{background:var(--dim)}
+
+/* полосы этапов */
+.rm-bar{position:absolute; top:6px; min-height:22px; padding:4px 9px; font-size:10.5px;
+  line-height:1.35; font-weight:600; overflow-wrap:anywhere; border:1px solid var(--line);
+  color:var(--muted); background:var(--bg); display:flex; align-items:center}
+.rm-bar.done{background:var(--ink); border-color:var(--ink); color:#fff}
+.rm-bar.now{border-color:var(--red); color:var(--ink); border-width:1.5px}
+.rm-bar.late{background:var(--red); border-color:var(--red); color:#fff}
+.rm-out{position:absolute; top:9px; font-size:10.5px; line-height:1.35; font-weight:600;
+  width:180px; overflow-wrap:anywhere; color:var(--ink)}
+.rm-out.muted{color:var(--muted); font-weight:500}
+.rm-bar.empty{padding:0; min-width:3px}
+
+/* вехи */
+.rm-ms{position:absolute; top:7px; display:flex; align-items:flex-start; gap:5px;
+  font-size:10.5px; font-weight:600; line-height:1.3; width:150px; overflow-wrap:anywhere}
+.rm-ms.right{transform:translateX(-100%); text-align:right; flex-direction:row-reverse}
+.rm-ms .ic{color:var(--red); margin-top:1px}
+.rm-ms small{display:block; font-size:9px; color:var(--muted); font-weight:600; letter-spacing:.4px}
+.rm-ms.done .ic{color:var(--dim)}
+
+.rm-now{position:absolute; top:0; bottom:0; width:1px; background:var(--red); opacity:.5; z-index:1}
 .rm-none{font-size:11px; color:var(--muted); line-height:1.6; padding-top:12px;
   border-top:1px solid var(--line); margin-top:4px}
 .rm-none b{color:var(--ink); font-weight:600}
-.rm-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px; font-size:9px;
+.rm-nodate{display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 0 8px 10px}
+.rm-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; font-size:9px;
   letter-spacing:1px; text-transform:uppercase; color:var(--muted); font-weight:700}
 .rm-legend span{display:flex; align-items:center; gap:6px}
-.rm-legend i{width:9px; height:9px; border:1.5px solid var(--red); transform:rotate(45deg); display:block}
-.rm-legend i.f{background:var(--red)}
+.rm-legend i{width:16px; height:9px; border:1px solid var(--line); display:block}
+.rm-legend i.d{background:var(--ink); border-color:var(--ink)}
+.rm-legend i.n{border-color:var(--red); border-width:1.5px}
+.rm-legend i.l{background:var(--red); border-color:var(--red)}
 
 /* ---------- проекты ---------- */
 .proj{padding:15px 0; border-bottom:1px solid var(--line)}
@@ -583,6 +646,7 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
   <nav class="tabs" id="tabs">
     <button id="tabPlanner"  onclick="setTab('planner')"><span class="lb">Планер</span></button>
     <button id="tabProjects" onclick="setTab('projects')"><span class="lb">Проекты</span></button>
+    <button id="tabSwot"     onclick="setTab('swot')"><span class="lb">SWOT</span></button>
     <button id="tabDiary"    onclick="setTab('diary')"><span class="lb">Дневник</span></button>
   </nav>
 
@@ -673,6 +737,30 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
         </div>
       </section>
 
+      <section class="block" data-view="swot" id="blkSwot">
+        <div class="block-head" onclick="toggleBlock('swot')">
+          <span id="swIcon"></span>
+          <h2>SWOT-анализ</h2>
+          <span class="meta-lbl" id="swTag"></span>
+          <span class="chev" id="swChev"></span>
+        </div>
+        <div class="block-body">
+          <div id="swNote"></div>
+          <div class="sw-meta">
+            <textarea class="sw-name grow" id="swName" rows="1" placeholder="Что анализируем"
+                      oninput="swDraft.n=this.value; autoGrow(this); swSaveDraft(); swRender()"></textarea>
+            <input class="date-in" id="swDate" type="date"
+                   onchange="swDraft.dt=this.value; swSaveDraft(); swRender()">
+          </div>
+          <div class="sw-grid" id="swGrid"></div>
+          <div class="foot">
+            <button class="btn primary" id="swSaveBtn" onclick="swSave()"></button>
+            <button class="btn quiet" id="swDropBtn" onclick="swDrop()"></button>
+            <button class="btn danger" id="swDelBtn" onclick="swDelete()" style="display:none"></button>
+          </div>
+        </div>
+      </section>
+
       <section class="block" data-view="diary" id="blkEntry">
         <div class="block-head" onclick="toggleBlock('entry')">
           <span id="enIcon"></span>
@@ -742,6 +830,16 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
             <div id="wishes"></div>
             <div class="task-acts">
               <button class="btn quiet tiny" id="wAddBtn" onclick="newWish()">Новое желание</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec" data-view="swot" id="secSwot">
+          <button class="sect-title" onclick="toggleBlock('swotList')">Сохранённые<span class="cnt" id="swCnt"></span><span class="chev" id="swlChev"></span></button>
+          <div class="sec-body">
+            <div id="swList"></div>
+            <div class="task-acts">
+              <button class="btn quiet tiny" id="swNewBtn" onclick="swNew()">Новый анализ</button>
             </div>
           </div>
         </div>
@@ -858,7 +956,8 @@ const I={
   loop:'<path d="M4 9.5A5.5 5.5 0 0 1 9.5 4H20"/><path d="M17 1.5L20 4l-3 2.5"/><path d="M20 14.5A5.5 5.5 0 0 1 14.5 20H4"/><path d="M7 17.5L4 20l3 2.5"/>',
   inbox:'<path d="M3.5 13.5h5l1.5 3h4l1.5-3h5"/><path d="M6 4h12l3 9.5v6.5H3v-6.5z"/>',
   print:'<path d="M7 9V3.5h10V9"/><path d="M3.5 9h17v7h-3.5v4.5h-10V16H3.5z"/>',
-  arrow:'<path d="M4 12h15"/><path d="M13.5 6.5L20 12l-6.5 5.5"/>'
+  arrow:'<path d="M4 12h15"/><path d="M13.5 6.5L20 12l-6.5 5.5"/>',
+  quad:'<path d="M3.5 3.5h7.5v7.5h-7.5zM13 3.5h7.5v7.5h-7.5zM3.5 13h7.5v7.5h-7.5zM13 13h7.5v7.5h-7.5z"/>'
 };
 const icon=(n,s=17)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none"
   stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${I[n]||''}</svg>`;
@@ -883,7 +982,7 @@ const $ = id => document.getElementById(id);
 const LS={cfg:'diary_cfg_v1', entries:'diary_entries_v1', tasks:'diary_tasks_v1',
   planner:'diary_planner_v1', projects:'diary_projects_v1', wishes:'diary_wishes_v1',
   habits:'diary_habits_v1', repeat:'diary_repeat_v1', inbox:'diary_inbox_v1', ui:'diary_ui_v1',
-  hint:'diary_hint_v1'};
+  swot:'diary_swot_v1', swotDraft:'diary_swot_draft_v1', hint:'diary_hint_v1'};
 
 let entries=[], currentFile=null, activeTags=new Set(), calDate=new Date();
 
@@ -1795,75 +1894,104 @@ function pjSpan(p){                                  // границы прое�
   const a=p.from||p.to, b=p.to||p.from;
   return (a&&b) ? {from:a, to:b} : null;
 }
+const TRACK_PX=600;                       // расчётная ширина шкалы для переносов текста
+const LINE_H=14;
+
 function renderRoadmap(){
   const start=new Date(rmStart);
   const end=new Date(rmStart); end.setDate(end.getDate()+RM_WEEKS*7);
   const span=end-start;
   const pos=d=>((parseISO(d)-start)/span)*100;
   const clamp=v=>Math.max(0,Math.min(100,v));
+  const wk=(100/RM_WEEKS)+'%';
+  const t=today(), nowVisible=parseISO(t)>=start&&parseISO(t)<end, nowPct=clamp(pos(t));
+  const now = nowVisible?`<span class="rm-now" style="left:${nowPct}%"></span>`:'';
 
   const fmtShort=d=>d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'}).replace('.','');
   $('rmLabel').textContent=fmtShort(start)+' – '+fmtShort(new Date(end-86400000))+' '+end.getFullYear();
 
-  const dated=pj().filter(p=>pjSpan(p)), undated=pj().filter(p=>!pjSpan(p));
-  $('rmTag').textContent=pj().length?`${dated.length} на шкале${undated.length?' · '+undated.length+' без сроков':''}`:'';
-
+  const withSpan=pj().filter(p=>pjSpan(p)), noSpan=pj().filter(p=>!pjSpan(p));
+  $('rmTag').textContent=pj().length?`${withSpan.length} на шкале${noSpan.length?' · '+noSpan.length+' без сроков':''}`:'';
   if(!pj().length){ $('roadmap').innerHTML='<div class="task-empty">Добавь проект — он появится на шкале</div>'; return; }
 
-  const cols=`grid-template-columns:150px repeat(${RM_WEEKS},minmax(46px,1fr))`;
-  const wk=(100/RM_WEEKS)+'%';
-  const t=today(), nowPct=clamp(pos(t)), nowVisible=parseISO(t)>=start&&parseISO(t)<end;
-
-  let head=`<div class="rm-corner"></div>`;
+  /* шапка: месяцы сверху, недели снизу */
+  const months=[];
   for(let i=0;i<RM_WEEKS;i++){
     const d=new Date(start); d.setDate(d.getDate()+i*7);
-    const first = i===0 || d.getDate()<=7;
-    head+=`<div class="rm-w${first?' mstart':''}">${first?d.toLocaleDateString('ru-RU',{month:'short'}).replace('.',''):'&nbsp;'}<b>${d.getDate()}</b></div>`;
+    const key=d.getFullYear()+'-'+d.getMonth();
+    if(!months.length || months[months.length-1].key!==key)
+      months.push({key, n:1, l:d.toLocaleDateString('ru-RU',{month:'long'})});
+    else months[months.length-1].n++;
   }
+  let weeks='';
+  for(let i=0;i<RM_WEEKS;i++){
+    const d=new Date(start); d.setDate(d.getDate()+i*7);
+    weeks+=`<div>${d.getDate()}</div>`;
+  }
+  const head=`<div class="rm-row rm-head"><div class="rm-l"></div><div class="rm-t" style="--wk:${wk}">
+      <div class="rm-months">${months.map(m=>`<div style="flex:${m.n}">${m.l}</div>`).join('')}</div>
+      <div class="rm-weeks">${weeks}</div></div></div>`;
 
+  /* вехи — дедлайны проектов */
+  const ms=withSpan.map(p=>{
+    const x=clamp(pos(p.to||p.from)), right=x>62, fin=pjDone(p);
+    return `<span class="rm-ms${right?' right':''}${fin?' done':''}" style="${right?'left':'left'}:${x}%">
+        ${icon('flag',12)}<span>${esc(p.n||'Проект')}<small>${fmtDate(p.to||p.from)}</small></span></span>`;
+  }).join('');
+  const msRow = withSpan.length
+    ? `<div class="rm-row"><div class="rm-l" style="font-weight:700;letter-spacing:1.4px;text-transform:uppercase;font-size:9.5px">Вехи</div>
+        <div class="rm-t" style="--wk:${wk};min-height:46px">${now}${ms}</div></div>` : '';
+
+  /* группы: проект и его этапы */
   let rows='';
-  dated.forEach((p,idx)=>{
-    const i=pj().indexOf(p), sp=pjSpan(p), st=p.s||[];
-    const done=st.filter(x=>x.d).length, fin=pjDone(p);
+  withSpan.forEach(p=>{
+    const sp=pjSpan(p), st=p.s||[], done=st.filter(x=>x.d).length, fin=pjDone(p);
     const L=clamp(pos(sp.from)), R=clamp(pos(sp.to));
-    const W=Math.max(1.2, R-L);
-    const fill=st.length?Math.round(done/st.length*100):0;
-    const marks=st.filter(x=>x.dt).map(x=>{
-      const late = !x.d && x.dt<t;
-      return `<i class="rm-mk${x.d?' on':''}${late?' late':''}" style="left:${clamp(pos(x.dt))}%"
-                title="${esc(x.t||'этап')} · ${fmtDate(x.dt)}${late?' · просрочен':''}"></i>`;
-    }).join('');
-    // подписи в два яруса, чтобы соседние не наезжали; текст переносится и виден целиком
-    const datedSt=st.filter(x=>x.dt);
-    const LINE=11, PER_LINE=13;
-    const linesOf=x=>Math.max(1, Math.ceil((x.t||'этап').length/PER_LINE));
-    const tier0=datedSt.filter((_,n)=>n%2===0), tier1=datedSt.filter((_,n)=>n%2===1);
-    const h0=tier0.length?Math.max(...tier0.map(linesOf)):0;
-    const h1=tier1.length?Math.max(...tier1.map(linesOf)):0;
-    const top1=27+h0*LINE+5;
-    const labels=datedSt.map((x,n)=>
-      `<span class="rm-lbl" style="left:${clamp(pos(x.dt))}%;top:${n%2?top1:27}px">${esc(x.t||'этап')}</span>`).join('');
-    const rowH=Math.max(42, (h1?top1+h1*LINE:27+h0*LINE)+10);
-    rows+=`<div class="rm-name rm-row${fin?' done':''}" title="${esc(p.n||'')}">
-        <span>${esc(p.n||'Без названия')}</span><span class="n">${st.length?done+'/'+st.length:''}</span>
-      </div>
-      <div class="rm-track rm-row${fin?' done':''}" style="grid-column:2 / span ${RM_WEEKS};--wk:${wk};min-height:${rowH}px">
-        ${nowVisible?`<span class="rm-now" style="left:${nowPct}%"></span>`:''}
-        <span class="rm-bar" style="left:${L}%;width:${W}%">
-          <span class="rm-fill" style="width:${fill}%"></span>
-          <span class="rm-cap" style="left:-1px"></span><span class="rm-cap" style="right:-1px"></span>
-        </span>
-        ${fin?`<span class="rm-star" style="left:calc(${clamp(R)}% + 6px)">${icon('star',13)}</span>`:''}
-        ${marks}${labels}
-      </div>`;
+    rows+=`<div class="rm-row grp${fin?' done':''}">
+        <div class="rm-l"><span>${esc(p.n||'Без названия')}</span>
+          <span class="n">${st.length?done+'/'+st.length:'—'}</span></div>
+        <div class="rm-t" style="--wk:${wk};min-height:34px">${now}
+          <span class="rm-sum" style="left:${L}%;width:${Math.max(0.6,R-L)}%"></span>
+          ${fin?`<span style="position:absolute;top:8px;left:calc(${R}% + 7px);color:var(--muted)">${icon('star',13)}</span>`:''}
+        </div></div>`;
+
+    const dated=st.filter(x=>(x.dt||'')).slice().sort((a,b)=>a.dt.localeCompare(b.dt));
+    let prev=sp.from;
+    dated.forEach(x=>{
+      const from = prev<x.dt ? prev : x.dt;         // цепочка: начало от предыдущего этапа
+      const rawA=pos(from), rawB=pos(x.dt);
+      if(rawB<=0 || rawA>=100){ prev=x.dt; return; } // этап целиком вне видимого периода
+      const A=clamp(rawA), B=clamp(rawB);
+      const W=Math.max(0.8, B-A);
+      const px=W/100*TRACK_PX;
+      const label=esc(x.t||'этап');
+      const cls = x.d ? 'done' : (x.dt<t ? 'late' : (from<=t ? 'now' : ''));
+      const inside = px>=62;                       // узкая полоса — подпись уезжает вправо
+      const lines = inside ? Math.ceil(label.length/Math.max(4,Math.floor((px-18)/5.6)))
+                           : Math.ceil(label.length/26);
+      const rowH=Math.max(34, lines*LINE_H+14);
+      rows+=`<div class="rm-row">
+        <div class="rm-l">${fmtDate(x.dt).replace(/ г\.$/,'')}</div>
+        <div class="rm-t" style="--wk:${wk};min-height:${rowH}px">${now}
+          <span class="rm-bar ${cls}${inside?'':' empty'}" style="left:${A}%;width:${W}%"
+                title="${label} · ${fmtDate(x.dt)}">${inside?label:''}</span>
+          ${inside?'':`<span class="rm-out${x.d?' muted':''}" style="left:calc(${B}% + 8px)">${label}</span>`}
+        </div></div>`;
+      prev=x.dt;
+    });
+
+    const nodate=st.filter(x=>!(x.dt||'') && (x.t||'').trim());
+    if(nodate.length) rows+=`<div class="rm-row"><div class="rm-l">без дат</div>
+      <div class="rm-t" style="--wk:${wk}"><div class="rm-nodate">
+        ${nodate.map(x=>`<span class="tag mini">${esc(x.t)}</span>`).join('')}</div></div></div>`;
   });
 
-  $('roadmap').innerHTML=`<div class="rm-grid" style="${cols}">${head}${rows}</div>`+
-    (undated.length?`<p class="rm-none">Без сроков: <b>${undated.map(p=>esc(p.n||'без названия')).join(', ')}</b>.
+  $('roadmap').innerHTML=`<div class="rm">${head}${msRow}${rows}</div>`+
+    (noSpan.length?`<p class="rm-none">Без сроков: <b>${noSpan.map(p=>esc(p.n||'без названия')).join(', ')}</b>.
        Поставь даты в карточке проекта — и они встанут на шкалу.</p>`:'')+
     `<div class="rm-legend">
-      <span><i></i>этап впереди</span><span><i class="f"></i>этап закрыт</span>
-      <span style="color:var(--red)"><i class="f"></i>просрочен</span></div>`;
+      <span><i class="d"></i>сделано</span><span><i class="n"></i>в работе</span>
+      <span><i class="l"></i>просрочено</span><span><i></i>впереди</span></div>`;
 }
 
 function pjAdd(){
@@ -1977,6 +2105,148 @@ function deleteWish(){
   if(wIdx<0) return;
   if(!confirm('Удалить желание «'+(wl()[wIdx].n||'')+'»?')) return;
   wl().splice(wIdx,1); closeWish(); renderWishes(); wishes.queue();
+}
+
+/* =============== SWOT =============== */
+const SW_Q=[['s','S','Сильные стороны',0],['w','W','Слабые стороны',1],
+            ['o','O','Возможности',0],['t','T','Угрозы',1]];
+const swot=makeStore({
+  key:'swot', label:'SWOT', ls:LS.swot, file:'swot.md', init:()=>[],
+  toMd:d=>{
+    const out=['# SWOT',''];
+    d.forEach(a=>{
+      out.push('## '+(a.dt?a.dt+' · ':'')+((a.n||'').trim()||'Без названия'),'');
+      SW_Q.forEach(([k,,label])=>{
+        const items=(a[k]||[]).filter(x=>(x||'').trim());
+        if(!items.length) return;
+        out.push('**'+label+'**','');
+        items.forEach(x=>out.push('- '+x.trim()));
+        out.push('');
+      });
+    });
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const byLabel={}; SW_Q.forEach(([k,,l])=>byLabel[l.toLowerCase()]=k);
+    const out=[]; let cur=null, q=null;
+    text.split(/\r?\n/).forEach(line=>{
+      const h=line.match(/^##\s+(.*)$/);
+      if(h){
+        let title=h[1].trim(), dt='';
+        const dm=title.match(/^(\d{4}-\d{2}-\d{2})\s*(?:[·—–-]\s*)?(.*)$/);
+        if(dm){ dt=dm[1]; title=dm[2].trim(); }
+        cur={n:title||'Без названия', dt, s:[], w:[], o:[], t:[]}; q=null; out.push(cur); return;
+      }
+      if(!cur) return;
+      const f=line.match(/^\*\*(.+?)\*\*\s*$/);
+      if(f){ q=byLabel[f[1].trim().toLowerCase()]||null; return; }
+      const b=line.match(/^\s*[-*]\s+(?!\[)(.+)$/);
+      if(b && q) cur[q].push(b[1].trim());
+    });
+    return out;
+  },
+  render:()=>renderSwotList()
+});
+const sw = () => swot.data;
+
+let swDraft=blankSwot(), swIdx=-1;
+function blankSwot(){ return {n:'', dt:today(), s:[], w:[], o:[], t:[]}; }
+const swEmpty = a => !(a.n||'').trim() && SW_Q.every(([k])=>!(a[k]||[]).some(x=>(x||'').trim()));
+const swCount = a => SW_Q.reduce((n,[k])=>n+(a[k]||[]).filter(x=>(x||'').trim()).length,0);
+
+function swSaveDraft(){
+  try{ localStorage.setItem(LS.swotDraft, JSON.stringify({d:swDraft, i:swIdx})); }catch(e){}
+}
+function swLoadDraft(){
+  try{
+    const j=JSON.parse(localStorage.getItem(LS.swotDraft)||'null');
+    if(j&&j.d){ swDraft=Object.assign(blankSwot(),j.d); swIdx=typeof j.i==='number'?j.i:-1; }
+  }catch(e){}
+}
+function swClearDraft(){ try{ localStorage.removeItem(LS.swotDraft); }catch(e){} }
+
+function swRender(){
+  $('swTag').textContent = swIdx>=0 ? 'правка · '+swCount(swDraft)+' пунктов'
+                        : (swEmpty(swDraft) ? '' : 'черновик · '+swCount(swDraft)+' пунктов');
+  $('swDelBtn').style.display = swIdx>=0 ? '' : 'none';
+  $('swNote').innerHTML = swIdx>=0
+    ? `<div class="sw-draft">Правишь сохранённый анализ. <b>Сохранить</b> обновит его.</div>`
+    : (swEmpty(swDraft) ? ''
+      : `<div class="sw-draft">Это <b>черновик</b> — он живёт только на этом устройстве.
+         Нажми <b>Сохранить</b>, чтобы он попал в список и в GitHub.</div>`);
+
+  $('swGrid').innerHTML=SW_Q.map(([k,letter,label,neg])=>{
+    const items=swDraft[k]||[];
+    return `<div class="sw-q${neg?' neg':''}">
+      <div class="sw-h"><span class="sw-b">${letter}</span><b>${label}</b>
+        <span class="n">${items.filter(x=>(x||'').trim()).length||''}</span></div>
+      ${items.map((x,i)=>`<div class="sw-i">
+          <span class="d"></span>
+          <textarea class="grow" rows="1" placeholder="Пункт"
+            oninput="swDraft.${k}[${i}]=this.value; autoGrow(this); swSaveDraft(); swTag()"
+            onkeydown="swKey(event,'${k}',${i})">${esc(x)}</textarea>
+          <button class="rm" onclick="swDel('${k}',${i})">${icon('x',12)}</button>
+        </div>`).join('')}
+      <button class="sw-add" onclick="swAdd('${k}')">+ пункт</button>
+    </div>`;
+  }).join('');
+  growAll($('swGrid'));
+}
+function swTag(){ $('swTag').textContent = swIdx>=0 ? 'правка · '+swCount(swDraft)+' пунктов'
+                        : (swEmpty(swDraft)?'':'черновик · '+swCount(swDraft)+' пунктов'); }
+function swFocus(k,i){
+  const box=[...$('swGrid').children][SW_Q.findIndex(q=>q[0]===k)];
+  if(box) focusIn(box,i);
+}
+function swAdd(k){ swDraft[k]=swDraft[k]||[]; swDraft[k].push(''); swSaveDraft(); swRender(); swFocus(k,swDraft[k].length-1); }
+function swDel(k,i){ swDraft[k].splice(i,1); swSaveDraft(); swRender(); }
+function swKey(ev,k,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); swDraft[k].splice(i+1,0,''); swSaveDraft(); swRender(); swFocus(k,i+1); }
+  else if(ev.key==='Backspace'&&!swDraft[k][i]){ ev.preventDefault(); swDel(k,i); swFocus(k,Math.max(0,i-1)); }
+}
+
+function swFill(){
+  $('swName').value=swDraft.n; $('swDate').value=swDraft.dt||today();
+  autoGrow($('swName')); swRender();
+}
+function swNew(){
+  if(!swEmpty(swDraft) && swIdx<0 && !confirm('Текущий черновик пропадёт. Начать новый анализ?')) return;
+  swDraft=blankSwot(); swIdx=-1; swClearDraft();
+  setTab('swot'); openBlock('swot'); swFill(); renderSwotList(); $('swName').focus();
+}
+function swOpen(i){
+  if(!swEmpty(swDraft) && swIdx<0 && !confirm('Незаконченный черновик пропадёт. Открыть сохранённый анализ?')) return;
+  swDraft=JSON.parse(JSON.stringify(sw()[i])); swIdx=i; swSaveDraft();
+  setTab('swot'); openBlock('swot'); swFill(); renderSwotList();
+}
+function swSave(){
+  const a={n:($('swName').value||'').trim()||'Без названия', dt:$('swDate').value||today()};
+  SW_Q.forEach(([k])=>a[k]=(swDraft[k]||[]).map(x=>(x||'').trim()).filter(Boolean));
+  if(swCount(a)===0){ toast('Заполни хотя бы один пункт'); return; }
+  if(swIdx>=0) sw()[swIdx]=a; else { sw().unshift(a); swIdx=0; }
+  swDraft=JSON.parse(JSON.stringify(a)); swSaveDraft();
+  swFill(); renderSwotList(); swot.queue(); toast('Анализ сохранён');
+}
+function swDrop(){
+  if(swEmpty(swDraft)&&swIdx<0){ toast('И так пусто'); return; }
+  if(!confirm(swIdx>=0 ? 'Закрыть без изменений? Сохранённый анализ останется как был.'
+                       : 'Стереть черновик? Он нигде не сохранён.')) return;
+  swDraft=blankSwot(); swIdx=-1; swClearDraft(); swFill(); renderSwotList();
+}
+function swDelete(){
+  if(swIdx<0) return;
+  if(!confirm('Удалить анализ «'+(sw()[swIdx].n||'')+'» навсегда?')) return;
+  sw().splice(swIdx,1);
+  swDraft=blankSwot(); swIdx=-1; swClearDraft();
+  swFill(); renderSwotList(); swot.queue(); toast('Анализ удалён');
+}
+function renderSwotList(){
+  $('swCnt').textContent=sw().length||'';
+  $('swList').innerHTML=sw().length?sw().map((a,i)=>
+    `<button class="sw-item${i===swIdx?' on':''}" onclick="swOpen(${i})">
+      <span class="t">${icon('quad',14)}<span>${esc(a.n||'Без названия')}</span></span>
+      <span class="m">${a.dt?fmtDate(a.dt).replace(/ г\.$/,''):''} · ${swCount(a)} ${plural(swCount(a),'пункт','пункта','пунктов')}</span>
+    </button>`).join('') : '<div class="task-empty">Сохранённых анализов пока нет</div>';
 }
 
 /* =============== цитата дня =============== */
@@ -2242,7 +2512,7 @@ function renderStats(list,daysUsed,daysTotal){
 }
 
 /* =============== вкладки =============== */
-const TABS={planner:'tabPlanner', projects:'tabProjects', diary:'tabDiary'};
+const TABS={planner:'tabPlanner', projects:'tabProjects', swot:'tabSwot', diary:'tabDiary'};
 let curTab='planner';
 function setTab(name, silent){
   if(!TABS[name]) name='planner';
@@ -2256,8 +2526,9 @@ function setTab(name, silent){
 }
 
 /* =============== сворачивание =============== */
-const BLOCKS={planner:'blkPlanner', habits:'blkHabits', roadmap:'blkRoadmap', projects:'blkProjects', entry:'blkEntry',
-  cal:'secCal', tasks:'secTasks', inbox:'secInbox', wishes:'secWishes', list:'secList'};
+const BLOCKS={planner:'blkPlanner', habits:'blkHabits', roadmap:'blkRoadmap', projects:'blkProjects',
+  swot:'blkSwot', entry:'blkEntry',
+  cal:'secCal', tasks:'secTasks', inbox:'secInbox', wishes:'secWishes', swotList:'secSwot', list:'secList'};
 function uiState(){ try{ return JSON.parse(localStorage.getItem(LS.ui)||'{}'); }catch(e){ return {}; } }
 function saveUi(patch){ localStorage.setItem(LS.ui, JSON.stringify({...uiState(),...patch})); }
 function applyBlocks(){
@@ -2320,7 +2591,7 @@ function signOut(){
 function exportAll(){
   const files=[];
   entries.forEach(e=>files.push([e.file, toMd(e)]));
-  ['tasks','inbox','habits','repeat','projects','wishes'].forEach(k=>{
+  ['tasks','inbox','habits','repeat','projects','wishes','swot'].forEach(k=>{
     const st=ST[k];
     if(st && st.data && st.data.length) files.push([st.file(), st.md()]);
   });
@@ -2394,7 +2665,13 @@ function paintStaticIcons(){
   $('hbNext').innerHTML=icon('right',14);
   $('tabPlanner').insertAdjacentHTML('afterbegin', icon('grid',16));
   $('tabProjects').insertAdjacentHTML('afterbegin', icon('flag',16));
+  $('tabSwot').insertAdjacentHTML('afterbegin', icon('quad',16));
   $('tabDiary').insertAdjacentHTML('afterbegin', icon('book',16));
+  $('swIcon').innerHTML=icon('quad',15);
+  $('swSaveBtn').innerHTML=icon('check',14)+'<span class="lbl">Сохранить</span>';
+  $('swDropBtn').innerHTML=icon('x',13)+'Не сохранять';
+  $('swDelBtn').innerHTML=icon('trash',14)+'<span class="lbl">Удалить</span>';
+  $('swNewBtn').innerHTML=icon('plus',12)+'Новый анализ';
   $('plIcon').innerHTML=icon('grid',15);
   $('hbIcon').innerHTML=icon('loop',15);
   $('pjIcon').innerHTML=icon('flag',15);
@@ -2402,7 +2679,7 @@ function paintStaticIcons(){
   $('rmPrev').innerHTML=icon('left',14);
   $('rmNext').innerHTML=icon('right',14);
   $('enIcon').innerHTML=icon('pen',15);
-  ['plChev','hbChev','rmChev','pjChev','enChev','calChev','tkChev','inChev','wChev','lsChev']
+  ['plChev','hbChev','rmChev','pjChev','swChev','enChev','calChev','tkChev','inChev','wChev','swlChev','lsChev']
     .forEach(id=>$(id).innerHTML=icon('down',14));
   $('eyeBtn').innerHTML=icon('eye',13)+'Показать';
   $('copyBtn').innerHTML=icon('copy',13)+'Копировать';
@@ -2418,7 +2695,8 @@ function paintStaticIcons(){
 
 async function bootSync(after){
   await pullAll();
-  for(const k of ['tasks','inbox','habits','repeat','projects','wishes']) await ST[k].pull();
+  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot']) await ST[k].pull();
+  renderSwotList();
   const k=curKey(), prev=iso(new Date(parseISO(k).getTime()-7*86400000));
   await pullWeek(k); await pullWeek(prev);
   if(applyRepeats()) queuePl();
@@ -2441,13 +2719,14 @@ setInterval(syncPending, 60000);
 
 paintStaticIcons();
 loadLocal(); loadPlLocal();
-['tasks','inbox','habits','repeat','projects','wishes'].forEach(k=>ST[k].load());
+['tasks','inbox','habits','repeat','projects','wishes','swot'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applyBlocks();
 const startTab = uiState().tab || 'planner';     // запоминаем до newEntry, он уводит на «Дневник»
 renderQuote(); renderInstall();
 newEntry();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
+swLoadDraft(); swFill(); renderSwotList();
 applyRepeats(); renderPlanner();
 setTab(startTab, true);
 if(hasGH()) bootSync(); else setSync('','Локально');
