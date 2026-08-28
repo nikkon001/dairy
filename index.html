@@ -83,6 +83,19 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 .grid>main{grid-column:2; grid-row:1; padding-left:30px; min-width:0}
 .side{display:flex; flex-direction:column; gap:26px; position:sticky; top:22px}
 
+/* ---------- вкладки ---------- */
+.tabs{display:flex; gap:0; border-bottom:1px solid var(--line); margin-bottom:26px}
+.tabs button{display:inline-flex; align-items:center; gap:8px; padding:12px 20px 13px;
+  font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
+  color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px; transition:.14s}
+.tabs button:hover{color:var(--ink)}
+.tabs button.on{color:var(--ink); border-bottom-color:var(--red)}
+.tabs button .lb{display:inline}
+[data-view]{display:none}
+body[data-tab="planner"]  [data-view="planner"],
+body[data-tab="projects"] [data-view="projects"],
+body[data-tab="diary"]    [data-view="diary"]{display:block}
+
 /* ---------- секции ---------- */
 .sect-title{font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
   margin:0 0 13px; padding-bottom:7px; border-bottom:1px solid var(--line); position:relative;
@@ -442,6 +455,16 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 /* ---------- телефон ---------- */
 @media(max-width:900px){
   .app{padding:0 15px 90px}
+  /* панель вкладок уезжает вниз экрана, как в приложениях */
+  .tabs{position:fixed; left:0; right:0; bottom:0; z-index:40; margin:0;
+    background:var(--bg); border-top:1px solid var(--line); border-bottom:none;
+    box-shadow:0 -2px 14px rgba(0,0,0,.06);
+    padding-bottom:env(safe-area-inset-bottom)}
+  .tabs button{flex:1; flex-direction:column; gap:4px; padding:10px 4px 9px;
+    font-size:9px; letter-spacing:1px; border-bottom:none; border-top:2px solid transparent; margin:0}
+  .tabs button.on{border-top-color:var(--red)}
+  .app{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
   .grid{grid-template-columns:minmax(0,1fr)}
   .grid>main{grid-column:1; grid-row:1; padding-left:0}
   .grid>aside{grid-column:1; grid-row:2; padding-right:0; border-right:none;
@@ -475,8 +498,9 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 /* ---------- печать ---------- */
 @media print{
   body::before{display:none}
-  header.top,aside,.quote,#blkHabits,#blkProjects,#blkEntry,.toast,
+  header.top,aside,.quote,.tabs,#installBox,#blkHabits,#blkProjects,#blkEntry,.toast,
   .pl-nav,.carry,.block-head .chev,.block-head .meta-lbl{display:none !important}
+  #blkPlanner{display:block !important}
   .app{padding:0; max-width:none}
   .grid{display:block}
   .grid>main{padding:0}
@@ -507,6 +531,12 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
     <button class="btn primary" id="newBtn" onclick="newEntry()"></button>
   </header>
 
+  <nav class="tabs" id="tabs">
+    <button id="tabPlanner"  onclick="setTab('planner')"><span class="lb">Планер</span></button>
+    <button id="tabProjects" onclick="setTab('projects')"><span class="lb">Проекты</span></button>
+    <button id="tabDiary"    onclick="setTab('diary')"><span class="lb">Дневник</span></button>
+  </nav>
+
   <div class="grid">
     <main>
       <div id="installBox"></div>
@@ -516,7 +546,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
         <span id="qAuthor"></span>
       </div>
 
-      <section class="block" id="blkPlanner">
+      <section class="block" data-view="planner" id="blkPlanner">
         <div class="block-head" onclick="toggleBlock('planner')">
           <span id="plIcon"></span>
           <h2>Планер</h2>
@@ -541,7 +571,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
         </div>
       </section>
 
-      <section class="block" id="blkHabits">
+      <section class="block" data-view="planner" id="blkHabits">
         <div class="block-head" onclick="toggleBlock('habits')">
           <span id="hbIcon"></span>
           <h2>Привычки</h2>
@@ -561,7 +591,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
         </div>
       </section>
 
-      <section class="block" id="blkProjects">
+      <section class="block" data-view="projects" id="blkProjects">
         <div class="block-head" onclick="toggleBlock('projects')">
           <span id="pjIcon"></span>
           <h2>Проекты</h2>
@@ -576,7 +606,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
         </div>
       </section>
 
-      <section class="block" id="blkEntry">
+      <section class="block" data-view="diary" id="blkEntry">
         <div class="block-head" onclick="toggleBlock('entry')">
           <span id="enIcon"></span>
           <h2>Запись</h2>
@@ -604,7 +634,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 
     <aside>
       <div class="side">
-        <div>
+        <div data-view="diary">
           <div class="search-wrap" id="searchWrap">
             <input class="search" id="search" placeholder="Поиск по дневнику" oninput="render()">
           </div>
@@ -612,7 +642,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
           <div id="findAll"></div>
         </div>
 
-        <div class="sec" id="secCal">
+        <div class="sec" data-view="diary" id="secCal">
           <button class="sect-title" onclick="toggleBlock('cal')">Календарь<span class="chev" id="calChev"></span></button>
           <div class="sec-body">
             <div class="cal-head">
@@ -625,21 +655,21 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
           </div>
         </div>
 
-        <div class="sec" id="secTasks">
+        <div class="sec" data-view="planner" id="secTasks">
           <button class="sect-title" onclick="toggleBlock('tasks')">Задачи<span class="cnt" id="tkCnt"></span><span class="chev" id="tkChev"></span></button>
           <div class="sec-body">
             <div id="tasksBox"></div>
           </div>
         </div>
 
-        <div class="sec" id="secInbox">
+        <div class="sec" data-view="planner" id="secInbox">
           <button class="sect-title" onclick="toggleBlock('inbox')">Входящие<span class="cnt" id="inCnt"></span><span class="chev" id="inChev"></span></button>
           <div class="sec-body">
             <div id="inboxBox"></div>
           </div>
         </div>
 
-        <div class="sec" id="secWishes">
+        <div class="sec" data-view="projects" id="secWishes">
           <button class="sect-title" onclick="toggleBlock('wishes')">Желания<span class="cnt" id="wCnt"></span><span class="chev" id="wChev"></span></button>
           <div class="sec-body">
             <div id="wishes"></div>
@@ -649,7 +679,7 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
           </div>
         </div>
 
-        <div class="sec" id="secList">
+        <div class="sec" data-view="diary" id="secList">
           <button class="sect-title" onclick="toggleBlock('list')">Записи<span class="chev" id="lsChev"></span></button>
           <div class="sec-body"><div class="list" id="list"></div></div>
         </div>
@@ -1203,7 +1233,7 @@ function renderHabits(){
   $('habits').innerHTML=hb().length?html:'<div class="task-empty">Привычек пока нет</div>';
   growAll($('habits'));
 }
-function hbAdd(){ hb().push({n:'',days:[]}); openBlock('habits'); renderHabits(); habits.queue(); }
+function hbAdd(){ hb().push({n:'',days:[]}); setTab('planner'); openBlock('habits'); renderHabits(); habits.queue(); }
 function hbRemove(i){
   if((hb()[i].n||'').trim()&&!confirm('Удалить привычку «'+hb()[i].n+'»?')) return;
   hb().splice(i,1); renderHabits(); habits.queue();
@@ -1671,7 +1701,7 @@ function renderProjects(){
   growAll($('projects'));
 }
 function pjAdd(){
-  pj().push({n:'',from:'',to:'',s:[]}); openBlock('projects'); renderProjects(); projects.queue();
+  pj().push({n:'',from:'',to:'',s:[]}); setTab('projects'); openBlock('projects'); renderProjects(); projects.queue();
   const n=$('projects').querySelectorAll('.proj-name');
   if(n.length) n[n.length-1].focus();
 }
@@ -1739,7 +1769,7 @@ function renderWishes(){
     </button>`;
   }).join('') : '<div class="task-empty">Здесь будет то, чего хочется</div>';
 }
-function newWish(){ wIdx=-1; wDraft={n:'',why:'',gain:'',result:'',prize:'',steps:[]}; fillWish('Новое желание'); }
+function newWish(){ setTab('projects'); wIdx=-1; wDraft={n:'',why:'',gain:'',result:'',prize:'',steps:[]}; fillWish('Новое желание'); }
 function openWish(i){ wIdx=i; wDraft=JSON.parse(JSON.stringify(wl()[i])); fillWish('Желание'); }
 function fillWish(head){
   $('wHead').textContent=head;
@@ -1877,7 +1907,7 @@ function newEntry(){
   $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
   renderMoods(''); ph={path:'',data:'',dirty:false,loading:false}; renderPhoto();
   $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
-  openBlock('entry'); autoGrow($('fTitle')); render(); $('fTitle').focus();
+  setTab('diary'); openBlock('entry'); autoGrow($('fTitle')); render(); $('fTitle').focus();
 }
 async function openEntry(file){
   const e=entries.find(x=>x.file===file); if(!e) return;
@@ -1886,7 +1916,7 @@ async function openEntry(file){
   $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
   $('editHint').textContent='Правка · '+fmtDate(e.date);
-  openBlock('entry'); autoGrow($('fTitle'));
+  setTab('diary'); openBlock('entry'); autoGrow($('fTitle'));
   ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo&&!e.photoData)};
   renderPhoto(); render();
   $('blkEntry').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2033,6 +2063,19 @@ function renderStats(list,daysUsed,daysTotal){
     (top.length?`<div class="tags-row">${top.map(([t,n])=>`<span class="tag mini">${esc(t)} · ${n}</span>`).join('')}</div>`:'');
 }
 
+/* =============== вкладки =============== */
+const TABS={planner:'tabPlanner', projects:'tabProjects', diary:'tabDiary'};
+let curTab='planner';
+function setTab(name, silent){
+  if(!TABS[name]) name='planner';
+  curTab=name;
+  document.body.setAttribute('data-tab', name);
+  Object.entries(TABS).forEach(([k,id])=>$(id).className = k===name?'on':'');
+  if(!silent) saveUi({tab:name});
+  growAll();                       // поля меряются только когда видимы
+  if(name==='planner') renderPlanner();
+}
+
 /* =============== сворачивание =============== */
 const BLOCKS={planner:'blkPlanner', habits:'blkHabits', projects:'blkProjects', entry:'blkEntry',
   cal:'secCal', tasks:'secTasks', inbox:'secInbox', wishes:'secWishes', list:'secList'};
@@ -2170,6 +2213,9 @@ function paintStaticIcons(){
   $('plNext').innerHTML=icon('right',14);
   $('hbPrev').innerHTML=icon('left',14);
   $('hbNext').innerHTML=icon('right',14);
+  $('tabPlanner').insertAdjacentHTML('afterbegin', icon('grid',16));
+  $('tabProjects').insertAdjacentHTML('afterbegin', icon('flag',16));
+  $('tabDiary').insertAdjacentHTML('afterbegin', icon('book',16));
   $('plIcon').innerHTML=icon('grid',15);
   $('hbIcon').innerHTML=icon('loop',15);
   $('pjIcon').innerHTML=icon('flag',15);
@@ -2216,10 +2262,12 @@ loadLocal(); loadPlLocal();
 ['tasks','inbox','habits','repeat','projects','wishes'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applyBlocks();
+const startTab = uiState().tab || 'planner';     // запоминаем до newEntry, он уводит на «Дневник»
 renderQuote(); renderInstall();
 newEntry();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
 applyRepeats(); renderPlanner();
+setTab(startTab, true);
 if(hasGH()) bootSync(); else setSync('','Локально');
 </script>
 </body>
