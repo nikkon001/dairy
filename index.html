@@ -383,6 +383,28 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
 .rm-out.muted{color:var(--muted); font-weight:500}
 .rm-bar.empty{padding:0; min-width:3px}
 
+/* правка прямо на шкале */
+.rm-bar textarea,.rm-out textarea{flex:1; width:100%; min-width:0; border:none; outline:none;
+  background:none; color:inherit; font:inherit; padding:0; line-height:1.35;
+  resize:none; overflow:hidden; word-break:break-word}
+.rm-bar textarea::placeholder,.rm-out textarea::placeholder{color:currentColor; opacity:.45}
+.rm-bar textarea:focus,.rm-out textarea:focus{outline:1px solid var(--red); outline-offset:2px}
+.rm-l .tick{width:14px; height:14px; margin-top:1px}
+.rm-l .tick svg{width:9px; height:9px}
+.rm-date{border:none; border-bottom:1px solid transparent; background:none; outline:none;
+  font-family:inherit; font-size:9px; letter-spacing:.3px; color:var(--muted);
+  text-transform:uppercase; padding:1px 0; width:98px; min-width:0}
+.rm-row:hover .rm-date{border-bottom-color:var(--line)}
+.rm-date:focus{border-bottom-color:var(--red); color:var(--ink)}
+.rm-l .rm-x{color:transparent; flex:none; margin-top:1px; display:grid; place-items:center}
+.rm-row:hover .rm-x{color:var(--dim)}
+.rm-l .rm-x:hover{color:var(--red)}
+.rm-plus{background:none; color:#fff; opacity:.7; display:grid; place-items:center; flex:none}
+.rm-plus:hover{opacity:1}
+.rm-nodate .sw-i,.rm-nd{display:flex; align-items:flex-start; gap:6px; padding:3px 8px 3px 0}
+.rm-nd textarea{width:120px; border:none; outline:none; background:none; font-size:10.5px;
+  line-height:1.35; padding:0; resize:none; overflow:hidden; word-break:break-word}
+
 /* вехи */
 .rm-ms{position:absolute; top:7px; display:flex; align-items:flex-start; gap:5px;
   font-size:10.5px; font-weight:600; line-height:1.3; width:150px; overflow-wrap:anywhere}
@@ -1945,45 +1967,64 @@ function renderRoadmap(){
   /* группы: проект и его этапы */
   let rows='';
   withSpan.forEach(p=>{
+    const i=pj().indexOf(p);
     const sp=pjSpan(p), st=p.s||[], done=st.filter(x=>x.d).length, fin=pjDone(p);
     const L=clamp(pos(sp.from)), R=clamp(pos(sp.to));
     rows+=`<div class="rm-row grp${fin?' done':''}">
         <div class="rm-l"><span>${esc(p.n||'Без названия')}</span>
-          <span class="n">${st.length?done+'/'+st.length:'—'}</span></div>
+          <span class="n">${st.length?done+'/'+st.length:'—'}</span>
+          <button class="rm-plus" onclick="rmAddStage(${i})" title="Добавить этап">${icon('plus',13)}</button></div>
         <div class="rm-t" style="--wk:${wk};min-height:34px">${now}
           <span class="rm-sum" style="left:${L}%;width:${Math.max(0.6,R-L)}%"></span>
           ${fin?`<span style="position:absolute;top:8px;left:calc(${R}% + 7px);color:var(--muted)">${icon('star',13)}</span>`:''}
         </div></div>`;
 
-    const dated=st.filter(x=>(x.dt||'')).slice().sort((a,b)=>a.dt.localeCompare(b.dt));
+    // сортируем копию, но помним исходный номер этапа — по нему и правим
+    const dated=st.map((x,j)=>({x,j})).filter(o=>o.x.dt).sort((a,b)=>a.x.dt.localeCompare(b.x.dt));
     let prev=sp.from;
-    dated.forEach(x=>{
+    dated.forEach(({x,j})=>{
       const from = prev<x.dt ? prev : x.dt;         // цепочка: начало от предыдущего этапа
       const rawA=pos(from), rawB=pos(x.dt);
       if(rawB<=0 || rawA>=100){ prev=x.dt; return; } // этап целиком вне видимого периода
       const A=clamp(rawA), B=clamp(rawB);
       const W=Math.max(0.8, B-A);
       const px=W/100*TRACK_PX;
-      const label=esc(x.t||'этап');
+      const label=esc(x.t||'');
+      const len=(x.t||'этап').length;
       const cls = x.d ? 'done' : (x.dt<t ? 'late' : (from<=t ? 'now' : ''));
       const inside = px>=62;                       // узкая полоса — подпись уезжает вправо
-      const lines = inside ? Math.ceil(label.length/Math.max(4,Math.floor((px-18)/5.6)))
-                           : Math.ceil(label.length/26);
+      const lines = inside ? Math.ceil(len/Math.max(4,Math.floor((px-18)/5.6)))
+                           : Math.ceil(len/26);
       const rowH=Math.max(34, lines*LINE_H+14);
+      const field=`<textarea class="grow" rows="1" placeholder="этап"
+            oninput="pj()[${i}].s[${j}].t=this.value; autoGrow(this); projects.queue()"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">${label}</textarea>`;
       rows+=`<div class="rm-row">
-        <div class="rm-l">${fmtDate(x.dt).replace(/ г\.$/,'')}</div>
+        <div class="rm-l">
+          <button class="tick${x.d?' on':''}" onclick="pjToggle(${i},${j})" title="Отметить">${icon('check',9)}</button>
+          <input type="date" class="rm-date" value="${x.dt}" title="Дата этапа"
+                 onchange="pj()[${i}].s[${j}].dt=this.value; projects.queue(); renderProjects()">
+          <button class="rm-x" onclick="pjDelStage(${i},${j})" title="Удалить этап">${icon('x',11)}</button>
+        </div>
         <div class="rm-t" style="--wk:${wk};min-height:${rowH}px">${now}
-          <span class="rm-bar ${cls}${inside?'':' empty'}" style="left:${A}%;width:${W}%"
-                title="${label} · ${fmtDate(x.dt)}">${inside?label:''}</span>
-          ${inside?'':`<span class="rm-out${x.d?' muted':''}" style="left:calc(${B}% + 8px)">${label}</span>`}
+          <span class="rm-bar ${cls}${inside?'':' empty'}" style="left:${A}%;width:${W}%">${inside?field:''}</span>
+          ${inside?'':`<span class="rm-out${x.d?' muted':''}" style="left:calc(${B}% + 8px)">${field}</span>`}
         </div></div>`;
       prev=x.dt;
     });
 
-    const nodate=st.filter(x=>!(x.dt||'') && (x.t||'').trim());
+    const nodate=st.map((x,j)=>({x,j})).filter(o=>!(o.x.dt||''));
     if(nodate.length) rows+=`<div class="rm-row"><div class="rm-l">без дат</div>
       <div class="rm-t" style="--wk:${wk}"><div class="rm-nodate">
-        ${nodate.map(x=>`<span class="tag mini">${esc(x.t)}</span>`).join('')}</div></div></div>`;
+        ${nodate.map(({x,j})=>`<span class="rm-nd">
+            <button class="tick${x.d?' on':''}" onclick="pjToggle(${i},${j})">${icon('check',9)}</button>
+            <textarea class="grow" rows="1" placeholder="этап"
+              oninput="pj()[${i}].s[${j}].t=this.value; autoGrow(this); projects.queue()"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">${esc(x.t)}</textarea>
+            <input type="date" class="rm-date" value="" title="Поставить дату"
+              onchange="pj()[${i}].s[${j}].dt=this.value; projects.queue(); renderProjects()">
+            <button class="rm-x" onclick="pjDelStage(${i},${j})">${icon('x',11)}</button>
+          </span>`).join('')}</div></div></div>`;
   });
 
   $('roadmap').innerHTML=`<div class="rm">${head}${msRow}${rows}</div>`+
@@ -1992,6 +2033,19 @@ function renderRoadmap(){
     `<div class="rm-legend">
       <span><i class="d"></i>сделано</span><span><i class="n"></i>в работе</span>
       <span><i class="l"></i>просрочено</span><span><i></i>впереди</span></div>`;
+}
+
+function pjDelStage(i,j){
+  const s=pj()[i].s[j];
+  if((s.t||'').trim() && !confirm('Удалить этап «'+s.t+'»?')) return;
+  pj()[i].s.splice(j,1); renderProjects(); projects.queue();
+}
+function rmAddStage(i){                       // новый этап прямо со шкалы, дата — сегодня
+  const p=pj(); p[i].s=p[i].s||[];
+  p[i].s.push({t:'', d:false, dt:today()});
+  renderProjects(); projects.queue();
+  const empty=[...$('roadmap').querySelectorAll('textarea')].find(a=>!a.value.trim());
+  if(empty) empty.focus();
 }
 
 function pjAdd(){
