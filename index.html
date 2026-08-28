@@ -165,7 +165,10 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
   border:1px solid transparent; position:relative; transition:.14s}
 .cal .day.pad{visibility:hidden}
 .cal .day.has{border-color:var(--line); color:var(--ink); font-weight:600; cursor:pointer}
-.cal .day.has:hover{border-color:var(--red); color:var(--red)}
+.cal .day.pick{cursor:pointer}
+.cal .day.has:hover,.cal .day.pick:hover{border-color:var(--red); color:var(--red)}
+.cal .day.inweek{background:var(--wash)}
+.cal .day.sel{border-color:var(--ink); color:var(--ink); font-weight:700}
 .cal .day.today{border-color:var(--red)}
 .cal .day.today::after{content:''; position:absolute; bottom:-1px; left:-1px; right:-1px; height:2px; background:var(--red)}
 .cal .day .more{position:absolute; top:1px; right:3px; font-size:8px; color:var(--red); font-weight:700}
@@ -642,7 +645,7 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
           <div id="findAll"></div>
         </div>
 
-        <div class="sec" data-view="diary" id="secCal">
+        <div class="sec" id="secCal">
           <button class="sect-title" onclick="toggleBlock('cal')">Календарь<span class="chev" id="calChev"></span></button>
           <div class="sec-body">
             <div class="cal-head">
@@ -1480,18 +1483,24 @@ async function pushWeek(k){                     // отправить произ
   catch(e){ pending.add('planner'); syncLabel(); }
 }
 
-function setMode(m){ plMode=m; saveUi({mode:m}); renderPlanner(); }
+function setMode(m){ plMode=m; saveUi({mode:m}); renderPlanner(); renderCal(); }
 function shiftPl(n){
   if(plTimer){ clearTimeout(plTimer); pushPlanner(); }
   plDate=new Date(plDate.getFullYear(),plDate.getMonth(),plDate.getDate()+(plMode==='day'?n:n*7));
   afterPlMove();
 }
 function goToday(){ plDate=new Date(); afterPlMove(); }
+function goDate(key){                       // клик по календарю — перейти к этому дню
+  if(plTimer){ clearTimeout(plTimer); pushPlanner(); }
+  plDate=parseISO(key);
+  calDate=new Date(plDate.getFullYear(), plDate.getMonth(), 1);
+  setTab('planner'); afterPlMove();
+}
 function afterPlMove(){
   const k=curKey();
-  renderPlanner();
-  if(hasGH() && !plWeeks[k]) pullWeek(k).then(()=>{ applyRepeats(); renderPlanner(); });
-  else { if(applyRepeats()) queuePl(); renderPlanner(); }
+  renderPlanner(); renderCal();
+  if(hasGH() && !plWeeks[k]) pullWeek(k).then(()=>{ applyRepeats(); renderPlanner(); renderCal(); });
+  else { if(applyRepeats()) queuePl(); renderPlanner(); renderCal(); }
 }
 
 function plDays(){
@@ -2026,13 +2035,25 @@ function renderCal(){
   let html=WD.map(d=>`<div class="wd">${d}</div>`).join('');
   for(let i=0;i<pad;i++) html+='<div class="day pad"></div>';
   const t=today();
+  const onPlanner = curTab==='planner';
+  const selDay = iso(plDate);
+  const wkStart = iso(mondayOf(plDate));
+  const wkEnd = iso(new Date(mondayOf(plDate).getTime()+6*86400000));
   for(let d=1;d<=days;d++){
     const key=`${pref}-${String(d).padStart(2,'0')}`;
     const list=byDay[d]||[], m=list.length?moodBy(list[0].mood):null;
-    const tip=list.length?(m?m.l+' · ':'')+list.map(x=>x.title).join(' · '):'';
-    html+=`<div class="day${list.length?' has':''}${key===t?' today':''}"
-      ${list.length?`onclick="openEntry('${list[0].file}')" title="${esc(tip)}"`:''}>
-      <span>${d}</span>${list.length?icon(m?m.i:'doc',11):''}
+    const day=plDayRead(key);
+    const busy=day && (Object.keys(day.slots||{}).length || (day.tasks||[]).length);
+    const inWeek = onPlanner && plMode==='week' && key>=wkStart && key<=wkEnd;
+    const sel = onPlanner && (plMode==='day' ? key===selDay : false);
+    const tips=[];
+    if(list.length) tips.push((m?m.l+' · ':'')+list.map(x=>x.title).join(' · '));
+    if(busy) tips.push('в планере есть записи');
+    // на «Планере» любой день перекидывает планер, иначе открываем запись
+    const click = onPlanner ? `goDate('${key}')` : (list.length?`openEntry('${list[0].file}')`:'');
+    html+=`<div class="day${list.length?' has':''}${onPlanner?' pick':''}${inWeek?' inweek':''}${sel?' sel':''}${key===t?' today':''}"
+      ${click?`onclick="${click}"`:''}${tips.length?` title="${esc(tips.join(' · '))}"`:''}>
+      <span>${d}</span>${list.length?icon(m?m.i:'doc',11):(busy?icon('grid',9):'')}
       ${list.length>1?`<span class="more">${list.length}</span>`:''}</div>`;
   }
   $('cal').innerHTML=html;
@@ -2074,6 +2095,7 @@ function setTab(name, silent){
   if(!silent) saveUi({tab:name});
   growAll();                       // поля меряются только когда видимы
   if(name==='planner') renderPlanner();
+  if(typeof renderCal==='function' && $('cal')) renderCal();   // подсветка дня зависит от вкладки
 }
 
 /* =============== сворачивание =============== */
