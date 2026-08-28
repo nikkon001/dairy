@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Дневник</title>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="description" content="Личный ежедневник: планер, привычки, проекты и записи">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Дневник">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
+<link rel="icon" href="./icons/icon-192.png" sizes="192x192">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,6 +36,20 @@ button{cursor:pointer; border:none; background:none; padding:0}
 
 /* ---------- каркас ---------- */
 .app{max-width:1260px; margin:0 auto; padding:0 24px 80px}
+/* чёлка и полоса жестов на айфоне */
+@supports(padding:max(0px)){
+  body{padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right)}
+  header.top{padding-top:max(22px, calc(14px + env(safe-area-inset-top)))}
+  .app{padding-bottom:max(80px, calc(50px + env(safe-area-inset-bottom)))}
+  .toast{bottom:max(28px, calc(18px + env(safe-area-inset-bottom)))}
+}
+
+/* подсказка про установку */
+.install{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  border:1px solid var(--line-dark); padding:13px 15px; margin-bottom:22px; font-size:12.5px; line-height:1.55}
+.install .ic{flex:none}
+.install b{font-weight:700}
+.install .sp{margin-left:auto}
 header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
   padding:22px 0 16px; border-bottom:2px solid var(--red); margin-bottom:26px}
 .logo{display:flex; align-items:center; gap:11px; margin-right:auto}
@@ -484,6 +509,8 @@ header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
 
   <div class="grid">
     <main>
+      <div id="installBox"></div>
+
       <div class="quote">
         <p id="qText"></p>
         <span id="qAuthor"></span>
@@ -758,7 +785,8 @@ const moodBy = k => MOODS.find(m=>m.k===k);
 const $ = id => document.getElementById(id);
 const LS={cfg:'diary_cfg_v1', entries:'diary_entries_v1', tasks:'diary_tasks_v1',
   planner:'diary_planner_v1', projects:'diary_projects_v1', wishes:'diary_wishes_v1',
-  habits:'diary_habits_v1', repeat:'diary_repeat_v1', inbox:'diary_inbox_v1', ui:'diary_ui_v1'};
+  habits:'diary_habits_v1', repeat:'diary_repeat_v1', inbox:'diary_inbox_v1', ui:'diary_ui_v1',
+  hint:'diary_hint_v1'};
 
 let entries=[], currentFile=null, activeTags=new Set(), calDate=new Date();
 
@@ -2087,6 +2115,48 @@ function exportAll(){
   toast('Скачиваю '+files.length+' '+plural(files.length,'файл','файла','файлов'));
 }
 
+/* =============== установка на телефон =============== */
+const isStandalone = () =>
+  (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true;
+const isIOS = () =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent||'') ||
+  (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+
+let installEvent=null;
+function hideInstall(remember){
+  if(remember){ try{ localStorage.setItem(LS.hint,'1'); }catch(e){} }
+  $('installBox').innerHTML='';
+}
+function renderInstall(){
+  const box=$('installBox');
+  if(isStandalone() || localStorage.getItem(LS.hint)){ box.innerHTML=''; return; }
+  if(installEvent){                                  // андроид и компьютер умеют ставить сами
+    box.innerHTML=`<div class="install">${icon('download',16)}
+      <span><b>Установить дневник</b> — откроется как отдельное приложение</span>
+      <button class="btn tiny sp" onclick="doInstall()">Установить</button>
+      <button class="btn quiet tiny" onclick="hideInstall(true)">Не сейчас</button></div>`;
+    return;
+  }
+  if(isIOS()){                                       // на айфоне ставится только вручную
+    box.innerHTML=`<div class="install">${icon('download',16)}
+      <span><b>Добавь дневник на экран «Домой»</b> — кнопка «Поделиться» внизу Safari, затем
+      «На экран «Домой»». Откроется без адресной строки и будет работать офлайн.</span>
+      <button class="btn quiet tiny sp" onclick="hideInstall(true)">Понятно</button></div>`;
+  }
+}
+async function doInstall(){
+  if(!installEvent) return;
+  installEvent.prompt();
+  try{ await installEvent.userChoice; }catch(e){}
+  installEvent=null; hideInstall(true);
+}
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); installEvent=e; renderInstall(); });
+window.addEventListener('appinstalled', ()=>{ installEvent=null; hideInstall(true); toast('Дневник установлен'); });
+
+if('serviceWorker' in navigator && location.protocol==='https:'){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
 /* =============== старт =============== */
 function paintStaticIcons(){
   $('logoMark').innerHTML=icon('book',18);
@@ -2146,7 +2216,7 @@ loadLocal(); loadPlLocal();
 ['tasks','inbox','habits','repeat','projects','wishes'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applyBlocks();
-renderQuote();
+renderQuote(); renderInstall();
 newEntry();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
 applyRepeats(); renderPlanner();
