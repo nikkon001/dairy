@@ -93,6 +93,9 @@ body[data-tab="home"] [data-view="home"],
 body[data-tab="planner"] [data-view="planner"],
 body[data-tab="projects"] [data-view="projects"],
 body[data-tab="house"] [data-view="house"],
+body[data-tab="brain"] [data-view="brain"],
+body[data-tab="ideas"] [data-view="ideas"],
+body[data-tab="pets"] [data-view="pets"],
 body[data-tab="swot"] [data-view="swot"],
 body[data-tab="diary"] [data-view="diary"]{display:block}
 
@@ -217,6 +220,60 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .rec-b .f-row+.f-row{margin-top:14px}
 .rec .chev{color:var(--ink3); transition:transform .2s; flex:none}
 .rec.open .chev{transform:rotate(90deg)}
+
+/* ---------- коллекции ---------- */
+.col-bar{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px}
+.card{border-bottom:.5px solid var(--sep); padding:13px 0}
+.card:last-of-type{border-bottom:none}
+.card-h{display:flex; align-items:flex-start; gap:10px}
+.card-h textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:15px;
+  font-weight:600; line-height:1.35; padding:0; resize:none; overflow:hidden; font-family:inherit}
+.card-h .chev{color:var(--ink3); transition:transform .2s; flex:none; cursor:pointer; margin-top:2px}
+.card.open .card-h .chev{transform:rotate(90deg)}
+.card-m{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px; padding-left:24px}
+.card-cat{border:none; background:var(--fill); border-radius:14px; padding:4px 11px; font-size:12px;
+  color:var(--ink2); font-family:inherit; outline:none; cursor:pointer}
+.card-cat:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.card-link{flex:1; min-width:120px; border:none; background:none; outline:none; font-size:12.5px;
+  color:var(--red); font-family:inherit; padding:2px 0}
+.card-link::placeholder{color:var(--ink3)}
+.card-b{display:none; padding:10px 0 2px 24px}
+.card.open .card-b{display:block}
+.card-b textarea{width:100%; border:none; background:var(--fill); border-radius:10px; outline:none;
+  font-size:14.5px; line-height:1.55; padding:11px 13px; min-height:60px; resize:none; overflow:hidden; font-family:inherit}
+.card-b textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.card .st{opacity:1; margin-top:2px}
+.card-prev{font-size:13.5px; color:var(--ink2); line-height:1.45; margin-top:6px; padding-left:24px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere}
+.card.open .card-prev{display:none}
+
+/* ---------- питомцы ---------- */
+.pet-f{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:6px}
+@media(max-width:920px){ .pet-f{grid-template-columns:1fr} }
+.pet-f label{display:block; font-size:12.5px; font-weight:600; color:var(--ink2); margin-bottom:6px}
+.pet-f textarea{width:100%; border:none; background:var(--fill); border-radius:10px; outline:none;
+  font-size:14px; line-height:1.45; padding:10px 12px; min-height:40px; resize:none; overflow:hidden; font-family:inherit}
+.pet-f textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.wrow{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:.5px solid var(--sep2)}
+.wrow:last-of-type{border-bottom:none}
+.wrow input[type=date]{border:none; background:none; outline:none; font-family:inherit; font-size:12.5px;
+  color:var(--ink2); width:118px; border-radius:6px}
+.wrow input[type=date]:focus{background:var(--fill); color:var(--ink)}
+.wrow input.val{width:78px; border:none; background:var(--fill); border-radius:8px; outline:none;
+  font-family:inherit; font-size:14px; padding:6px 9px; text-align:right}
+.wrow .u{font-size:12.5px; color:var(--ink3)}
+.wrow .delta{font-size:12px; color:var(--ink3); margin-left:auto}
+.wrow .delta.up{color:#FF9500} .wrow .delta.down{color:#34C759}
+.spark{width:100%; max-width:420px; height:60px; display:block; margin:8px 0 12px}
+.spark path{fill:none; stroke:var(--red); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+.spark circle{fill:var(--red)}
+.vet{display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:.5px solid var(--sep2)}
+.vet:last-of-type{border-bottom:none}
+.vet input[type=date]{flex:none; width:118px; border:none; background:none; outline:none;
+  font-family:inherit; font-size:12.5px; color:var(--ink2); border-radius:6px; margin-top:2px}
+.vet input[type=date]:focus{background:var(--fill); color:var(--ink)}
+.vet textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:14px;
+  line-height:1.45; padding:0; resize:none; overflow:hidden; font-family:inherit}
 
 /* ---------- цитата ---------- */
 .quote{background:var(--card); border-radius:var(--r); padding:16px 18px; margin-bottom:26px;
@@ -642,8 +699,10 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
     gap:0; display:flex; background:rgba(255,255,255,.86);
     backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
     box-shadow:0 -.5px 0 var(--sep); padding-bottom:env(safe-area-inset-bottom)}
-  .tabs button{flex:1; flex-direction:column; gap:3px; padding:8px 3px 6px; font-size:10.5px;
-    border-radius:0; min-height:48px; box-shadow:none !important; background:none !important}
+  .tabs{overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:1 0 auto; min-width:72px; flex-direction:column; gap:3px; padding:8px 6px 6px;
+    font-size:10px; border-radius:0; min-height:48px; box-shadow:none !important; background:none !important}
   .tabs button.on{color:var(--red); font-weight:500}
   .tabs button.on .ic{color:var(--red)}
   .toast{bottom:calc(80px + env(safe-area-inset-bottom))}
@@ -868,6 +927,8 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
         </section>
       </div>
 
+      <div id="genViews"></div>
+
       <!-- SWOT -->
       <div data-view="swot">
         <section class="sec" id="secSwot">
@@ -1070,6 +1131,9 @@ const I={
   print:'<path d="M7 9V3.5h10V9"/><path d="M3.5 9h17v7h-3.5v4.5h-10V16H3.5z"/>',
   arrow:'<path d="M4 12h15"/><path d="M13.5 6.5L20 12l-6.5 5.5"/>',
   dots:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+  brain:'<path d="M9.5 4.2a2.8 2.8 0 0 0-2.8 2.8 2.9 2.9 0 0 0-1.7 5.2v3.3a3.4 3.4 0 0 0 5 3M14.5 4.2a2.8 2.8 0 0 1 2.8 2.8 2.9 2.9 0 0 1 1.7 5.2v3.3a3.4 3.4 0 0 1-5 3"/><path d="M12 4v16"/>',
+  bulb:'<path d="M9.2 17.5h5.6M10.2 20.5h3.6"/><path d="M12 3.5a5.5 5.5 0 0 0-3.2 10c.5.4.8 1 .8 1.6h4.8c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 12 3.5z"/>',
+  paw:'<ellipse cx="12" cy="15.8" rx="4.2" ry="3.4"/><circle cx="6.3" cy="11" r="1.9"/><circle cx="17.7" cy="11" r="1.9"/><circle cx="9.3" cy="6.8" r="1.9"/><circle cx="14.7" cy="6.8" r="1.9"/>',
   pot:'<path d="M4 9h16v6.5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2.5 9h19"/><path d="M9 5.5c0-1 1-1.5 1-2.5M12.5 5.5c0-1 1-1.5 1-2.5M16 5.5c0-1 1-1.5 1-2.5"/>',
   cart:'<circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/><path d="M2.5 3.5h2.6l2.4 11h11l2-8H6.6"/>',
   home:'<path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/>',
@@ -2433,6 +2497,9 @@ const MODULES=[
   {id:'planner', name:'Планер',   ic:'grid', hint:'День, неделя, привычки'},
   {id:'projects',name:'Проекты',  ic:'flag', hint:'Roadmap и этапы'},
   {id:'house',   name:'Дом',      ic:'pot',  hint:'Уборка, меню, рецепты, покупки'},
+  {id:'brain',   name:'Второй мозг', ic:'brain', hint:'Мысли, факты, цитаты, ссылки'},
+  {id:'ideas',   name:'Идеи',     ic:'bulb', hint:'Стартапы, проекты, дизайн'},
+  {id:'pets',    name:'Питомцы',  ic:'paw',  hint:'Прививки, вес, ветеринар'},
   {id:'swot',    name:'SWOT',     ic:'quad', hint:'Анализ по квадрантам'},
   {id:'diary',   name:'Дневник',  ic:'book', hint:'Записи и статистика'}
 ];
@@ -2509,6 +2576,308 @@ const weekKey  = () => iso(mondayOf(new Date()));
 function curYear(){ const y=fc().y||(fc().y={}); return y[yearKey()]=y[yearKey()]||{word:'',goals:[]}; }
 
 
+
+
+/* =============== движок коллекций =============== */
+const COLS=[
+  {id:'brain', name:'Второй мозг', title:'Заметки', file:'brain.md', ls:'diary_brain_v1',
+   cats:['Мысль','Факт','Исследование','Цитата','Ссылка','Конспект'],
+   ph:'О чём это', bph:'Сама мысль, цитата или конспект'},
+  {id:'ideas', name:'Идеи', title:'Идеи', file:'ideas.md', ls:'diary_ideas_v1',
+   cats:['Стартап','Бизнес','Проект','Приложение','Дизайн','Исследование'],
+   ph:'Название идеи', bph:'В чём суть, зачем, что дальше'}
+];
+const colFilter={}, colOpen={};
+
+COLS.forEach(c=>{
+  makeStore({
+    key:c.id, label:c.name, ls:c.ls, file:c.file, init:()=>[],
+    toMd:d=>{
+      const out=['# '+c.name,''];
+      d.filter(x=>(x.n||'').trim()||(x.txt||'').trim()).forEach(x=>{
+        out.push('## '+(x.star?'★ ':'')+((x.n||'').trim()||'Без названия'),'');
+        if((x.cat||'').trim()) out.push('Категория: '+x.cat.trim());
+        if((x.url||'').trim()) out.push('Ссылка: '+x.url.trim());
+        if((x.cat||'').trim()||(x.url||'').trim()) out.push('');
+        if((x.txt||'').trim()) out.push(x.txt.trim(),'');
+      });
+      return out.join('\n');
+    },
+    fromMd:text=>{
+      const out=[]; let cur=null;
+      text.split(/\r?\n/).forEach(line=>{
+        const h2=line.match(/^##\s+(.*)$/);
+        if(h2){ let n=h2[1].trim(), star=false;
+          if(/^★\s*/.test(n)){ star=true; n=n.replace(/^★\s*/,''); }
+          cur={n, cat:'', url:'', txt:'', star}; out.push(cur); return; }
+        if(!cur) return;
+        const k=line.match(/^(Категория|Ссылка):\s*(.*)$/);
+        if(k){ cur[k[1]==='Категория'?'cat':'url']=k[2].trim(); return; }
+        if(line.trim()||cur.txt) cur.txt=(cur.txt?cur.txt+'\n':'')+line;
+      });
+      out.forEach(x=>x.txt=(x.txt||'').trim());
+      return out;
+    },
+    render:()=>renderCol(c.id)
+  });
+});
+const colOf = id => COLS.find(c=>c.id===id);
+const colData = id => ST[id].data;
+
+function colViewHTML(c){
+  return `<div data-view="${c.id}">
+    <section class="sec">
+      <div class="sec-h" style="cursor:default">
+        <h2>${c.title}</h2><span class="meta" id="${c.id}Meta"></span>
+      </div>
+      <div class="sec-b">
+        <div class="col-bar" id="${c.id}Bar"></div>
+        <div id="${c.id}Box"></div>
+        <div class="acts"><button class="btn quiet tiny" onclick="colAdd('${c.id}')">${icon('plus',12)}Добавить</button></div>
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderCol(id){
+  const c=colOf(id), list=colData(id), f=colFilter[id]||'';
+  if(!$(id+'Box')) return;
+  const cnt={}; list.forEach(x=>{ const k=(x.cat||'').trim(); if(k) cnt[k]=(cnt[k]||0)+1; });
+  $(id+'Meta').textContent=list.length?list.length+' '+plural(list.length,'карточка','карточки','карточек'):'';
+  $(id+'Bar').innerHTML=
+    `<button class="tag${f?'':' on'}" onclick="colSetFilter('${id}','')">Все ${list.length||''}</button>`+
+    c.cats.map(cat=>`<button class="tag${f===cat?' on':''}" onclick="colSetFilter('${id}','${cat}')">${cat}${cnt[cat]?' '+cnt[cat]:''}</button>`).join('');
+
+  const rows=list.map((x,i)=>({x,i}))
+    .filter(o=>!f || (o.x.cat||'')===f)
+    .sort((a,b)=>(b.x.star?1:0)-(a.x.star?1:0));
+  $(id+'Box').innerHTML=rows.length?rows.map(({x,i})=>`<div class="card${colOpen[id]===i?' open':''}">
+      <div class="card-h">
+        <span class="chev" onclick="colToggle('${id}',${i})">${icon('right',14)}</span>
+        <textarea class="grow" rows="1" placeholder="${c.ph}"
+          oninput="colData('${id}')[${i}].n=this.value; autoGrow(this); ST['${id}'].queue()">${esc(x.n||'')}</textarea>
+        <button class="st${x.star?' on':''}" onclick="colStar('${id}',${i})" title="В избранное">${icon('star',14)}</button>
+        <button class="rm" style="opacity:1" onclick="colRemove('${id}',${i})">${icon('x',12)}</button>
+      </div>
+      <div class="card-m">
+        <select class="card-cat" onchange="colData('${id}')[${i}].cat=this.value; ST['${id}'].queue(); renderCol('${id}')">
+          <option value="">без категории</option>
+          ${c.cats.map(cat=>`<option${(x.cat||'')===cat?' selected':''}>${cat}</option>`).join('')}
+        </select>
+        <input class="card-link" placeholder="ссылка" value="${esc(x.url||'')}"
+          oninput="colData('${id}')[${i}].url=this.value; ST['${id}'].queue()">
+      </div>
+      ${(x.txt||'').trim()?`<div class="card-prev">${esc(x.txt)}</div>`:''}
+      <div class="card-b">
+        <textarea class="grow" rows="2" placeholder="${c.bph}"
+          oninput="colData('${id}')[${i}].txt=this.value; autoGrow(this); ST['${id}'].queue()">${esc(x.txt||'')}</textarea>
+      </div>
+    </div>`).join('') : `<div class="empty">${f?'В этой категории пусто':'Пока пусто — добавь первую карточку'}</div>`;
+  growAll($(id+'Box'));
+}
+function colSetFilter(id,f){ colFilter[id]=f; renderCol(id); }
+function colToggle(id,i){ colOpen[id]= colOpen[id]===i ? -1 : i; renderCol(id); }
+function colStar(id,i){ const x=colData(id)[i]; x.star=!x.star; renderCol(id); ST[id].queue(); }
+function colRemove(id,i){
+  const x=colData(id)[i];
+  if(((x.n||'').trim()||(x.txt||'').trim()) && !confirm('Удалить карточку?')) return;
+  colData(id).splice(i,1); colOpen[id]=-1; renderCol(id); ST[id].queue();
+}
+function colAdd(id){
+  const f=colFilter[id]||'';
+  colData(id).unshift({n:'',cat:f,url:'',txt:'',star:false});
+  colOpen[id]=0; renderCol(id); ST[id].queue();
+  const t=$(id+'Box').querySelector('textarea'); if(t) t.focus();
+}
+
+
+/* =============== питомцы =============== */
+let petIdx=0;
+const pets=makeStore({
+  key:'pets', label:'Питомцы', ls:'diary_pets_v1', file:'pets.md', init:()=>[],
+  toMd:d=>{
+    const out=['# Питомцы',''];
+    d.filter(p=>(p.n||'').trim()).forEach(p=>{
+      out.push('## '+p.n.trim(),'');
+      if((p.kind||'').trim()) out.push('Вид: '+p.kind.trim());
+      if((p.food||'').trim()) out.push('Корм: '+p.food.trim());
+      if((p.kind||'').trim()||(p.food||'').trim()) out.push('');
+      const vac=(p.vac||[]).filter(x=>(x.t||'').trim());
+      if(vac.length){ out.push('### Прививки','');
+        vac.forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+(x.dt?x.dt+' · ':'')+x.t.trim())); out.push(''); }
+      const w=(p.w||[]).filter(x=>x.dt&&x.v!=='');
+      if(w.length){ out.push('### Вес','');
+        w.slice().sort((a,b)=>a.dt.localeCompare(b.dt)).forEach(x=>out.push('- '+x.dt+': '+x.v)); out.push(''); }
+      const vet=(p.vet||[]).filter(x=>(x.t||'').trim());
+      if(vet.length){ out.push('### Ветеринар','');
+        vet.forEach(x=>out.push('- '+(x.dt?x.dt+' · ':'')+x.t.trim())); out.push(''); }
+      const sh=(p.shop||[]).filter(x=>(x.t||'').trim());
+      if(sh.length){ out.push('### Покупки','');
+        sh.forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+x.t.trim())); out.push(''); }
+    });
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const out=[]; let p=null, sec=null;
+    const names={'Прививки':'vac','Вес':'w','Ветеринар':'vet','Покупки':'shop'};
+    text.split(/\r?\n/).forEach(line=>{
+      const h2=line.match(/^##\s+(?!#)(.*)$/);
+      if(h2){ p={n:h2[1].trim(),kind:'',food:'',vac:[],w:[],vet:[],shop:[]}; out.push(p); sec=null; return; }
+      if(!p) return;
+      const h3=line.match(/^###\s+(.*)$/);
+      if(h3){ sec=names[h3[1].trim()]||null; return; }
+      const kv=line.match(/^(Вид|Корм):\s*(.*)$/);
+      if(kv){ p[kv[1]==='Вид'?'kind':'food']=kv[2].trim(); return; }
+      if(sec==='w'){
+        const m=line.match(/^\s*-\s*(\d{4}-\d{2}-\d{2}):\s*([\d.,]+)\s*$/);
+        if(m) p.w.push({dt:m[1], v:m[2].replace(',','.')});
+        return;
+      }
+      if(sec==='vet'){
+        const m=line.match(/^\s*-\s*(?:(\d{4}-\d{2}-\d{2})\s*·\s*)?(.*)$/);
+        if(m && m[2].trim()) p.vet.push({dt:m[1]||'', t:m[2].trim()});
+        return;
+      }
+      if(sec==='vac'||sec==='shop'){
+        const c=parseCheck(line);
+        if(!c) return;
+        let t=c[2].trim(), dt='';
+        const dm=t.match(/^(\d{4}-\d{2}-\d{2})\s*(?:·\s*)?(.*)$/);
+        if(dm){ dt=dm[1]; t=dm[2].trim(); }
+        p[sec].push(sec==='vac'?{t,d:c[1].toLowerCase()==='x',dt}:{t,d:c[1].toLowerCase()==='x'});
+      }
+    });
+    return out;
+  },
+  render:()=>renderPets()
+});
+const pt = () => pets.data;
+const curPet = () => pt()[petIdx];
+
+function sparkline(w){
+  const pts=w.filter(x=>x.dt&&x.v!=='').slice().sort((a,b)=>a.dt.localeCompare(b.dt)).map(x=>+x.v).filter(v=>!isNaN(v));
+  if(pts.length<2) return '';
+  const W=300,H=56,P=6;
+  const min=Math.min(...pts), max=Math.max(...pts), span=(max-min)||1;
+  const xy=pts.map((v,i)=>[P+i*(W-2*P)/(pts.length-1), H-P-((v-min)/span)*(H-2*P)]);
+  const d=xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const last=xy[xy.length-1];
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="${d}"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3"/></svg>`;
+}
+
+function petsViewHTML(){
+  return `<div data-view="pets">
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Питомцы</h2><span class="meta" id="ptMeta"></span></div>
+      <div class="sec-b">
+        <div class="col-bar" id="petBar"></div>
+        <div id="petBox"></div>
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderPets(){
+  if(!$('petBox')) return;
+  const list=pt();
+  if(petIdx>=list.length) petIdx=Math.max(0,list.length-1);
+  $('ptMeta').textContent=list.length?list.length+' '+plural(list.length,'питомец','питомца','питомцев'):'';
+  $('petBar').innerHTML=list.map((p,i)=>
+    `<button class="tag${i===petIdx?' on':''}" onclick="petSel(${i})">${esc((p.n||'').trim()||'Без имени')}</button>`).join('')+
+    `<button class="tag" onclick="petAdd()">${icon('plus',12)} питомец</button>`;
+  if(!list.length){ $('petBox').innerHTML='<div class="empty">Добавь питомца — появятся прививки, вес и визиты</div>'; return; }
+
+  const p=curPet();
+  const w=(p.w||[]).slice().sort((a,b)=>b.dt.localeCompare(a.dt));
+  const vacDue=(p.vac||[]).filter(x=>!x.d && x.dt && x.dt<=today()).length;
+
+  $('petBox').innerHTML=`
+    <div class="pet-f">
+      <div><label>Имя</label><textarea class="grow" rows="1" placeholder="Мурзик"
+        oninput="curPet().n=this.value; autoGrow(this); pets.queue(); renderPetBar()">${esc(p.n||'')}</textarea></div>
+      <div><label>Вид и порода</label><textarea class="grow" rows="1" placeholder="кот, британец"
+        oninput="curPet().kind=this.value; autoGrow(this); pets.queue()">${esc(p.kind||'')}</textarea></div>
+    </div>
+    <div class="pet-f" style="grid-template-columns:1fr">
+      <div><label>Корм</label><textarea class="grow" rows="1" placeholder="Что и сколько"
+        oninput="curPet().food=this.value; autoGrow(this); pets.queue()">${esc(p.food||'')}</textarea></div>
+    </div>
+
+    <p class="sub" style="margin-top:22px">Прививки${vacDue?` <span style="color:var(--red)">· ${vacDue} пора</span>`:''}</p>
+    ${(p.vac||[]).length?(p.vac||[]).map((x,i)=>{
+      const late=!x.d && x.dt && x.dt<=today();
+      return `<div class="task${x.d?' done':''}">
+        <button class="tick${x.d?' on':''}" onclick="petVacToggle(${i})">${icon('check',10)}</button>
+        <textarea class="tx grow" rows="1" placeholder="Прививка"
+          oninput="curPet().vac[${i}].t=this.value; autoGrow(this); pets.queue()">${esc(x.t)}</textarea>
+        <input type="date" class="rm-date" value="${x.dt||''}" style="opacity:1;color:${late?'var(--red)':'var(--ink3)'}"
+          onchange="curPet().vac[${i}].dt=this.value; pets.queue(); renderPets()">
+        <button class="rm" onclick="curPet().vac.splice(${i},1); renderPets(); pets.queue()">${icon('x',12)}</button>
+      </div>`;}).join('') : '<div class="empty">Когда и что ставили</div>'}
+    <div class="acts"><button class="btn quiet tiny" onclick="petVacAdd()">${icon('plus',12)}Прививка</button></div>
+
+    <p class="sub" style="margin-top:22px">Вес</p>
+    ${sparkline(p.w||[])}
+    ${w.length?w.map((x)=>{
+      const i=(p.w||[]).indexOf(x);
+      const prev=(p.w||[]).slice().sort((a,b)=>a.dt.localeCompare(b.dt));
+      const at=prev.indexOf(x), before=at>0?+prev[at-1].v:null;
+      const dv=(before!==null&&!isNaN(+x.v))?(+x.v-before):null;
+      return `<div class="wrow">
+        <input type="date" value="${x.dt||''}" onchange="curPet().w[${i}].dt=this.value; pets.queue(); renderPets()">
+        <input class="val" value="${esc(String(x.v))}" inputmode="decimal"
+          oninput="curPet().w[${i}].v=this.value.replace(',','.'); pets.queue()"
+          onchange="renderPets()"><span class="u">кг</span>
+        ${dv!==null?`<span class="delta ${dv>0?'up':(dv<0?'down':'')}">${dv>0?'+':''}${dv.toFixed(1)}</span>`:'<span class="delta"></span>'}
+        <button class="rm" style="opacity:1" onclick="curPet().w.splice(${i},1); renderPets(); pets.queue()">${icon('x',12)}</button>
+      </div>`;}).join('') : '<div class="empty">Взвешивай раз в месяц — увидишь динамику</div>'}
+    <div class="acts"><button class="btn quiet tiny" onclick="petWAdd()">${icon('plus',12)}Взвесить</button></div>
+
+    <p class="sub" style="margin-top:22px">Ветеринар</p>
+    ${(p.vet||[]).length?(p.vet||[]).map((x,i)=>`<div class="vet">
+        <input type="date" value="${x.dt||''}" onchange="curPet().vet[${i}].dt=this.value; pets.queue(); renderPets()">
+        <textarea class="grow" rows="1" placeholder="Что было на приёме"
+          oninput="curPet().vet[${i}].t=this.value; autoGrow(this); pets.queue()">${esc(x.t)}</textarea>
+        <button class="rm" style="opacity:1" onclick="curPet().vet.splice(${i},1); renderPets(); pets.queue()">${icon('x',12)}</button>
+      </div>`).join('') : '<div class="empty">История визитов</div>'}
+    <div class="acts"><button class="btn quiet tiny" onclick="petVetAdd()">${icon('plus',12)}Визит</button></div>
+
+    <p class="sub" style="margin-top:22px">Покупки</p>
+    ${(p.shop||[]).length?(p.shop||[]).map((x,i)=>`<div class="task${x.d?' done':''}">
+        <button class="tick${x.d?' on':''}" onclick="curPet().shop[${i}].d=!curPet().shop[${i}].d; renderPets(); pets.queue()">${icon('check',10)}</button>
+        <textarea class="tx grow" rows="1" placeholder="Что купить"
+          oninput="curPet().shop[${i}].t=this.value; autoGrow(this); pets.queue()">${esc(x.t)}</textarea>
+        <button class="rm" onclick="curPet().shop.splice(${i},1); renderPets(); pets.queue()">${icon('x',12)}</button>
+      </div>`).join('') : '<div class="empty">Корм, наполнитель, игрушки</div>'}
+    <div class="acts">
+      <button class="btn quiet tiny" onclick="petShopAdd()">${icon('plus',12)}Добавить</button>
+      <button class="btn quiet tiny" onclick="petRemove()">${icon('trash',12)}Удалить питомца</button>
+    </div>`;
+  growAll($('petBox'));
+}
+function renderPetBar(){
+  $('petBar').innerHTML=pt().map((p,i)=>
+    `<button class="tag${i===petIdx?' on':''}" onclick="petSel(${i})">${esc((p.n||'').trim()||'Без имени')}</button>`).join('')+
+    `<button class="tag" onclick="petAdd()">${icon('plus',12)} питомец</button>`;
+}
+function petSel(i){ petIdx=i; renderPets(); }
+function petAdd(){ pt().push({n:'',kind:'',food:'',vac:[],w:[],vet:[],shop:[]}); petIdx=pt().length-1; renderPets(); pets.queue();
+  const t=$('petBox').querySelector('textarea'); if(t) t.focus(); }
+function petRemove(){
+  if(!pt().length) return;
+  if((curPet().n||'').trim() && !confirm('Удалить питомца «'+curPet().n+'» со всеми записями?')) return;
+  pt().splice(petIdx,1); petIdx=0; renderPets(); pets.queue();
+}
+function petVacAdd(){ (curPet().vac=curPet().vac||[]).push({t:'',d:false,dt:today()}); renderPets(); pets.queue(); }
+function petWAdd(){ (curPet().w=curPet().w||[]).push({dt:today(),v:''}); renderPets(); pets.queue(); }
+function petVetAdd(){ (curPet().vet=curPet().vet||[]).push({dt:today(),t:''}); renderPets(); pets.queue(); }
+function petShopAdd(){ (curPet().shop=curPet().shop||[]).push({t:'',d:false}); renderPets(); pets.queue(); }
+function petVacToggle(i){ const x=curPet().vac[i]; x.d=!x.d; renderPets(); pets.queue(); }
+
+function buildGenViews(){
+  $('genViews').innerHTML=COLS.map(colViewHTML).join('')+petsViewHTML();
+}
 
 /* =============== дом =============== */
 const HOUSE_LISTS={shop:'Покупки', chores:'Домашние дела', repair:'Ремонт'};
@@ -3097,6 +3466,8 @@ function setTab(name, silent){
   if(name==='planner') renderPlanner();
   if(name==='home') renderHome();
   if(name==='house') renderHouse();
+  if(COLS.some(c=>c.id===name)) renderCol(name);
+  if(name==='pets') renderPets();
   if(typeof renderCal==='function' && $('cal')) renderCal();
 }
 
@@ -3172,7 +3543,7 @@ function signOut(){
 function exportAll(){
   const files=[];
   entries.forEach(e=>files.push([e.file, toMd(e)]));
-  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house'].forEach(k=>{
+  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets'].forEach(k=>{
     const st=ST[k];
     if(st && st.data && st.data.length) files.push([st.file(), st.md()]);
   });
@@ -3361,8 +3732,8 @@ function paintStaticIcons(){
 
 async function bootSync(after){
   await pullAll();
-  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house']) await ST[k].pull();
-  pruneTasks(); renderSwotList(); renderHome(); renderHouse();
+  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets']) await ST[k].pull();
+  pruneTasks(); renderSwotList(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets();
   const k=curKey(), prev=iso(new Date(parseISO(k).getTime()-7*86400000));
   await pullWeek(k); await pullWeek(prev);
   if(applyRepeats()) queuePl();
@@ -3383,9 +3754,10 @@ window.addEventListener('online', ()=>{ toast('Связь вернулась —
 window.addEventListener('offline', ()=>setSync('err','Нет связи'));
 setInterval(syncPending, 60000);
 
+buildGenViews();
 paintStaticIcons();
 loadLocal(); loadPlLocal();
-['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house'].forEach(k=>ST[k].load());
+['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applySecs();
 const startTab = uiState().tab || 'home';     // запоминаем до newEntry, он уводит на «Дневник»
@@ -3393,7 +3765,7 @@ renderQuote(); renderInstall();
 newEntry();
 renderTabs();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
-pruneTasks(); renderHome(); renderHouse();
+pruneTasks(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets();
 swLoadDraft(); swFill(); renderSwotList();
 applyRepeats(); renderPlanner();
 setTab(startTab, true);
