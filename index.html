@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Дневник</title>
-
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#F2F2F7">
 <meta name="description" content="Личный ежедневник: планер, привычки, проекты и записи">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -14,638 +13,564 @@
 <meta name="apple-mobile-web-app-title" content="Дневник">
 <link rel="apple-touch-icon" href="./icons/icon-180.png">
 <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
-<link rel="icon" href="./icons/icon-192.png" sizes="192x192">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#FFFFFF; --ink:#111111; --muted:#8A8A8A;
-  --line:#DEDEDE; --line-dark:#111111; --red:#D91E18; --wash:#FAFAFA; --dim:#C4C4C4;
+  --bg:#F2F2F7;              /* systemGroupedBackground */
+  --card:#FFFFFF;
+  --ink:#1C1C1E;             /* label */
+  --ink2:rgba(60,60,67,.60); /* secondaryLabel */
+  --ink3:rgba(60,60,67,.30); /* tertiaryLabel */
+  --sep:rgba(60,60,67,.20);  /* separator */
+  --sep2:rgba(60,60,67,.10);
+  --fill:rgba(120,120,128,.12);
+  --fill2:rgba(120,120,128,.20);
+  --red:#FF3B30;             /* systemRed */
+  --red-soft:rgba(255,59,48,.12);
+  --dim:#C7C7CC;
+  --r:12px; --r-s:9px; --r-l:16px;
+  --muted:var(--ink2); --line:var(--sep); --line-dark:var(--ink); --wash:#F7F7FA;
 }
 *{box-sizing:border-box}
-body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font-family:'Montserrat Alternates','Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  font-size:14px; -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
-}
-button,input,textarea{font-family:inherit; font-size:inherit; color:inherit}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.45;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Segoe UI',
+    Roboto,'Helvetica Neue',Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; letter-spacing:-.01em}
+button,input,textarea{font-family:inherit; font-size:inherit; color:inherit; letter-spacing:inherit}
 button{cursor:pointer; border:none; background:none; padding:0}
 .ic{flex:none; display:block}
 .grow{resize:none; overflow:hidden; font-family:inherit; display:block; word-break:break-word}
+.row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.sp{margin-left:auto}
+.mut{color:var(--ink2)}
 
 /* ---------- каркас ---------- */
-.app{max-width:1260px; margin:0 auto; padding:0 24px 80px}
-/* чёлка и полоса жестов на айфоне */
+.app{max-width:1180px; margin:0 auto; padding:0 20px 90px}
 @supports(padding:max(0px)){
   body{padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right)}
-  header.top{padding-top:max(22px, calc(14px + env(safe-area-inset-top)))}
-  .app{padding-bottom:max(80px, calc(50px + env(safe-area-inset-bottom)))}
-  .toast{bottom:max(28px, calc(18px + env(safe-area-inset-bottom)))}
 }
+header.top{display:flex; align-items:center; gap:14px; padding:16px 0 14px; position:sticky; top:0; z-index:35;
+  background:rgba(242,242,247,.82); backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px); margin:0 -20px; padding-left:20px; padding-right:20px}
+@supports(padding:max(0px)){ header.top{padding-top:max(16px, calc(8px + env(safe-area-inset-top)))} }
+.logo{display:flex; align-items:center; gap:11px; min-width:0}
+.logo .mark{width:34px; height:34px; border-radius:9px; background:var(--ink); color:#fff;
+  display:grid; place-items:center; flex:none}
+.logo h1{margin:0; font-size:17px; font-weight:600; letter-spacing:-.02em}
+.logo small{display:block; font-size:12px; color:var(--ink2); margin-top:1px; letter-spacing:0}
+.sync{display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink2)}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--dim); flex:none}
+.dot.ok{background:#34C759} .dot.err{background:var(--red)}
+.dot.busy{background:#FF9500; animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
 
-/* подсказка про установку */
-.install{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-  border:1px solid var(--line-dark); padding:13px 15px; margin-bottom:22px; font-size:12.5px; line-height:1.55}
-.install .ic{flex:none}
-.install b{font-weight:700}
-.install .sp{margin-left:auto}
-header.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-  padding:22px 0 16px; border-bottom:2px solid var(--red); margin-bottom:26px}
-.logo{display:flex; align-items:center; gap:11px; margin-right:auto}
-.logo .mark{width:34px; height:34px; border:1.5px solid var(--ink); display:grid; place-items:center; flex:none}
-.logo h1{margin:0; font-size:15px; font-weight:700; letter-spacing:3px; text-transform:uppercase}
-.logo small{display:block; font-size:10.5px; color:var(--muted); letter-spacing:1.2px;
-  text-transform:uppercase; margin-top:2px}
-
-.btn{display:inline-flex; align-items:center; gap:7px; padding:9px 14px; min-height:36px;
-  border:1px solid var(--line-dark); background:var(--bg); font-size:11px; font-weight:600;
-  letter-spacing:1.1px; text-transform:uppercase; transition:.14s}
-.btn:hover{color:var(--red); border-color:var(--red)}
-.btn.primary{background:var(--ink); color:#fff; border-color:var(--ink)}
-.btn.primary:hover{background:var(--red); border-color:var(--red); color:#fff}
-.btn.quiet{border-color:var(--line); color:var(--muted)}
-.btn.quiet:hover{border-color:var(--red); color:var(--red)}
-.btn.on{border-color:var(--red); color:var(--red)}
-.btn.tiny{padding:6px 10px; min-height:30px; font-size:10px; gap:5px}
-.btn.danger:hover{color:var(--red); border-color:var(--red)}
-
-.sync{display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:600;
-  letter-spacing:1px; text-transform:uppercase; color:var(--muted)}
-.dot{width:7px; height:7px; background:var(--line); flex:none}
-.dot.ok{background:var(--ink)} .dot.err{background:var(--red)}
-.dot.busy{background:var(--red); animation:blink 1s steps(2,end) infinite}
-@keyframes blink{50%{opacity:0}}
-
-.grid{display:grid; grid-template-columns:320px minmax(0,1fr); gap:0; align-items:start}
-/* aside в разметке идёт вторым — на десктопе ставим его в левую колонку явно */
-.grid>aside{grid-column:1; grid-row:1; padding-right:26px; border-right:1px solid var(--line); min-width:0}
-.grid>main{grid-column:2; grid-row:1; padding-left:30px; min-width:0}
-.side{display:flex; flex-direction:column; gap:26px; position:sticky; top:22px}
+/* ---------- кнопки ---------- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:9px 15px; min-height:36px; border-radius:var(--r-s); border:none;
+  background:var(--fill); color:var(--ink); font-size:14px; font-weight:500;
+  letter-spacing:-.01em; transition:.15s}
+.btn:hover{background:var(--fill2)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--red); color:#fff}
+.btn.primary:hover{background:#E5342A}
+.btn.quiet{background:none; color:var(--red); padding:9px 11px}
+.btn.quiet:hover{background:var(--red-soft)}
+.btn.tiny{padding:6px 11px; min-height:30px; font-size:13px; border-radius:8px}
+.btn.icon{padding:0; width:36px; min-height:36px; border-radius:50%; background:var(--fill); color:var(--ink2)}
+.btn.icon:hover{background:var(--fill2); color:var(--ink)}
 
 /* ---------- вкладки ---------- */
-.tabs{display:flex; gap:0; border-bottom:1px solid var(--line); margin-bottom:26px}
-.tabs button{display:inline-flex; align-items:center; gap:8px; padding:12px 20px 13px;
-  font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase;
-  color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px; transition:.14s}
+.tabs{display:inline-flex; gap:2px; padding:2px; background:var(--fill); border-radius:10px; margin:6px 0 26px}
+.tabs button{display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:7px 16px; min-height:32px; border-radius:8px; font-size:13.5px; font-weight:500;
+  color:var(--ink2); transition:.18s; white-space:nowrap}
 .tabs button:hover{color:var(--ink)}
-.tabs button.on{color:var(--ink); border-bottom-color:var(--red)}
-.tabs button .lb{display:inline}
+.tabs button.on{background:var(--card); color:var(--ink); font-weight:600;
+  box-shadow:0 1px 3px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.04)}
+.tabs button .ic{opacity:.75}
+.tabs button.on .ic{opacity:1; color:var(--red)}
 [data-view]{display:none}
-body[data-tab="planner"]  [data-view="planner"],
+body[data-tab="planner"] [data-view="planner"],
 body[data-tab="projects"] [data-view="projects"],
-body[data-tab="swot"]     [data-view="swot"],
-body[data-tab="diary"]    [data-view="diary"]{display:block}
+body[data-tab="swot"] [data-view="swot"],
+body[data-tab="diary"] [data-view="diary"]{display:block}
 
-/* ---------- SWOT ---------- */
-.sw-meta{display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap; margin-bottom:20px}
-.sw-name{flex:1; min-width:180px; border:none; border-bottom:1px solid var(--line-dark);
-  background:none; outline:none; font-size:19px; font-weight:700; padding:0 0 9px; line-height:1.3}
-.sw-name::placeholder{color:var(--dim)}
-.sw-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-.sw-q{border:1px solid var(--line); padding:14px 15px 12px; min-width:0}
-.sw-q.neg{border-color:var(--line-dark)}
-.sw-h{display:flex; align-items:center; gap:9px; margin-bottom:10px}
-.sw-b{width:22px; height:22px; flex:none; display:grid; place-items:center; font-size:11px;
-  font-weight:700; background:var(--ink); color:#fff}
-.sw-q.neg .sw-b{background:var(--red)}
-.sw-h b{font-size:10px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase}
-.sw-h .n{margin-left:auto; font-size:9px; font-weight:700; color:var(--muted)}
-.sw-i{display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid var(--line)}
-.sw-i:last-of-type{border-bottom:none}
-.sw-i .d{width:5px; height:5px; margin-top:7px; flex:none; background:var(--ink)}
-.sw-q.neg .sw-i .d{background:var(--red)}
-.sw-i textarea{flex:1; min-width:0; border:none; outline:none; background:none;
-  font-size:12.5px; line-height:1.45; padding:1px 0}
-.sw-i textarea::placeholder{color:var(--dim)}
-.sw-i .rm{color:transparent; flex:none; margin-top:2px; display:grid; place-items:center}
-.sw-i:hover .rm{color:var(--dim)}
-.sw-i .rm:hover{color:var(--red)}
-.sw-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-  color:var(--dim); margin-top:8px; min-height:24px; text-align:left}
-.sw-add:hover{color:var(--red)}
-.sw-draft{border-left:2px solid var(--red); padding:3px 0 3px 13px; margin-bottom:18px;
-  font-size:11.5px; line-height:1.55; color:var(--muted)}
-.sw-draft b{color:var(--ink); font-weight:700}
-.sw-item{width:100%; text-align:left; display:block; padding:11px 0;
-  border-bottom:1px solid var(--line); transition:.14s}
-.sw-item:last-of-type{border-bottom:none}
-.sw-item:hover .t{color:var(--red)}
-.sw-item .t{display:flex; align-items:flex-start; gap:8px; font-size:12.5px; font-weight:600; line-height:1.4}
-.sw-item .t .ic{color:var(--muted); flex:none; margin-top:2px}
-.sw-item.on .t{color:var(--red)}
-.sw-item .m{font-size:9px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); margin-top:6px}
+.grid{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:26px; align-items:start}
+aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap:26px}
 
-/* ---------- секции ---------- */
-.sect-title{font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
-  margin:0 0 13px; padding-bottom:7px; border-bottom:1px solid var(--line); position:relative;
-  display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; width:100%; text-align:left}
-.sect-title::after{content:''; position:absolute; left:0; bottom:-1px; width:34px; height:1px; background:var(--red)}
-.sect-title:hover{color:var(--red)}
-.sect-title .cnt{margin-left:auto; color:var(--muted); font-weight:600}
-.sect-title .chev{color:var(--muted); transition:transform .2s ease}
-.sec.closed .sect-title{margin-bottom:0}
-.sec.closed .sec-body{display:none}
+/* ---------- секция как в «Настройках» ---------- */
+.sec{margin-bottom:26px}
+.sec:last-child{margin-bottom:0}
+.sec-h{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:0 4px 8px; background:none; transition:.15s}
+.sec-h h2{margin:0; font-size:13px; font-weight:600; letter-spacing:-.01em; color:var(--ink2)}
+.sec-h:hover h2{color:var(--ink)}
+.sec-h .meta{margin-left:auto; font-size:12.5px; color:var(--ink3); text-align:right; line-height:1.3}
+.sec-h .chev{color:var(--ink3); transition:transform .22s ease; flex:none}
+.sec-b{background:var(--card); border-radius:var(--r); padding:16px 18px;
+  box-shadow:0 0 0 .5px rgba(0,0,0,.04)}
+.sec.closed .sec-b{display:none}
 .sec.closed .chev{transform:rotate(-90deg)}
+.sub{font-size:13px; font-weight:600; color:var(--ink2); margin:0 0 10px; padding-left:4px; letter-spacing:-.01em}
+.empty{color:var(--ink3); font-size:14px; line-height:1.6; padding:14px 0; text-align:center}
 
-.block{border:1px solid var(--line); margin-bottom:24px}
-.block-head{display:flex; align-items:center; gap:10px; padding:13px 18px;
-  cursor:pointer; border-bottom:1px solid var(--line); user-select:none; transition:.14s}
-.block-head:hover{color:var(--red)}
-.block-head h2{margin:0; font-size:11px; font-weight:700; letter-spacing:2.2px; text-transform:uppercase}
-.block-head .meta-lbl{font-size:9.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted)}
-.block-head .chev{margin-left:auto; color:var(--muted); transition:transform .2s ease}
-.block.closed .block-head{border-bottom:none}
-.block.closed .block-body{display:none}
-.block.closed .chev{transform:rotate(-90deg)}
-.block-body{padding:20px 18px}
-
-/* ---------- поиск, теги ---------- */
-.search-wrap{display:flex; align-items:center; gap:9px; border-bottom:1px solid var(--line-dark); padding-bottom:9px}
-.search-wrap .ic{color:var(--muted)}
-.search{flex:1; min-width:0; border:none; outline:none; background:none; font-size:13px; padding:4px 0}
-.search::placeholder{color:var(--muted)}
-.tags-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
-.tag{font-size:10.5px; font-weight:600; letter-spacing:.6px; padding:4px 9px; text-align:left;
-  border:1px solid var(--line); color:var(--muted); background:none; transition:.14s;
-  overflow-wrap:anywhere; max-width:100%}
-.tag:hover{border-color:var(--ink); color:var(--ink)}
-.tag.on{border-color:var(--red); color:var(--red)}
-.tag.mini{padding:3px 7px; font-size:10px}
-
-/* ---------- список записей ---------- */
-.list{display:flex; flex-direction:column; max-height:44vh; overflow:auto}
-.list::-webkit-scrollbar{width:3px}
-.list::-webkit-scrollbar-thumb{background:var(--line-dark)}
-.item{text-align:left; width:100%; display:block; padding:13px 0 13px 14px;
-  border-bottom:1px solid var(--line); border-left:1px solid transparent; transition:.14s}
-.item:hover{border-left-color:var(--ink); background:var(--wash)}
-.item.on{border-left:2px solid var(--red); background:var(--wash); padding-left:13px}
-.item .t{display:flex; gap:8px; align-items:flex-start; font-weight:600; font-size:13px; line-height:1.4}
-.item .t .ic{color:var(--muted); margin-top:2px}
-.item.on .t .ic{color:var(--red)}
-.item .t span.txt{overflow-wrap:anywhere}
-.item .d{display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:10px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--muted); margin-top:5px}
-.item .p{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.5;
-  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
-  overflow-wrap:anywhere}
-.empty,.task-empty{color:var(--muted); font-size:12px; padding:14px 0; line-height:1.7; letter-spacing:.3px}
-.empty{text-align:center; padding:26px 8px}
-
-/* ---------- календарь ---------- */
-.cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
-.cal-head b{font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase}
-.nav-sq{width:30px; height:30px; border:1px solid var(--line); display:grid; place-items:center; color:var(--muted); flex:none}
-.nav-sq:hover{border-color:var(--red); color:var(--red)}
-.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:3px}
-.cal .wd{font-size:9px; text-align:center; color:var(--muted); font-weight:700;
-  letter-spacing:.8px; text-transform:uppercase; padding-bottom:5px}
-.cal .day{aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:2px; font-size:11.5px; font-weight:500; color:var(--muted);
-  border:1px solid transparent; position:relative; transition:.14s}
-.cal .day.pad{visibility:hidden}
-.cal .day.has{border-color:var(--line); color:var(--ink); font-weight:600; cursor:pointer}
-.cal .day.pick{cursor:pointer}
-.cal .day.has:hover,.cal .day.pick:hover{border-color:var(--red); color:var(--red)}
-.cal .day.inweek{background:var(--wash)}
-.cal .day.sel{border-color:var(--ink); color:var(--ink); font-weight:700}
-.cal .day.today{border-color:var(--red)}
-.cal .day.today::after{content:''; position:absolute; bottom:-1px; left:-1px; right:-1px; height:2px; background:var(--red)}
-.cal .day .more{position:absolute; top:1px; right:3px; font-size:8px; color:var(--red); font-weight:700}
-
-/* ---------- статистика ---------- */
-.stats{margin-top:20px; padding-top:16px; border-top:1px solid var(--line)}
-.stat-top{display:flex; margin-bottom:16px; border:1px solid var(--line)}
-.stat-top div{flex:1; padding:10px 12px}
-.stat-top div+div{border-left:1px solid var(--line)}
-.stat-top b{display:block; font-size:20px; font-weight:700; line-height:1.1}
-.stat-top span{font-size:9.5px; color:var(--muted); letter-spacing:1px; text-transform:uppercase}
-.mb{display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:11px; font-weight:500}
-.mb-l{display:flex; align-items:center; gap:6px; width:104px; flex:none; line-height:1.3}
-.mb-l .ic{flex:none}
-.mb-l span{overflow-wrap:anywhere}
-.mb-track{flex:1; height:1px; background:var(--line)}
-.mb-track i{display:block; height:1px; background:var(--ink); transition:width .35s ease}
-.mb.top .mb-track i{height:2px; margin-top:-.5px; background:var(--red)}
-.mb.top .mb-l{color:var(--red)}
-.mb-n{width:16px; flex:none; text-align:right; font-weight:700; font-size:11px}
-.stat-note{font-size:11px; color:var(--muted); margin:14px 0 0; line-height:1.6; letter-spacing:.3px}
-.stat-note b{color:var(--ink); font-weight:600}
-
-/* ---------- галочки и строки ---------- */
-.task{display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid var(--line)}
-.tick{width:16px; height:16px; border:1px solid var(--line-dark); flex:none; margin-top:2px;
-  display:grid; place-items:center; color:transparent; transition:.14s}
-.tick:hover{border-color:var(--red)}
-.tick.on{border-color:var(--red); color:var(--red)}
-.task .tx{flex:1; min-width:0; border:none; outline:none; background:none;
-  font-size:12.5px; padding:1px 0; line-height:1.45}
-.task .tx::placeholder{color:var(--dim)}
-.task.done .tx{color:var(--muted); text-decoration:line-through}
-.task .rm,.task .st{color:transparent; display:grid; place-items:center; transition:.14s; margin-top:2px; flex:none}
-.task:hover .rm,.task:hover .st{color:var(--dim)}
-.task .rm:hover,.task .st:hover{color:var(--red)}
-.task .st.on{color:var(--red)}
-.task-acts{display:flex; gap:7px; margin-top:12px; flex-wrap:wrap}
-.task-bar{display:flex; align-items:center; gap:10px; margin-top:13px;
-  font-size:9.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); font-weight:700}
-.task-bar .track{flex:1; height:1px; background:var(--line)}
-.task-bar .track i{display:block; height:1px; background:var(--red); transition:width .3s ease}
-
-/* ---------- планер ---------- */
-.pl-nav{display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap}
-.pl-nav b{font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase}
-.pl-nav .sp{margin-left:auto}
-.modes{display:flex; border:1px solid var(--line)}
-.modes button{padding:7px 12px; min-height:32px; font-size:10px; font-weight:700;
-  letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); transition:.14s}
-.modes button.on{background:var(--ink); color:#fff}
-.modes button:not(.on):hover{color:var(--red)}
-
-.carry{display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-  border-left:2px solid var(--red); padding:9px 0 9px 13px; margin-bottom:14px;
-  font-size:11.5px; line-height:1.5}
-.carry b{font-weight:700}
-
-.pl-wrap{overflow-x:auto}
-.pl-scroll{max-height:330px; overflow-y:auto; border:1px solid var(--line); border-bottom:none}
-.pl-scroll::-webkit-scrollbar{width:3px}
-.pl-scroll::-webkit-scrollbar-thumb{background:var(--line-dark)}
-.pl-grid{display:grid; grid-auto-rows:minmax(27px,auto)}
-.pl-dh{padding:7px 3px; text-align:center; border-left:1px solid var(--line);
-  font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted);
-  position:sticky; top:0; background:var(--bg); z-index:2; border-bottom:1px solid var(--line-dark)}
-.pl-dh b{display:block; font-size:13px; color:var(--ink); letter-spacing:0; margin-top:3px}
-.pl-dh.today{color:var(--red)} .pl-dh.today b{color:var(--red)}
-.pl-corner{position:sticky; top:0; background:var(--bg); z-index:3; border-bottom:1px solid var(--line-dark)}
-.pl-h{font-size:8.5px; color:var(--muted); font-weight:700; letter-spacing:.5px;
-  display:flex; align-items:flex-start; justify-content:flex-end; padding:6px 6px 0;
-  border-bottom:1px solid var(--line)}
-.pl-cell{border-left:1px solid var(--line); border-bottom:1px solid var(--line); position:relative}
-.pl-cell textarea{width:100%; min-height:26px; border:none; outline:none; background:none;
-  font-size:11px; padding:5px 16px 5px 5px; line-height:1.35}
-.pl-cell textarea:focus{background:var(--wash); box-shadow:inset 0 0 0 1px var(--red)}
-.pl-cell.on{box-shadow:inset 2px 0 0 var(--ink)}
-.pl-cell.on textarea{font-weight:600}
-.pl-cell.now{box-shadow:inset 2px 0 0 var(--red)}
-.pl-dur{position:absolute; right:1px; top:1px; display:none; flex-direction:column; gap:1px}
-.pl-cell:hover .pl-dur,.pl-cell.on .pl-dur{display:flex}
-.pl-dur button{width:14px; height:13px; font-size:11px; line-height:1; color:var(--dim);
-  display:grid; place-items:center}
-.pl-dur button:hover{color:var(--red)}
-
-.pl-tasks{display:grid; border:1px solid var(--line); border-top:1px solid var(--line-dark)}
-.pl-lbl{font-size:8.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
-  color:var(--muted); display:flex; align-items:flex-start; justify-content:flex-end; padding:9px 6px 0}
-.pl-tcol{border-left:1px solid var(--line); padding:7px 5px 9px; display:flex; flex-direction:column; gap:4px; min-width:0}
-.pl-t{display:flex; align-items:flex-start; gap:5px}
-.pl-t .tick{width:12px; height:12px; margin-top:1px}
-.pl-t .tick svg{width:8px; height:8px}
-.pl-t textarea{flex:1; min-width:0; border:none; outline:none; background:none;
-  font-size:10.5px; line-height:1.4; padding:0}
-.pl-t.done textarea{text-decoration:line-through; color:var(--muted)}
-.pl-t .st{color:transparent; flex:none; margin-top:1px}
-.pl-tcol:hover .st{color:var(--dim)}
-.pl-t .st.on{color:var(--red)}
-.pl-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-  color:var(--dim); text-align:left; padding:2px 0; transition:.14s; min-height:22px}
-.pl-add:hover{color:var(--red)}
-
-/* день */
-.day-view{display:flex; flex-direction:column; gap:20px}
-.day-tasks .task{padding:9px 0}
-.day-sum{display:grid; grid-template-columns:1fr 1fr; gap:18px}
-.day-sum label{display:block; font-size:9.5px; font-weight:700; letter-spacing:1.4px;
-  text-transform:uppercase; color:var(--muted); margin-bottom:6px}
-.day-sum textarea{width:100%; border:none; border-bottom:1px solid var(--line); background:none;
-  outline:none; font-size:13px; padding:6px 0; line-height:1.6; min-height:34px}
-.day-sum textarea:focus{border-bottom-color:var(--red)}
-.mit{font-size:9.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted)}
-.mit b{color:var(--red)}
-
-/* ---------- привычки ---------- */
-.hb-wrap{overflow-x:auto}
-.hb-grid{display:grid; min-width:0}
-.hb-name{display:flex; align-items:center; gap:6px; padding:4px 8px 4px 0; min-width:0}
-.hb-name textarea{flex:1; min-width:0; border:none; outline:none; background:none;
-  font-size:11.5px; line-height:1.35; padding:0}
-.hb-name .rm{color:transparent; flex:none}
-.hb-row:hover .rm{color:var(--dim)}
-.hb-name .rm:hover{color:var(--red)}
-.hb-d{font-size:8px; color:var(--muted); text-align:center; font-weight:700; padding-bottom:5px}
-.hb-d.today{color:var(--red)}
-.hb-c{width:100%; aspect-ratio:1; min-height:15px; border:1px solid var(--line); transition:.12s}
-.hb-c:hover{border-color:var(--red)}
-.hb-c.on{background:var(--red); border-color:var(--red)}
-.hb-c.wknd{border-style:dashed}
-.hb-streak{font-size:9px; font-weight:700; letter-spacing:.8px; color:var(--muted);
-  padding-left:8px; display:flex; align-items:center; line-height:1.3; overflow-wrap:anywhere}
-.hb-streak.hot{color:var(--red)}
-
-/* ---------- roadmap ---------- */
-.rm-wrap{overflow-x:auto}
-.rm{min-width:760px}
-.rm-row{display:grid; grid-template-columns:158px minmax(0,1fr); align-items:stretch}
-.rm-l{padding:9px 12px 9px 0; font-size:11px; line-height:1.35; min-width:0;
-  border-bottom:1px solid var(--line); display:flex; align-items:flex-start; gap:6px;
-  overflow-wrap:anywhere; color:var(--muted)}
-.rm-t{position:relative; border-left:1px solid var(--line-dark); border-bottom:1px solid var(--line);
-  background-image:repeating-linear-gradient(to right,var(--line) 0 1px,transparent 1px var(--wk))}
-
-/* шапка со шкалой */
-.rm-head .rm-l,.rm-head .rm-t{border-bottom:1px solid var(--line-dark); background:none}
-.rm-months,.rm-weeks{display:flex}
-.rm-months div{font-size:9px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase;
-  padding:5px 6px 4px; border-left:1px solid var(--line); color:var(--ink); overflow:hidden}
-.rm-months div:first-child{border-left:none}
-.rm-weeks div{flex:1; text-align:center; font-size:9px; font-weight:600; color:var(--muted);
-  padding:3px 0 6px; border-left:1px solid var(--line)}
-.rm-weeks div:first-child{border-left:none}
-
-/* группа проекта */
-.rm-row.grp .rm-l{background:var(--ink); color:#fff; font-size:10px; font-weight:700;
-  letter-spacing:1.4px; text-transform:uppercase; padding:10px 12px; align-items:center}
-.rm-row.grp .rm-l .n{margin-left:auto; opacity:.6; letter-spacing:.6px; white-space:nowrap}
-.rm-row.grp.done .rm-l{background:var(--dim)}
-.rm-sum{position:absolute; top:50%; height:3px; margin-top:-1.5px; background:var(--ink); opacity:.55}
-.rm-row.grp.done .rm-sum{background:var(--dim)}
-
-/* полосы этапов */
-.rm-bar{position:absolute; top:6px; min-height:22px; padding:4px 9px; font-size:10.5px;
-  line-height:1.35; font-weight:600; overflow-wrap:anywhere; border:1px solid var(--line);
-  color:var(--muted); background:var(--bg); display:flex; align-items:center}
-.rm-bar.done{background:var(--ink); border-color:var(--ink); color:#fff}
-.rm-bar.now{border-color:var(--red); color:var(--ink); border-width:1.5px}
-.rm-bar.late{background:var(--red); border-color:var(--red); color:#fff}
-.rm-out{position:absolute; top:9px; font-size:10.5px; line-height:1.35; font-weight:600;
-  width:180px; overflow-wrap:anywhere; color:var(--ink)}
-.rm-out.muted{color:var(--muted); font-weight:500}
-.rm-bar.empty{padding:0; min-width:3px}
-
-/* правка прямо на шкале */
-.rm-bar textarea,.rm-out textarea{flex:1; width:100%; min-width:0; border:none; outline:none;
-  background:none; color:inherit; font:inherit; padding:0; line-height:1.35;
-  resize:none; overflow:hidden; word-break:break-word}
-.rm-bar textarea::placeholder,.rm-out textarea::placeholder{color:currentColor; opacity:.45}
-.rm-bar textarea:focus,.rm-out textarea:focus{outline:1px solid var(--red); outline-offset:2px}
-.rm-l .tick{width:14px; height:14px; margin-top:1px}
-.rm-l .tick svg{width:9px; height:9px}
-.rm-date{border:none; border-bottom:1px solid transparent; background:none; outline:none;
-  font-family:inherit; font-size:9px; letter-spacing:.3px; color:var(--muted);
-  text-transform:uppercase; padding:1px 0; width:98px; min-width:0}
-.rm-row:hover .rm-date{border-bottom-color:var(--line)}
-.rm-date:focus{border-bottom-color:var(--red); color:var(--ink)}
-.rm-l .rm-x{color:transparent; flex:none; margin-top:1px; display:grid; place-items:center}
-.rm-row:hover .rm-x{color:var(--dim)}
-.rm-l .rm-x:hover{color:var(--red)}
-.rm-plus{background:none; color:#fff; opacity:.7; display:grid; place-items:center; flex:none}
-.rm-plus:hover{opacity:1}
-.rm-nodate .sw-i,.rm-nd{display:flex; align-items:flex-start; gap:6px; padding:3px 8px 3px 0}
-.rm-nd textarea{width:120px; border:none; outline:none; background:none; font-size:10.5px;
-  line-height:1.35; padding:0; resize:none; overflow:hidden; word-break:break-word}
-
-/* вехи */
-.rm-ms{position:absolute; top:7px; display:flex; align-items:flex-start; gap:5px;
-  font-size:10.5px; font-weight:600; line-height:1.3; width:150px; overflow-wrap:anywhere}
-.rm-ms.right{transform:translateX(-100%); text-align:right; flex-direction:row-reverse}
-.rm-ms .ic{color:var(--red); margin-top:1px}
-.rm-ms small{display:block; font-size:9px; color:var(--muted); font-weight:600; letter-spacing:.4px}
-.rm-ms.done .ic{color:var(--dim)}
-
-.rm-now{position:absolute; top:0; bottom:0; width:1px; background:var(--red); opacity:.5; z-index:1}
-.rm-none{font-size:11px; color:var(--muted); line-height:1.6; padding-top:12px;
-  border-top:1px solid var(--line); margin-top:4px}
-.rm-none b{color:var(--ink); font-weight:600}
-.rm-nodate{display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 0 8px 10px}
-.rm-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; font-size:9px;
-  letter-spacing:1px; text-transform:uppercase; color:var(--muted); font-weight:700}
-.rm-legend span{display:flex; align-items:center; gap:6px}
-.rm-legend i{width:16px; height:9px; border:1px solid var(--line); display:block}
-.rm-legend i.d{background:var(--ink); border-color:var(--ink)}
-.rm-legend i.n{border-color:var(--red); border-width:1.5px}
-.rm-legend i.l{background:var(--red); border-color:var(--red)}
-
-/* ---------- проекты ---------- */
-.proj{padding:15px 0; border-bottom:1px solid var(--line)}
-.proj:first-child{padding-top:0}
-.proj:last-of-type{border-bottom:none}
-.proj-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
-.proj-name{flex:1; min-width:130px; border:none; outline:none; background:none;
-  font-size:13.5px; font-weight:600; padding:0; line-height:1.4}
-.proj-name::placeholder{color:var(--dim)}
-.proj-dates{display:flex; align-items:center; gap:5px; color:var(--muted); font-size:9.5px}
-.proj-dates input{border:none; border-bottom:1px solid var(--line); background:none; outline:none;
-  font-size:9.5px; letter-spacing:.4px; color:var(--muted); padding:3px 0; width:106px;
-  font-family:inherit; text-transform:uppercase}
-.proj-dates input:focus{border-bottom-color:var(--red); color:var(--ink)}
-.proj-cnt{font-size:9.5px; font-weight:700; letter-spacing:1.2px; color:var(--muted); line-height:1.4}
-.proj-cnt.late{color:var(--red)}
-.proj-rm{color:transparent; display:grid; place-items:center; transition:.14s}
-.proj:hover .proj-rm{color:var(--dim)}
-.proj-rm:hover{color:var(--red)}
-.proj-line{display:flex; align-items:center; gap:4px; margin:12px 0 10px}
-.seg{flex:1; height:9px; border:1px solid var(--red); background:none; transition:.2s; padding:0}
-.seg:hover{transform:scaleY(1.35)}
-.seg.on{background:var(--red)}
-.proj-line .star{flex:none; color:var(--red); margin-left:3px}
-.proj-stages{display:flex; flex-wrap:wrap; gap:7px 14px; align-items:flex-start}
-.stage{display:flex; align-items:flex-start; gap:6px; max-width:100%}
-.stage .tick{width:13px; height:13px; margin-top:1px}
-.stage .tick svg{width:8px; height:8px}
-.stage-b{display:flex; flex-direction:column; gap:2px; min-width:0}
-.stage textarea{border:none; outline:none; background:none; font-size:11px; padding:0;
-  width:120px; max-width:100%; line-height:1.4}
-.stage textarea::placeholder{color:var(--dim)}
-.stage.done textarea{color:var(--muted); text-decoration:line-through}
-.stage-dt{width:120px; max-width:100%; border:none; border-bottom:1px solid transparent;
-  background:none; outline:none; font-family:inherit; font-size:8.5px; letter-spacing:.4px;
-  color:var(--dim); padding:1px 0; text-transform:uppercase; transition:.14s}
-.stage:hover .stage-dt{border-bottom-color:var(--line)}
-.stage-dt.set{color:var(--muted); border-bottom-color:var(--line)}
-.stage-dt:focus{border-bottom-color:var(--red); color:var(--ink)}
-.stage-add{font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-  color:var(--dim); transition:.14s; min-height:22px}
-.stage-add:hover{color:var(--red)}
-.proj.done .proj-name{color:var(--muted); text-decoration:line-through}
-.proj.done .seg{border-color:var(--dim); background:var(--dim)}
-.proj.done .star{color:var(--muted)}
-.proj.done .stage textarea,.proj.done .proj-cnt{color:var(--muted)}
-.proj.done .tick.on{border-color:var(--muted); color:var(--muted)}
-
-/* ---------- желания ---------- */
-.wish{width:100%; text-align:left; display:block; padding:11px 0;
-  border-bottom:1px solid var(--line); transition:.14s}
-.wish:last-of-type{border-bottom:none}
-.wish:hover .wn{color:var(--red)}
-.wn{display:flex; align-items:flex-start; gap:8px; font-size:12.5px; font-weight:600;
-  line-height:1.4; transition:.14s}
-.wn .ic{color:var(--muted); flex:none; margin-top:2px}
-.wish:hover .wn .ic{color:var(--red)}
-.wn span{overflow-wrap:anywhere}
-.wl-line{display:flex; gap:3px; margin-top:8px}
-.wl-line i{flex:1; height:4px; border:1px solid var(--red)}
-.wl-line i.on{background:var(--red)}
-.wish.done .wn{color:var(--muted); text-decoration:line-through}
-.wish.done .wn .ic{color:var(--muted)}
-.wish.done .wl-line i{border-color:var(--dim); background:var(--dim)}
-.wm{font-size:9px; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted); margin-top:6px}
-
-/* ---------- цитата ---------- */
-.quote{border-left:2px solid var(--red); padding:3px 0 3px 17px; margin-bottom:26px}
-.quote p{margin:0 0 7px; font-size:14px; line-height:1.6; font-weight:500}
-.quote span{font-size:9.5px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted)}
-
-/* ---------- редактор ---------- */
-.editor{display:flex; flex-direction:column; gap:20px}
-.title-in{width:100%; border:none; border-bottom:1px solid var(--line-dark); outline:none;
-  background:none; font-size:26px; font-weight:700; letter-spacing:-.4px; padding:0 0 12px;
-  line-height:1.25; min-height:44px}
-.title-in::placeholder{color:var(--dim)}
-.meta{display:flex; flex-wrap:wrap; gap:20px; align-items:center}
-.date-in{border:none; border-bottom:1px solid var(--line); background:none; padding:6px 0;
-  outline:none; font-weight:600; font-size:11px; letter-spacing:1px; color:var(--muted); font-family:inherit}
-.date-in:focus{border-color:var(--red); color:var(--ink)}
-.moods{display:flex; gap:6px; flex-wrap:wrap}
-.mood{display:inline-flex; align-items:center; gap:6px; padding:8px 11px; min-height:34px;
-  border:1px solid var(--line); font-size:10.5px; font-weight:600; letter-spacing:.7px;
-  text-transform:uppercase; color:var(--muted); transition:.14s}
-.mood:hover{border-color:var(--ink); color:var(--ink)}
-.mood.on{background:var(--ink); border-color:var(--ink); color:#fff}
-.tag-in{width:100%; border:none; border-bottom:1px solid var(--line); background:none;
-  padding:9px 0; outline:none; font-size:12.5px}
-.tag-in:focus{border-bottom-color:var(--red)}
-.tag-in::placeholder{color:var(--muted)}
-.body-in{flex:1; min-height:260px; width:100%; border:1px solid var(--line); outline:none;
-  resize:vertical; background:none; padding:18px; line-height:1.8; font-size:15px; font-weight:400}
-.body-in:focus{border-color:var(--line-dark)}
-.body-in::placeholder{color:var(--muted)}
-.foot{display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding-top:18px; border-top:1px solid var(--line)}
-.foot .spacer{margin-left:auto}
-.hint{font-size:10px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase}
-
-/* ---------- фото ---------- */
-.photo-box{display:flex; flex-direction:column; gap:10px}
-.photo-prev{border:1px solid var(--line); line-height:0}
-.photo-prev img{display:block; width:100%; max-height:340px; object-fit:cover;
-  filter:grayscale(1) contrast(1.04); transition:filter .3s}
-.photo-prev:hover img{filter:none}
-.photo-actions{display:flex; gap:8px; flex-wrap:wrap}
-.photo-drop{display:flex; align-items:center; justify-content:center; gap:9px;
-  border:1px dashed var(--line); padding:16px; color:var(--muted); cursor:pointer;
-  font-size:10.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; transition:.14s}
-.photo-drop:hover{border-color:var(--red); color:var(--red)}
-.photo-load{border:1px solid var(--line); padding:16px; text-align:center; color:var(--muted);
-  font-size:10.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase}
-
-/* ---------- окна ---------- */
-.mask{position:fixed; inset:0; background:rgba(17,17,17,.55); display:none; place-items:center;
-  padding:20px; z-index:50; overflow:auto}
-.mask.open{display:grid}
-.modal{background:var(--bg); border:1px solid var(--ink); padding:28px; width:min(560px,100%);
-  max-height:88vh; overflow:auto}
-.modal h2{margin:0 0 6px; font-size:13px; font-weight:700; letter-spacing:2.4px; text-transform:uppercase}
-.modal .rule{height:2px; background:var(--red); width:40px; margin-bottom:16px}
-.modal p.sub{margin:0 0 18px; color:var(--muted); font-size:12px; line-height:1.65}
-.field{margin-bottom:15px}
-.field label{display:block; font-size:9.5px; font-weight:700; letter-spacing:1.4px;
-  text-transform:uppercase; color:var(--muted); margin-bottom:6px}
-.field input{width:100%; padding:10px 0; border:none; border-bottom:1px solid var(--line);
-  background:none; outline:none; font-size:13px}
-.field input:focus{border-bottom-color:var(--red)}
-.field textarea{width:100%; padding:9px 0; border:none; border-bottom:1px solid var(--line);
-  background:none; outline:none; font-size:13px; font-family:inherit; resize:vertical;
-  min-height:46px; line-height:1.6}
-.field textarea:focus{border-bottom-color:var(--red)}
-.field .note{font-size:11px; color:var(--muted); margin-top:7px; line-height:1.6}
-.field .note a{color:var(--ink)}
-.note-box{border-left:2px solid var(--red); padding:2px 0 2px 13px; font-size:11.5px;
-  line-height:1.65; color:var(--muted); margin-bottom:20px}
-.tok-btns{display:flex; gap:7px; margin-top:10px}
-.q-steps .task{padding:6px 0}
-.q-steps .task .tx{font-size:12.5px}
-
-/* повторы */
-.rep{display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
-.rep-days{display:flex; gap:3px}
-.rep-days button{width:26px; height:26px; border:1px solid var(--line); font-size:9px;
-  font-weight:700; color:var(--muted); text-transform:uppercase; transition:.14s}
-.rep-days button.on{border-color:var(--red); color:var(--red)}
-.rep input.rt{width:62px; border:none; border-bottom:1px solid var(--line); background:none;
-  outline:none; font-size:11.5px; padding:4px 0; font-family:inherit; text-align:center}
-.rep input.rt:focus{border-bottom-color:var(--red)}
-.rep textarea{flex:1; min-width:110px; border:none; border-bottom:1px solid var(--line);
-  background:none; outline:none; font-size:12.5px; padding:4px 0; line-height:1.4}
-.rep textarea:focus{border-bottom-color:var(--red)}
-.rep .rm{color:var(--dim); flex:none}
-.rep .rm:hover{color:var(--red)}
+/* ---------- меню ---------- */
+.more{position:relative}
+.more-menu{position:absolute; right:0; top:calc(100% + 8px); z-index:30; min-width:220px;
+  background:rgba(255,255,255,.86); backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px); border-radius:13px; display:none; padding:5px;
+  box-shadow:0 10px 34px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.06)}
+.more.open .more-menu{display:block}
+.more-menu button{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:9px 11px; border-radius:8px; font-size:14px}
+.more-menu button:hover{background:var(--fill)}
 
 .toast{position:fixed; left:50%; bottom:28px; transform:translate(-50%,90px); z-index:99;
-  background:var(--ink); color:#fff; padding:12px 20px; font-size:10.5px; font-weight:600;
-  letter-spacing:1.2px; text-transform:uppercase; opacity:0; transition:.28s;
-  pointer-events:none; max-width:90vw; text-align:center; border-left:2px solid var(--red)}
+  background:rgba(28,28,30,.92); backdrop-filter:blur(20px); color:#fff; padding:12px 20px;
+  border-radius:14px; font-size:14px; font-weight:500; opacity:0; transition:.3s cubic-bezier(.2,.8,.2,1);
+  pointer-events:none; max-width:90vw; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,.2)}
 .toast.show{transform:translate(-50%,0); opacity:1}
+/* ---------- цитата ---------- */
+.quote{background:var(--card); border-radius:var(--r); padding:16px 18px; margin-bottom:26px;
+  box-shadow:0 0 0 .5px rgba(0,0,0,.04)}
+.quote p{margin:0 0 8px; font-size:15px; line-height:1.5}
+.quote span{font-size:12.5px; color:var(--ink2)}
+
+/* ---------- строки со списками ---------- */
+.task{display:flex; align-items:flex-start; gap:12px; padding:11px 0; border-bottom:.5px solid var(--sep)}
+.task:last-of-type{border-bottom:none}
+.tick{width:22px; height:22px; border-radius:50%; border:1.5px solid var(--dim); flex:none; margin-top:0;
+  display:grid; place-items:center; color:transparent; background:none; transition:.15s}
+.tick:hover{border-color:var(--red)}
+.tick.on{border-color:var(--red); background:var(--red); color:#fff}
+.tx{flex:1; min-width:0; border:none; outline:none; background:none; font-size:15px; padding:2px 0; line-height:1.4}
+.tx::placeholder{color:var(--ink3)}
+.task.done .tx{color:var(--ink3); text-decoration:line-through}
+.rm,.st{color:var(--dim); display:grid; place-items:center; transition:.15s; margin-top:3px; flex:none; opacity:0}
+.task:hover .rm,.task:hover .st,.hb-row:hover .rm,.sw-i:hover .rm{opacity:1}
+.rm:hover{color:var(--red)} .st:hover{color:#FF9500}
+.st.on{color:#FF9500; opacity:1}
+.acts{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+.bar-p{display:flex; align-items:center; gap:10px; margin-top:14px; font-size:12.5px; color:var(--ink2)}
+.bar-p .track{flex:1; height:6px; background:var(--fill); border-radius:3px; overflow:hidden}
+.bar-p .track i{display:block; height:100%; background:var(--red); border-radius:3px; transition:width .35s}
+
+.tag{font-size:13px; padding:5px 11px; border-radius:14px; background:var(--fill); border:none;
+  color:var(--ink2); transition:.15s; overflow-wrap:anywhere; max-width:100%; text-align:left}
+.tag:hover{background:var(--fill2); color:var(--ink)}
+.tag.on{background:var(--red); color:#fff}
+.tag.mini{padding:3px 9px; font-size:12px}
+.tags{display:flex; flex-wrap:wrap; gap:7px}
+
+/* ---------- поиск ---------- */
+.search-wrap{display:flex; align-items:center; gap:8px; background:var(--fill);
+  border-radius:10px; padding:8px 12px}
+.search-wrap .ic{color:var(--ink2)}
+.search{flex:1; min-width:0; border:none; outline:none; background:none; font-size:15px; padding:2px 0}
+.search::placeholder{color:var(--ink2)}
+
+/* ---------- список записей ---------- */
+.item{text-align:left; width:100%; display:block; padding:13px 12px; margin:0 -12px;
+  border-radius:10px; border-bottom:.5px solid var(--sep); transition:.15s}
+.item:last-of-type{border-bottom:none}
+.item:hover{background:var(--fill)}
+.item.on{background:var(--red-soft)}
+.item .t{display:flex; gap:9px; align-items:flex-start; font-weight:600; font-size:15px; line-height:1.35}
+.item .t .ic{color:var(--ink3); margin-top:2px}
+.item.on .t{color:var(--red)} .item.on .t .ic{color:var(--red)}
+.item .t span{overflow-wrap:anywhere}
+.item .d{display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:12.5px; color:var(--ink2); margin-top:4px}
+.item .p{font-size:13.5px; color:var(--ink2); margin-top:5px; line-height:1.45;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere}
+
+/* ---------- календарь ---------- */
+.cal-h{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+.cal-h b{font-size:15px; font-weight:600; letter-spacing:-.02em; text-transform:capitalize}
+.nav-sq{width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+  color:var(--red); flex:none; transition:.15s}
+.nav-sq:hover{background:var(--red-soft)}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:2px}
+.cal .wd{font-size:11px; text-align:center; color:var(--ink2); font-weight:600; padding-bottom:6px}
+.cal .day{aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:1px; font-size:14px; color:var(--ink); border-radius:50%; position:relative; transition:.15s}
+.cal .day.pad{visibility:hidden}
+.cal .day.has,.cal .day.pick{cursor:pointer}
+.cal .day.has{font-weight:600}
+.cal .day.has:hover,.cal .day.pick:hover{background:var(--fill)}
+.cal .day.inweek{background:var(--fill)}
+.cal .day.sel{background:var(--ink); color:#fff; font-weight:600}
+.cal .day.today{color:var(--red); font-weight:700}
+.cal .day.today.sel{background:var(--red); color:#fff}
+.cal .day .ic{opacity:.55}
+.cal .day.sel .ic{opacity:.9}
+.cal .day .more-n{position:absolute; top:2px; right:5px; font-size:9px; color:var(--red); font-weight:700}
+
+/* ---------- статистика ---------- */
+.stat-top{display:flex; gap:10px; margin-bottom:18px}
+.stat-top div{flex:1; padding:12px 14px; background:var(--fill); border-radius:10px}
+.stat-top b{display:block; font-size:24px; font-weight:600; letter-spacing:-.03em; line-height:1.15}
+.stat-top span{font-size:12px; color:var(--ink2)}
+.mb{display:flex; align-items:center; gap:11px; margin-bottom:11px; font-size:13.5px}
+.mb-l{display:flex; align-items:center; gap:8px; width:126px; flex:none; line-height:1.3; color:var(--ink2)}
+.mb-l span{overflow-wrap:anywhere}
+.mb-t{flex:1; height:6px; background:var(--fill); border-radius:3px; overflow:hidden}
+.mb-t i{display:block; height:100%; background:var(--dim); border-radius:3px; transition:width .35s}
+.mb.top .mb-t i{background:var(--red)}
+.mb.top .mb-l{color:var(--red)}
+.mb-n{width:20px; flex:none; text-align:right; font-weight:600; font-size:13.5px; color:var(--ink2)}
+.note-t{font-size:13.5px; color:var(--ink2); margin:14px 0 0; line-height:1.5}
+.note-t b{color:var(--ink); font-weight:600}
+/* ---------- планер ---------- */
+.pl-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px}
+.pl-bar b{font-size:15px; font-weight:600; letter-spacing:-.02em; text-transform:capitalize}
+.modes{display:inline-flex; gap:2px; padding:2px; background:var(--fill); border-radius:9px}
+.modes button{padding:6px 14px; min-height:30px; border-radius:7px; font-size:13.5px;
+  font-weight:500; color:var(--ink2); transition:.18s}
+.modes button.on{background:var(--card); color:var(--ink); font-weight:600;
+  box-shadow:0 1px 3px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.04)}
+.carry{display:flex; align-items:center; gap:11px; flex-wrap:wrap; background:var(--red-soft);
+  border-radius:10px; padding:11px 14px; margin-bottom:16px; font-size:13.5px; line-height:1.45}
+.pl-scroll{max-height:360px; overflow-y:auto; border-radius:10px; box-shadow:0 0 0 .5px var(--sep)}
+.pl-scroll::-webkit-scrollbar{width:5px}
+.pl-scroll::-webkit-scrollbar-thumb{background:var(--dim); border-radius:3px}
+.pl-grid{display:grid; grid-auto-rows:minmax(30px,auto)}
+.pl-dh{padding:8px 3px; text-align:center; font-size:11px; color:var(--ink2);
+  position:sticky; top:0; background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  z-index:2; border-bottom:.5px solid var(--sep)}
+.pl-dh b{display:block; font-size:15px; color:var(--ink); font-weight:600; margin-top:2px}
+.pl-dh.today{color:var(--red)} .pl-dh.today b{color:var(--red)}
+.pl-corner{position:sticky; top:0; background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  z-index:3; border-bottom:.5px solid var(--sep)}
+.pl-h{font-size:11px; color:var(--ink3); display:flex; align-items:flex-start; justify-content:flex-end;
+  padding:7px 8px 0; border-bottom:.5px solid var(--sep2)}
+.pl-cell{border-left:.5px solid var(--sep2); border-bottom:.5px solid var(--sep2); position:relative}
+.pl-cell textarea{width:100%; min-height:29px; border:none; outline:none; background:none;
+  font-size:13px; padding:6px 18px 6px 7px; line-height:1.3; border-radius:6px}
+.pl-cell textarea:focus{background:var(--red-soft)}
+.pl-cell.on{background:var(--fill)}
+.pl-cell.on textarea{font-weight:500}
+.pl-cell.now{box-shadow:inset 2px 0 0 var(--red)}
+.pl-dur{position:absolute; right:2px; top:2px; display:none; flex-direction:column; gap:1px}
+.pl-cell:hover .pl-dur,.pl-cell.on .pl-dur{display:flex}
+.pl-dur button{width:16px; height:15px; font-size:13px; line-height:1; color:var(--ink3);
+  display:grid; place-items:center; border-radius:4px}
+.pl-dur button:hover{color:var(--red); background:var(--fill)}
+.pl-tasks{display:grid; margin-top:14px; border-radius:10px; box-shadow:0 0 0 .5px var(--sep); overflow:hidden}
+.pl-lbl{font-size:11px; color:var(--ink3); display:flex; align-items:flex-start; justify-content:flex-end; padding:11px 8px 0}
+.pl-tcol{border-left:.5px solid var(--sep2); padding:9px 7px 11px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.pl-t{display:flex; align-items:flex-start; gap:7px}
+.pl-t .tick{width:16px; height:16px; margin-top:1px}
+.pl-t .tick svg{width:10px; height:10px}
+.pl-t textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:12.5px; line-height:1.35; padding:0}
+.pl-t.done textarea{text-decoration:line-through; color:var(--ink3)}
+.pl-add{font-size:12.5px; color:var(--red); text-align:left; padding:3px 0; min-height:26px}
+.pl-add:hover{opacity:.7}
+.day-sum{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:22px}
+.day-sum label{display:block; font-size:12.5px; font-weight:600; color:var(--ink2); margin-bottom:7px}
+.day-sum textarea{width:100%; border:none; background:var(--fill); border-radius:10px;
+  outline:none; font-size:14.5px; padding:11px 13px; line-height:1.5; min-height:44px}
+.day-sum textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.mit{font-size:13px; color:var(--ink2)}
+.mit b{color:var(--red); font-weight:600}
+
+/* неделя списком */
+.wk-day{border-bottom:.5px solid var(--sep); padding:13px 12px; margin:0 -12px; width:calc(100% + 24px);
+  text-align:left; display:block; border-radius:10px; transition:.15s}
+.wk-day:last-child{border-bottom:none}
+.wk-day:hover{background:var(--fill)}
+.wk-day .h{display:flex; align-items:baseline; gap:8px; font-size:15px; font-weight:600}
+.wk-day .h em{font-style:normal; font-size:13px; color:var(--ink2); font-weight:400}
+.wk-day.today .h{color:var(--red)}
+.wk-day .n{margin-left:auto; font-size:12.5px; color:var(--ink3); font-weight:400}
+.wk-day .l{font-size:13.5px; color:var(--ink2); margin-top:6px; line-height:1.45; overflow-wrap:anywhere}
+.wk-day .l b{color:var(--ink); font-weight:600}
+
+
+.pl-wrap{overflow-x:auto}
+.day-view{display:flex; flex-direction:column; gap:6px}
+.day-tasks{display:block}
+
+/* ---------- привычки ---------- */
+.hb-grid{display:grid}
+.hb-name{display:flex; align-items:center; gap:7px; padding:5px 10px 5px 0; min-width:0}
+.hb-name textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:14px; line-height:1.3; padding:0}
+.hb-d{font-size:10.5px; color:var(--ink3); text-align:center; padding-bottom:7px}
+.hb-d.today{color:var(--red); font-weight:700}
+.hb-c{width:100%; aspect-ratio:1; min-height:18px; border-radius:5px; background:var(--fill); transition:.14s}
+.hb-c:hover{background:var(--fill2)}
+.hb-c.on{background:var(--red)}
+.hb-c.wknd{background:rgba(120,120,128,.06)}
+.hb-c.wknd.on{background:var(--red)}
+.hb-streak{font-size:12px; color:var(--ink3); padding-left:9px; display:flex; align-items:center; line-height:1.2}
+.hb-streak.hot{color:var(--red); font-weight:600}
+/* ---------- roadmap ---------- */
+.rm-wrap{overflow-x:auto; border-radius:10px; box-shadow:0 0 0 .5px var(--sep)}
+.rm{min-width:760px}
+.rm-row{display:grid; grid-template-columns:158px minmax(0,1fr); align-items:stretch}
+.rm-l{padding:10px 12px 10px 14px; font-size:12.5px; line-height:1.3; min-width:0;
+  border-bottom:.5px solid var(--sep2); display:flex; align-items:flex-start; gap:8px;
+  overflow-wrap:anywhere; color:var(--ink2)}
+.rm-t{position:relative; border-left:.5px solid var(--sep); border-bottom:.5px solid var(--sep2);
+  background-image:repeating-linear-gradient(to right,var(--sep2) 0 1px,transparent 1px var(--wk))}
+.rm-head .rm-l,.rm-head .rm-t{border-bottom:.5px solid var(--sep); background:var(--wash)}
+.rm-months,.rm-weeks{display:flex}
+.rm-months div{font-size:12px; font-weight:600; padding:7px 8px 3px; overflow:hidden;
+  border-left:.5px solid var(--sep2); text-transform:capitalize}
+.rm-months div:first-child,.rm-weeks div:first-child{border-left:none}
+.rm-weeks div{flex:1; text-align:center; font-size:11px; color:var(--ink3);
+  padding:2px 0 8px; border-left:.5px solid var(--sep2)}
+.rm-row.grp .rm-l{background:var(--fill); font-size:13.5px; font-weight:600; color:var(--ink);
+  padding:12px 14px; align-items:center}
+.rm-row.grp .rm-l .n{margin-left:auto; color:var(--ink3); font-weight:400; font-size:12px}
+.rm-row.grp.done .rm-l{color:var(--ink3)}
+.rm-sum{position:absolute; top:50%; height:4px; margin-top:-2px; background:var(--dim); border-radius:2px}
+.rm-row.grp.done .rm-sum{background:var(--sep)}
+.rm-bar{position:absolute; top:6px; min-height:24px; padding:5px 10px; font-size:12.5px;
+  line-height:1.3; border-radius:7px; overflow-wrap:anywhere; background:var(--fill);
+  color:var(--ink2); display:flex; align-items:center}
+.rm-bar.done{background:var(--ink); color:#fff}
+.rm-bar.now{background:var(--red-soft); color:var(--red); box-shadow:inset 0 0 0 1.5px var(--red)}
+.rm-bar.late{background:var(--red); color:#fff}
+.rm-bar.empty{padding:0; min-width:4px}
+.rm-out{position:absolute; top:9px; font-size:12.5px; line-height:1.3; width:180px;
+  overflow-wrap:anywhere; color:var(--ink)}
+.rm-out.muted{color:var(--ink3)}
+.rm-bar textarea,.rm-out textarea,.rm-nd textarea,.rl-s textarea{flex:1; width:100%; min-width:0;
+  border:none; outline:none; background:none; color:inherit; font:inherit; padding:0;
+  line-height:1.35; resize:none; overflow:hidden; word-break:break-word}
+.rm-bar textarea::placeholder,.rm-out textarea::placeholder{color:currentColor; opacity:.5}
+.rm-bar textarea:focus,.rm-out textarea:focus{outline:none}
+.rm-l .tick{width:17px; height:17px; margin-top:1px}
+.rm-l .tick svg{width:10px; height:10px}
+.rm-date{border:none; background:none; outline:none; font-family:inherit; font-size:11.5px;
+  color:var(--ink3); padding:2px 0; width:104px; min-width:0; border-radius:5px}
+.rm-date:hover{color:var(--ink2)}
+.rm-date:focus{color:var(--ink); background:var(--fill)}
+.rm-x{color:var(--dim); flex:none; margin-top:1px; display:grid; place-items:center; opacity:0}
+.rm-row:hover .rm-x,.rm-nd:hover .rm-x,.rl-s:hover .rm-x{opacity:1}
+.rm-x:hover{color:var(--red)}
+.rm-plus{color:var(--red); display:grid; place-items:center; flex:none}
+.rm-ms{position:absolute; top:9px; display:flex; align-items:flex-start; gap:6px;
+  font-size:12.5px; font-weight:500; line-height:1.25; width:154px; overflow-wrap:anywhere}
+.rm-ms.right{transform:translateX(-100%); text-align:right; flex-direction:row-reverse}
+.rm-ms .ic{color:var(--red); margin-top:1px}
+.rm-ms small{display:block; font-size:11.5px; color:var(--ink3); font-weight:400}
+.rm-ms.done .ic{color:var(--dim)}
+.rm-now{position:absolute; top:0; bottom:0; width:1.5px; background:var(--red); opacity:.6; z-index:1}
+.rm-nodate{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; padding:10px 0 10px 12px}
+.rm-nd{display:flex; align-items:flex-start; gap:8px}
+.rm-nd textarea{width:130px; font-size:12.5px}
+.rm-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; font-size:12.5px; color:var(--ink2)}
+.rm-legend span{display:flex; align-items:center; gap:7px}
+.rm-legend i{width:18px; height:10px; border-radius:4px; background:var(--fill); display:block}
+.rm-legend i.d{background:var(--ink)}
+.rm-legend i.n{background:var(--red-soft); box-shadow:inset 0 0 0 1.5px var(--red)}
+.rm-legend i.l{background:var(--red)}
+
+/* roadmap списком */
+.rl{border-bottom:.5px solid var(--sep); padding:16px 0}
+.rl:last-child{border-bottom:none}
+.rl-h{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+.rl-h b{font-size:16px; font-weight:600; letter-spacing:-.02em; overflow-wrap:anywhere}
+.rl-h .n{margin-left:auto; font-size:12.5px; color:var(--ink3)}
+.rl.done .rl-h b{color:var(--ink3); text-decoration:line-through}
+.rl-d{font-size:12.5px; color:var(--ink2); margin-top:4px}
+.rl-line{display:flex; gap:3px; margin:12px 0 6px}
+.rl-line i{flex:1; height:6px; border-radius:3px; background:var(--fill)}
+.rl-line i.on{background:var(--red)}
+.rl-line i.late{background:#FF9500}
+.rl.done .rl-line i{background:var(--sep)}
+.rl-s{display:flex; align-items:flex-start; gap:11px; padding:10px 0; border-bottom:.5px solid var(--sep2)}
+.rl-s:last-of-type{border-bottom:none}
+.rl-s textarea{font-size:14.5px; line-height:1.4}
+.rl-s.done textarea{color:var(--ink3); text-decoration:line-through}
+.rl-s .rm-date{width:96px}
+/* ---------- проекты ---------- */
+.proj{padding:16px 0; border-bottom:.5px solid var(--sep)}
+.proj:first-child{padding-top:0}
+.proj:last-of-type{border-bottom:none}
+.proj-top{display:flex; align-items:center; gap:11px; flex-wrap:wrap}
+.proj-name{flex:1; min-width:140px; border:none; outline:none; background:none;
+  font-size:16px; font-weight:600; letter-spacing:-.02em; padding:0; line-height:1.35}
+.proj-name::placeholder{color:var(--ink3)}
+.proj-dates{display:flex; align-items:center; gap:6px; color:var(--ink3); font-size:12px}
+.proj-dates input{border:none; background:var(--fill); border-radius:7px; outline:none;
+  font-size:12px; color:var(--ink2); padding:5px 8px; width:118px; font-family:inherit}
+.proj-dates input:focus{color:var(--ink); box-shadow:0 0 0 2px var(--red-soft)}
+.proj-cnt{font-size:12.5px; color:var(--ink2); line-height:1.4}
+.proj-cnt.late{color:var(--red)}
+.proj-line{display:flex; align-items:center; gap:4px; margin:13px 0 12px}
+.seg{flex:1; height:8px; border-radius:4px; background:var(--fill); transition:.2s; padding:0}
+.seg.on{background:var(--red)}
+.proj-line .star{flex:none; color:#FF9500; margin-left:5px}
+.proj-stages{display:flex; flex-wrap:wrap; gap:10px 18px; align-items:flex-start}
+.stage{display:flex; align-items:flex-start; gap:8px; max-width:100%}
+.stage .tick{width:18px; height:18px; margin-top:1px}
+.stage .tick svg{width:10px; height:10px}
+.stage-b{display:flex; flex-direction:column; gap:2px; min-width:0}
+.stage textarea{border:none; outline:none; background:none; font-size:13.5px; padding:0;
+  width:136px; max-width:100%; line-height:1.35}
+.stage.done textarea{color:var(--ink3); text-decoration:line-through}
+.stage-dt{width:136px; max-width:100%; border:none; background:none; outline:none;
+  font-family:inherit; font-size:11.5px; color:var(--ink3); padding:1px 0; border-radius:5px}
+.stage-dt:focus{color:var(--ink); background:var(--fill)}
+.stage-add{font-size:13px; color:var(--red); min-height:26px}
+.stage-add:hover{opacity:.7}
+.proj.done .proj-name{color:var(--ink3); text-decoration:line-through}
+.proj.done .seg{background:var(--sep)}
+.proj.done .stage textarea,.proj.done .proj-cnt{color:var(--ink3)}
+.proj.done .tick.on{background:var(--dim); border-color:var(--dim)}
+
+/* ---------- желания ---------- */
+.wish{width:100%; text-align:left; display:block; padding:12px; margin:0 -12px;
+  border-radius:10px; border-bottom:.5px solid var(--sep); transition:.15s}
+.wish:last-of-type{border-bottom:none}
+.wish:hover{background:var(--fill)}
+.wn{display:flex; align-items:flex-start; gap:9px; font-size:15px; font-weight:600; line-height:1.35}
+.wn .ic{color:#FF9500; flex:none; margin-top:2px}
+.wn span{overflow-wrap:anywhere}
+.wl-line{display:flex; gap:3px; margin-top:9px}
+.wl-line i{flex:1; height:5px; border-radius:3px; background:var(--fill)}
+.wl-line i.on{background:var(--red)}
+.wish.done .wn{color:var(--ink3); text-decoration:line-through}
+.wish.done .wn .ic{color:var(--dim)}
+.wish.done .wl-line i{background:var(--sep)}
+.wm{font-size:12.5px; color:var(--ink2); margin-top:6px}
+
+/* ---------- SWOT ---------- */
+.sw-meta{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:20px}
+.sw-name{flex:1; min-width:200px; border:none; background:var(--fill); border-radius:10px;
+  outline:none; font-size:19px; font-weight:600; letter-spacing:-.02em; padding:11px 14px; line-height:1.3}
+.sw-name::placeholder{color:var(--ink3)}
+.sw-name:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.sw-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.sw-q{background:var(--wash); border-radius:12px; padding:15px 16px 13px; min-width:0}
+.sw-h{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+.sw-b{width:26px; height:26px; border-radius:8px; flex:none; display:grid; place-items:center;
+  font-size:13px; font-weight:600; background:var(--ink); color:#fff}
+.sw-q.neg .sw-b{background:var(--red)}
+.sw-h b{font-size:13.5px; font-weight:600}
+.sw-h .n{margin-left:auto; font-size:12px; color:var(--ink3)}
+.sw-i{display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:.5px solid var(--sep2)}
+.sw-i:last-of-type{border-bottom:none}
+.sw-i .d{width:6px; height:6px; border-radius:50%; margin-top:8px; flex:none; background:var(--ink3)}
+.sw-q.neg .sw-i .d{background:var(--red)}
+.sw-i textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:14.5px; line-height:1.4; padding:1px 0}
+.sw-i textarea::placeholder{color:var(--ink3)}
+.sw-i .rm{margin-top:3px}
+.sw-add{font-size:13px; color:var(--red); margin-top:8px; min-height:26px; text-align:left}
+.sw-add:hover{opacity:.7}
+.sw-note{background:var(--red-soft); border-radius:10px; padding:11px 14px; margin-bottom:18px;
+  font-size:13.5px; line-height:1.45; color:var(--ink2)}
+.sw-note b{color:var(--ink); font-weight:600}
+.sw-item{width:100%; text-align:left; display:block; padding:12px; margin:0 -12px;
+  border-radius:10px; border-bottom:.5px solid var(--sep); transition:.15s}
+.sw-item:last-of-type{border-bottom:none}
+.sw-item:hover{background:var(--fill)}
+.sw-item.on{background:var(--red-soft)}
+.sw-item .t{display:flex; align-items:flex-start; gap:9px; font-size:15px; font-weight:600; line-height:1.35}
+.sw-item .t .ic{color:var(--ink3); flex:none; margin-top:2px}
+.sw-item.on .t,.sw-item.on .t .ic{color:var(--red)}
+.sw-item .m{font-size:12.5px; color:var(--ink2); margin-top:5px}
+/* ---------- редактор записи ---------- */
+.editor{display:flex; flex-direction:column; gap:18px}
+.title-in{width:100%; border:none; outline:none; background:none; font-size:26px; font-weight:700;
+  letter-spacing:-.03em; padding:0; line-height:1.2; min-height:34px}
+.title-in::placeholder{color:var(--ink3)}
+.meta-row{display:flex; flex-wrap:wrap; gap:14px; align-items:center}
+.date-in{border:none; background:var(--fill); border-radius:8px; padding:7px 11px; outline:none;
+  font-size:13.5px; color:var(--ink2); font-family:inherit}
+.date-in:focus{color:var(--ink); box-shadow:0 0 0 2px var(--red-soft)}
+.moods{display:flex; gap:7px; flex-wrap:wrap}
+.mood{display:inline-flex; align-items:center; gap:7px; padding:8px 13px; min-height:34px;
+  border-radius:17px; background:var(--fill); font-size:13.5px; color:var(--ink2); transition:.15s}
+.mood:hover{background:var(--fill2); color:var(--ink)}
+.mood.on{background:var(--ink); color:#fff}
+.tag-in{width:100%; border:none; background:var(--fill); border-radius:10px; padding:11px 13px;
+  outline:none; font-size:14.5px}
+.tag-in:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.tag-in::placeholder{color:var(--ink3)}
+.body-in{min-height:300px; width:100%; border:none; outline:none; resize:vertical;
+  background:var(--fill); border-radius:12px; padding:16px 18px; line-height:1.6; font-size:16px}
+.body-in:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.body-in::placeholder{color:var(--ink3)}
+.foot{display:flex; gap:9px; align-items:center; flex-wrap:wrap; padding-top:16px; border-top:.5px solid var(--sep)}
+.photo-box{display:flex; flex-direction:column; gap:10px}
+.photo-prev{border-radius:12px; overflow:hidden; line-height:0; background:var(--fill)}
+.photo-prev img{display:block; width:100%; max-height:360px; object-fit:cover}
+.photo-drop{display:flex; align-items:center; justify-content:center; gap:9px; background:var(--fill);
+  border-radius:12px; padding:22px; color:var(--ink2); cursor:pointer; font-size:14px; transition:.15s}
+.photo-drop:hover{background:var(--fill2); color:var(--red)}
+.photo-load{background:var(--fill); border-radius:12px; padding:22px; text-align:center;
+  color:var(--ink2); font-size:14px}
+.photo-actions{display:flex; gap:8px; flex-wrap:wrap}
+
+/* ---------- окна ---------- */
+.mask{position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; place-items:center;
+  padding:20px; z-index:50; overflow:auto; backdrop-filter:blur(3px)}
+.mask.open{display:grid}
+.modal{background:var(--card); border-radius:16px; padding:26px; width:min(540px,100%);
+  max-height:88vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.24)}
+.modal h2{margin:0 0 4px; font-size:20px; font-weight:600; letter-spacing:-.02em}
+.modal .rule{display:none}
+.modal p.sub-t{margin:0 0 18px; color:var(--ink2); font-size:14px; line-height:1.5}
+.field{margin-bottom:16px}
+.field label{display:block; font-size:12.5px; font-weight:600; color:var(--ink2); margin-bottom:7px}
+.field input,.field textarea{width:100%; padding:11px 13px; border:none; border-radius:10px;
+  background:var(--fill); outline:none; font-size:15px; font-family:inherit}
+.field textarea{resize:vertical; min-height:52px; line-height:1.5}
+.field input:focus,.field textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.field .note{font-size:12.5px; color:var(--ink2); margin-top:8px; line-height:1.5}
+.field .note a{color:var(--red); text-decoration:none}
+.note-box{background:var(--fill); border-radius:10px; padding:11px 14px; font-size:13.5px;
+  line-height:1.5; color:var(--ink2); margin-bottom:20px}
+.tok-btns{display:flex; gap:8px; margin-top:10px}
+.rep{display:flex; align-items:center; gap:9px; padding:11px 0; border-bottom:.5px solid var(--sep); flex-wrap:wrap}
+.rep-days{display:flex; gap:3px}
+.rep-days button{width:30px; height:30px; border-radius:8px; background:var(--fill);
+  font-size:12px; color:var(--ink2); transition:.15s}
+.rep-days button.on{background:var(--red); color:#fff}
+.rep input.rt{width:66px; border:none; background:var(--fill); border-radius:8px; outline:none;
+  font-size:13.5px; padding:7px 0; font-family:inherit; text-align:center}
+.rep textarea{flex:1; min-width:120px; border:none; background:var(--fill); border-radius:8px;
+  outline:none; font-size:14px; padding:7px 11px; line-height:1.4}
+.install{display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--card);
+  border-radius:12px; padding:14px 16px; margin-bottom:24px; font-size:14px; line-height:1.45;
+  box-shadow:0 0 0 .5px rgba(0,0,0,.04)}
 
 /* ---------- телефон ---------- */
-@media(max-width:900px){
-  .app{padding:0 15px 90px}
-  /* панель вкладок уезжает вниз экрана, как в приложениях */
-  .tabs{position:fixed; left:0; right:0; bottom:0; z-index:40; margin:0;
-    background:var(--bg); border-top:1px solid var(--line); border-bottom:none;
-    box-shadow:0 -2px 14px rgba(0,0,0,.06);
-    padding-bottom:env(safe-area-inset-bottom)}
-  .tabs button{flex:1; flex-direction:column; gap:4px; padding:10px 4px 9px;
-    font-size:9px; letter-spacing:1px; border-bottom:none; border-top:2px solid transparent; margin:0}
-  .tabs button.on{border-top-color:var(--red)}
-  .app{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
-  .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
-  .grid{grid-template-columns:minmax(0,1fr)}
-  .grid>main{grid-column:1; grid-row:1; padding-left:0}
-  .grid>aside{grid-column:1; grid-row:2; padding-right:0; border-right:none;
-    border-top:1px solid var(--line); padding-top:26px; margin-top:8px}
-  .side{position:static}
-  header.top{padding:16px 0 12px; margin-bottom:20px; gap:8px}
-  .logo h1{font-size:13px; letter-spacing:2px}
-  .block-body{padding:16px 13px}
-  .block-head{padding:13px 13px}
-  .day-sum{grid-template-columns:1fr}
-  .list{max-height:none}
-  .modal{padding:20px 17px; max-height:94vh; width:100%}
-  .mask{padding:10px}
-  .tick{width:20px; height:20px}
-  .pl-t .tick{width:15px; height:15px}
-  .btn{padding:10px 13px; min-height:40px}
-  .pl-add,.stage-add{min-height:28px}
+@media(max-width:920px){
+  .app{padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+  header.top{margin:0 -16px; padding-left:16px; padding-right:16px}
+  .grid{grid-template-columns:minmax(0,1fr); gap:26px}
+  aside .stick{position:static}
+  .tabs{position:fixed; left:0; right:0; bottom:0; z-index:40; margin:0; border-radius:0; padding:0;
+    gap:0; display:flex; background:rgba(255,255,255,.86);
+    backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
+    box-shadow:0 -.5px 0 var(--sep); padding-bottom:env(safe-area-inset-bottom)}
+  .tabs button{flex:1; flex-direction:column; gap:3px; padding:8px 3px 6px; font-size:10.5px;
+    border-radius:0; min-height:48px; box-shadow:none !important; background:none !important}
+  .tabs button.on{color:var(--red); font-weight:500}
+  .tabs button.on .ic{color:var(--red)}
+  .toast{bottom:calc(80px + env(safe-area-inset-bottom))}
+  .sec-b{padding:14px 15px; border-radius:12px}
+  .day-sum,.sw-grid{grid-template-columns:1fr}
+  .modal{padding:20px 18px; max-height:92vh; width:100%; border-radius:16px}
+  .mask{padding:12px; align-items:end}
+  .title-in{font-size:23px}
+  .body-in{min-height:220px; padding:14px 15px}
   .quote{margin-bottom:20px}
-  .quote p{font-size:13.5px}
-  .title-in{font-size:22px}
-  .body-in{min-height:200px; padding:14px}
+  .item,.wish,.sw-item,.wk-day{margin:0 -8px; padding-left:8px; padding-right:8px}
+  .wk-day{width:calc(100% + 16px)}
 }
-@media(max-width:560px){
-  .btn .lbl{display:none}
-  .btn{padding:10px; gap:0}
-  .btn.tiny .lbl{display:inline}
-  .btn.tiny{padding:7px 10px; gap:5px}
-  .sync{order:5; width:100%; justify-content:flex-start; padding-top:4px}
-}
-
-/* ---------- печать ---------- */
 @media print{
-  body::before{display:none}
-  header.top,aside,.quote,.tabs,#installBox,#blkHabits,#blkProjects,#blkEntry,.toast,
-  .pl-nav,.carry,.block-head .chev,.block-head .meta-lbl{display:none !important}
-  #blkPlanner{display:block !important}
+  header.top,.tabs,aside,.quote,#installBox,.pl-bar,.carry,.sec-h .chev,.sec-h .meta,.toast{display:none !important}
+  body{background:#fff}
   .app{padding:0; max-width:none}
   .grid{display:block}
-  .grid>main{padding:0}
-  .block{border:none; margin:0}
-  .block-head{border-bottom:2px solid #000; padding:0 0 8px; margin-bottom:14px}
-  .block-body{padding:0}
-  .pl-scroll{max-height:none; overflow:visible; border-color:#000}
-  .pl-wrap{overflow:visible}
-  .pl-cell,.pl-tcol,.pl-tasks,.pl-h{border-color:#999 !important}
-  .pl-cell textarea,.pl-t textarea{color:#000}
-  .pl-dur,.pl-add{display:none !important}
+  .sec{display:none} .sec#secPlanner{display:block}
+  .sec-b{box-shadow:none; padding:0}
+  .pl-scroll{max-height:none; overflow:visible; box-shadow:none}
 }
 </style>
 </head>
@@ -655,14 +580,10 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
   <header class="top">
     <div class="logo">
       <div class="mark" id="logoMark"></div>
-      <div>
-        <h1>Дневник</h1>
-        <small id="counter">0 записей</small>
-      </div>
+      <div><h1>Дневник</h1><small id="counter">0 записей</small></div>
     </div>
-    <div class="sync"><span class="dot" id="syncDot"></span><span id="syncText">Локально</span></div>
-    <button class="btn quiet" id="setBtn" onclick="openSettings()"></button>
-    <button class="btn primary" id="newBtn" onclick="newEntry()"></button>
+    <div class="sync sp"><span class="dot" id="syncDot"></span><span id="syncText">Локально</span></div>
+    <button class="btn icon" id="setBtn" onclick="openSettings()" title="Настройки"></button>
   </header>
 
   <nav class="tabs" id="tabs">
@@ -676,212 +597,190 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
     <main>
       <div id="installBox"></div>
 
-      <div class="quote">
-        <p id="qText"></p>
-        <span id="qAuthor"></span>
+      <!-- ПЛАНЕР -->
+      <div data-view="planner">
+        <div class="quote"><p id="qText"></p><span id="qAuthor"></span></div>
+
+        <section class="sec" id="secPlanner">
+          <button class="sec-h" onclick="toggleSec('planner')">
+            <h2>Планер</h2><span class="meta" id="plMeta"></span><span class="chev" id="plChev"></span>
+          </button>
+          <div class="sec-b">
+            <div class="pl-bar">
+              <div class="modes">
+                <button id="mDay" onclick="setMode('day')">День</button>
+                <button id="mWeek" onclick="setMode('week')">Неделя</button>
+              </div>
+              <button class="nav-sq" id="plPrev" onclick="shiftPl(-1)"></button>
+              <b id="plLabel"></b>
+              <button class="nav-sq" id="plNext" onclick="shiftPl(1)"></button>
+              <button class="btn quiet tiny" onclick="goToday()">Сегодня</button>
+              <span class="more sp" id="plMore">
+                <button class="btn icon" onclick="toggleMore('plMore')" title="Ещё"><span id="plMoreIc"></span></button>
+                <span class="more-menu">
+                  <button onclick="closeMore();openRepeat()" id="repBtn">Повторяющиеся дела</button>
+                  <button onclick="closeMore();window.print()" id="prnBtn">Распечатать неделю</button>
+                </span>
+              </span>
+            </div>
+            <div id="carryBox"></div>
+            <div id="planner"></div>
+          </div>
+        </section>
+
+        <section class="sec" id="secInbox">
+          <button class="sec-h" onclick="toggleSec('inbox')">
+            <h2>Входящие</h2><span class="meta" id="inMeta"></span><span class="chev" id="inChev"></span>
+          </button>
+          <div class="sec-b"><div id="inboxBox"></div></div>
+        </section>
+
+        <section class="sec" id="secHabits">
+          <button class="sec-h" onclick="toggleSec('habits')">
+            <h2>Привычки</h2><span class="meta" id="hbMeta"></span><span class="chev" id="hbChev"></span>
+          </button>
+          <div class="sec-b">
+            <div class="cal-h" style="margin-bottom:14px">
+              <button class="nav-sq" id="hbPrev" onclick="shiftHb(-1)"></button>
+              <b id="hbLabel"></b>
+              <button class="nav-sq" id="hbNext" onclick="shiftHb(1)"></button>
+            </div>
+            <div style="overflow-x:auto"><div id="habits"></div></div>
+            <div class="acts"><button class="btn quiet tiny" id="hbAddBtn" onclick="hbAdd()">Новая привычка</button></div>
+          </div>
+        </section>
       </div>
 
-      <section class="block" data-view="planner" id="blkPlanner">
-        <div class="block-head" onclick="toggleBlock('planner')">
-          <span id="plIcon"></span>
-          <h2>Планер</h2>
-          <span class="meta-lbl" id="plWeekTag"></span>
-          <span class="chev" id="plChev"></span>
-        </div>
-        <div class="block-body">
-          <div class="pl-nav">
-            <div class="modes">
-              <button id="mDay"  onclick="setMode('day')">День</button>
-              <button id="mWeek" onclick="setMode('week')">Неделя</button>
+      <!-- ПРОЕКТЫ -->
+      <div data-view="projects">
+        <section class="sec" id="secRoadmap">
+          <button class="sec-h" onclick="toggleSec('roadmap')">
+            <h2>Roadmap</h2><span class="meta" id="rmMeta"></span><span class="chev" id="rmChev"></span>
+          </button>
+          <div class="sec-b">
+            <div class="pl-bar" id="rmBar">
+              <button class="nav-sq" id="rmPrev" onclick="shiftRm(-1)"></button>
+              <b id="rmLabel"></b>
+              <button class="nav-sq" id="rmNext" onclick="shiftRm(1)"></button>
+              <button class="btn quiet tiny" onclick="rmToday()">Сегодня</button>
             </div>
-            <button class="nav-sq" id="plPrev" onclick="shiftPl(-1)"></button>
-            <b id="plLabel"></b>
-            <button class="nav-sq" id="plNext" onclick="shiftPl(1)"></button>
-            <button class="btn quiet tiny sp" onclick="goToday()">Сегодня</button>
-            <button class="btn quiet tiny" id="repBtn" onclick="openRepeat()">Повторы</button>
-            <button class="btn quiet tiny" id="prnBtn" onclick="window.print()">Печать</button>
+            <div id="roadmap"></div>
           </div>
-          <div id="carryBox"></div>
-          <div id="planner"></div>
-        </div>
-      </section>
+        </section>
 
-      <section class="block" data-view="planner" id="blkHabits">
-        <div class="block-head" onclick="toggleBlock('habits')">
-          <span id="hbIcon"></span>
-          <h2>Привычки</h2>
-          <span class="meta-lbl" id="hbTag"></span>
-          <span class="chev" id="hbChev"></span>
-        </div>
-        <div class="block-body">
-          <div class="cal-head" style="margin-bottom:14px">
-            <button class="nav-sq" id="hbPrev" onclick="shiftHb(-1)"></button>
-            <b id="hbLabel"></b>
-            <button class="nav-sq" id="hbNext" onclick="shiftHb(1)"></button>
+        <section class="sec" id="secProjects">
+          <button class="sec-h" onclick="toggleSec('projects')">
+            <h2>Проекты</h2><span class="meta" id="pjMeta"></span><span class="chev" id="pjChev"></span>
+          </button>
+          <div class="sec-b">
+            <div id="projects"></div>
+            <div class="acts"><button class="btn quiet tiny" id="pjAddBtn" onclick="pjAdd()">Новый проект</button></div>
           </div>
-          <div class="hb-wrap"><div id="habits"></div></div>
-          <div class="task-acts">
-            <button class="btn quiet tiny" id="hbAddBtn" onclick="hbAdd()">Новая привычка</button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <section class="block" data-view="projects" id="blkRoadmap">
-        <div class="block-head" onclick="toggleBlock('roadmap')">
-          <span id="rmIcon"></span>
-          <h2>Roadmap</h2>
-          <span class="meta-lbl" id="rmTag"></span>
-          <span class="chev" id="rmChev"></span>
-        </div>
-        <div class="block-body">
-          <div class="pl-nav">
-            <button class="nav-sq" id="rmPrev" onclick="shiftRm(-1)"></button>
-            <b id="rmLabel"></b>
-            <button class="nav-sq" id="rmNext" onclick="shiftRm(1)"></button>
-            <button class="btn quiet tiny sp" onclick="rmToday()">Сегодня</button>
+      <!-- SWOT -->
+      <div data-view="swot">
+        <section class="sec" id="secSwot">
+          <button class="sec-h" onclick="toggleSec('swot')">
+            <h2>SWOT-анализ</h2><span class="meta" id="swMeta"></span><span class="chev" id="swChev"></span>
+          </button>
+          <div class="sec-b">
+            <div id="swNote"></div>
+            <div class="sw-meta">
+              <textarea class="sw-name grow" id="swName" rows="1" placeholder="Что анализируем"
+                oninput="swDraft.n=this.value; autoGrow(this); swSaveDraft(); swTag()"></textarea>
+              <input class="date-in" id="swDate" type="date" onchange="swDraft.dt=this.value; swSaveDraft()">
+            </div>
+            <div class="sw-grid" id="swGrid"></div>
+            <div class="foot">
+              <button class="btn primary" id="swSaveBtn" onclick="swSave()"></button>
+              <button class="btn quiet" id="swDropBtn" onclick="swDrop()"></button>
+              <button class="btn quiet sp" id="swDelBtn" onclick="swDelete()" style="display:none"></button>
+            </div>
           </div>
-          <div class="rm-wrap"><div id="roadmap"></div></div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <section class="block" data-view="projects" id="blkProjects">
-        <div class="block-head" onclick="toggleBlock('projects')">
-          <span id="pjIcon"></span>
-          <h2>Проекты</h2>
-          <span class="meta-lbl" id="pjTag"></span>
-          <span class="chev" id="pjChev"></span>
-        </div>
-        <div class="block-body">
-          <div id="projects"></div>
-          <div class="task-acts">
-            <button class="btn quiet tiny" id="pjAddBtn" onclick="pjAdd()">Новый проект</button>
+      <!-- ДНЕВНИК -->
+      <div data-view="diary">
+        <section class="sec" id="secEntry">
+          <button class="sec-h" onclick="toggleSec('entry')">
+            <h2>Запись</h2><span class="meta" id="editHint">Новая</span><span class="chev" id="enChev"></span>
+          </button>
+          <div class="sec-b editor">
+            <textarea class="title-in grow" id="fTitle" rows="1" placeholder="Название записи" oninput="autoGrow(this)"></textarea>
+            <div class="meta-row">
+              <input class="date-in" id="fDate" type="date">
+              <div class="moods" id="moods"></div>
+            </div>
+            <input class="tag-in" id="fTags" placeholder="Теги через запятую">
+            <div class="photo-box" id="photoBox"></div>
+            <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
+            <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить"></textarea>
+            <div class="foot">
+              <button class="btn primary" id="saveBtn" onclick="saveEntry()"></button>
+              <button class="btn quiet" id="newBtn" onclick="newEntry()"></button>
+              <button class="btn quiet sp" id="delBtn" onclick="deleteEntry()" style="display:none"></button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="block" data-view="swot" id="blkSwot">
-        <div class="block-head" onclick="toggleBlock('swot')">
-          <span id="swIcon"></span>
-          <h2>SWOT-анализ</h2>
-          <span class="meta-lbl" id="swTag"></span>
-          <span class="chev" id="swChev"></span>
-        </div>
-        <div class="block-body">
-          <div id="swNote"></div>
-          <div class="sw-meta">
-            <textarea class="sw-name grow" id="swName" rows="1" placeholder="Что анализируем"
-                      oninput="swDraft.n=this.value; autoGrow(this); swSaveDraft(); swRender()"></textarea>
-            <input class="date-in" id="swDate" type="date"
-                   onchange="swDraft.dt=this.value; swSaveDraft(); swRender()">
-          </div>
-          <div class="sw-grid" id="swGrid"></div>
-          <div class="foot">
-            <button class="btn primary" id="swSaveBtn" onclick="swSave()"></button>
-            <button class="btn quiet" id="swDropBtn" onclick="swDrop()"></button>
-            <button class="btn danger" id="swDelBtn" onclick="swDelete()" style="display:none"></button>
-          </div>
-        </div>
-      </section>
-
-      <section class="block" data-view="diary" id="blkEntry">
-        <div class="block-head" onclick="toggleBlock('entry')">
-          <span id="enIcon"></span>
-          <h2>Запись</h2>
-          <span class="meta-lbl" id="editHint">Новая запись</span>
-          <span class="chev" id="enChev"></span>
-        </div>
-        <div class="block-body editor">
-          <textarea class="title-in grow" id="fTitle" rows="1" placeholder="Название записи"
-                    oninput="autoGrow(this)"></textarea>
-          <div class="meta">
-            <input class="date-in" id="fDate" type="date">
-            <div class="moods" id="moods"></div>
-          </div>
-          <input class="tag-in" id="fTags" placeholder="Теги через запятую: работа, мысли, книги">
-          <div class="photo-box" id="photoBox"></div>
-          <input type="file" id="photoFile" accept="image/*" hidden onchange="pickPhoto(this)">
-          <textarea class="body-in" id="fBody" placeholder="Пиши всё, что хочется сохранить"></textarea>
-          <div class="foot">
-            <button class="btn primary" id="saveBtn" onclick="saveEntry()"></button>
-            <button class="btn danger" id="delBtn" onclick="deleteEntry()" style="display:none"></button>
-          </div>
-        </div>
-      </section>
+        <section class="sec" id="secStats">
+          <button class="sec-h" onclick="toggleSec('stats')">
+            <h2>Месяц</h2><span class="meta" id="stMeta"></span><span class="chev" id="stChev"></span>
+          </button>
+          <div class="sec-b"><div id="stats"></div></div>
+        </section>
+      </div>
     </main>
 
     <aside>
-      <div class="side">
+      <div class="stick">
+        <div>
+          <div class="cal-h">
+            <button class="nav-sq" id="prevBtn" onclick="shiftMonth(-1)"></button>
+            <b id="calLabel"></b>
+            <button class="nav-sq" id="nextBtn" onclick="shiftMonth(1)"></button>
+          </div>
+          <div class="cal" id="cal"></div>
+        </div>
+
+        <div data-view="planner">
+          <p class="sub">Задачи <span id="tkMeta" class="mut"></span></p>
+          <div id="tasksBox"></div>
+        </div>
+
+        <div data-view="projects">
+          <p class="sub">Желания <span id="wMeta" class="mut"></span></p>
+          <div id="wishes"></div>
+          <div class="acts"><button class="btn quiet tiny" id="wAddBtn" onclick="newWish()">Новое желание</button></div>
+        </div>
+
+        <div data-view="swot">
+          <p class="sub">Сохранённые <span id="swListMeta" class="mut"></span></p>
+          <div id="swList"></div>
+          <div class="acts"><button class="btn quiet tiny" id="swNewBtn" onclick="swNew()">Новый анализ</button></div>
+        </div>
+
         <div data-view="diary">
           <div class="search-wrap" id="searchWrap">
             <input class="search" id="search" placeholder="Поиск по дневнику" oninput="render()">
           </div>
-          <div class="tags-row" id="tagFilters"></div>
+          <div class="tags" id="tagFilters" style="margin-top:12px"></div>
           <div id="findAll"></div>
-        </div>
-
-        <div class="sec" id="secCal">
-          <button class="sect-title" onclick="toggleBlock('cal')">Календарь<span class="chev" id="calChev"></span></button>
-          <div class="sec-body">
-            <div class="cal-head">
-              <button class="nav-sq" id="prevBtn" onclick="shiftMonth(-1)"></button>
-              <b id="calLabel"></b>
-              <button class="nav-sq" id="nextBtn" onclick="shiftMonth(1)"></button>
-            </div>
-            <div class="cal" id="cal"></div>
-            <div class="stats" id="stats"></div>
-          </div>
-        </div>
-
-        <div class="sec" data-view="planner" id="secTasks">
-          <button class="sect-title" onclick="toggleBlock('tasks')">Задачи<span class="cnt" id="tkCnt"></span><span class="chev" id="tkChev"></span></button>
-          <div class="sec-body">
-            <div id="tasksBox"></div>
-          </div>
-        </div>
-
-        <div class="sec" data-view="planner" id="secInbox">
-          <button class="sect-title" onclick="toggleBlock('inbox')">Входящие<span class="cnt" id="inCnt"></span><span class="chev" id="inChev"></span></button>
-          <div class="sec-body">
-            <div id="inboxBox"></div>
-          </div>
-        </div>
-
-        <div class="sec" data-view="projects" id="secWishes">
-          <button class="sect-title" onclick="toggleBlock('wishes')">Желания<span class="cnt" id="wCnt"></span><span class="chev" id="wChev"></span></button>
-          <div class="sec-body">
-            <div id="wishes"></div>
-            <div class="task-acts">
-              <button class="btn quiet tiny" id="wAddBtn" onclick="newWish()">Новое желание</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="sec" data-view="swot" id="secSwot">
-          <button class="sect-title" onclick="toggleBlock('swotList')">Сохранённые<span class="cnt" id="swCnt"></span><span class="chev" id="swlChev"></span></button>
-          <div class="sec-body">
-            <div id="swList"></div>
-            <div class="task-acts">
-              <button class="btn quiet tiny" id="swNewBtn" onclick="swNew()">Новый анализ</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="sec" data-view="diary" id="secList">
-          <button class="sect-title" onclick="toggleBlock('list')">Записи<span class="chev" id="lsChev"></span></button>
-          <div class="sec-body"><div class="list" id="list"></div></div>
+          <p class="sub" style="margin-top:22px">Записи</p>
+          <div id="list"></div>
         </div>
       </div>
     </aside>
   </div>
 </div>
-
-<!-- настройки -->
 <div class="mask" id="mask" onclick="if(event.target===this)closeSettings()">
   <div class="modal">
-    <h2>Синхронизация</h2>
-    <div class="rule"></div>
-    <p class="sub">Всё хранится markdown-файлами в папке <b>entries/</b> и рядом с ней. Указывай здесь свой <b>приватный</b> репозиторий — тот, что с записями, а не тот, где лежит приложение.</p>
-    <div class="note-box">Токен хранится только в этом браузере и уходит напрямую в GitHub — больше никуда.</div>
+    <h2>Синхронизация</h2><div class="rule"></div>
+    <p class="sub-t">Всё хранится markdown-файлами в приватном репозитории. Указывай тот, что с данными, а не тот, где лежит приложение.</p>
+    <div class="note-box">Токен хранится только в этом браузере и уходит напрямую в GitHub.</div>
     <div class="field"><label>Владелец</label><input id="cOwner" placeholder="ник на GitHub"></div>
     <div class="field"><label>Репозиторий</label><input id="cRepo" placeholder="diary-entries"></div>
     <div class="field"><label>Ветка</label><input id="cBranch" placeholder="main"></div>
@@ -893,62 +792,56 @@ body[data-tab="diary"]    [data-view="diary"]{display:block}
         <button class="btn quiet tiny" id="eyeBtn" onclick="toggleToken()">Показать</button>
         <button class="btn quiet tiny" id="copyBtn" onclick="copyToken()">Копировать</button>
       </div>
-      <div class="note">Создай на <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>, дай доступ к репозиторию и права <b>Contents: Read and write</b>.</div>
+      <div class="note">Создай на <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>, права <b>Contents: Read and write</b>.</div>
     </div>
     <div class="foot" style="margin-top:22px">
       <button class="btn primary" onclick="saveSettings()">Подключить</button>
       <button class="btn quiet" onclick="closeSettings()">Отмена</button>
       <button class="btn quiet" id="expBtn" onclick="exportAll()">Скачать всё</button>
-      <button class="btn quiet spacer" id="outBtn" onclick="signOut()">Выйти</button>
+      <button class="btn quiet sp" id="outBtn" onclick="signOut()">Выйти</button>
     </div>
   </div>
 </div>
 
-<!-- желание -->
 <div class="mask" id="wMask" onclick="if(event.target===this)closeWish()">
   <div class="modal">
-    <h2 id="wHead">Новое желание</h2>
-    <div class="rule"></div>
+    <h2 id="wHead">Новое желание</h2><div class="rule"></div>
     <div class="field"><label>Желание</label><input id="wName" placeholder="Чего я хочу"></div>
     <div class="field"><label>1 · Почему для меня это важно?</label>
-      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wWhy" placeholder="Что стоит за этим желанием"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wWhy"></textarea></div>
     <div class="field"><label>2 · Что я получу, добившись этого?</label>
-      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wGain" placeholder="Как изменится жизнь"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wGain"></textarea></div>
     <div class="field"><label>3 · Что мне нужно сделать для этого?</label>
-      <div class="q-steps" id="wSteps"></div>
-      <button class="btn quiet tiny" style="margin-top:10px" onclick="wAddStep()">+ шаг</button></div>
+      <div id="wSteps"></div>
+      <button class="btn quiet tiny" style="margin-top:11px" onclick="wAddStep()">+ шаг</button></div>
     <div class="field"><label>4 · Какого результата я хочу?</label>
-      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wResult" placeholder="Как я пойму, что дошла"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wResult"></textarea></div>
     <div class="field"><label>5 · Какой приз я получу?</label>
-      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wPrize" placeholder="Чем себя награжу"></textarea></div>
+      <textarea class="grow" rows="2" oninput="autoGrow(this)" id="wPrize"></textarea></div>
     <div class="foot" style="margin-top:22px">
       <button class="btn primary" onclick="saveWish()">Сохранить</button>
       <button class="btn quiet" onclick="closeWish()">Отмена</button>
-      <button class="btn quiet spacer" id="wDelBtn" onclick="deleteWish()">Удалить</button>
+      <button class="btn quiet sp" id="wDelBtn" onclick="deleteWish()">Удалить</button>
     </div>
   </div>
 </div>
 
-<!-- повторы -->
 <div class="mask" id="rMask" onclick="if(event.target===this)closeRepeat()">
   <div class="modal">
-    <h2>Повторяющиеся дела</h2>
-    <div class="rule"></div>
-    <p class="sub">Появляются в планере сами, когда открываешь новую неделю. Отметь дни, при желании поставь время.</p>
+    <h2>Повторяющиеся дела</h2><div class="rule"></div>
+    <p class="sub-t">Появляются в планере сами, когда открываешь новую неделю. Со временем — событием в сетке, без времени — делом дня.</p>
     <div id="repList"></div>
-    <div class="task-acts">
+    <div class="acts">
       <button class="btn quiet tiny" onclick="repAdd()">+ правило</button>
       <button class="btn quiet tiny" onclick="applyRepeats(true)">Применить к этой неделе</button>
     </div>
-    <div class="foot" style="margin-top:22px">
-      <button class="btn primary" onclick="closeRepeat()">Готово</button>
-    </div>
+    <div class="foot" style="margin-top:22px"><button class="btn primary" onclick="closeRepeat()">Готово</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script>
+
 /* =============== иконки =============== */
 const I={
   book:'<path d="M5 3h11a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17h13"/>',
@@ -979,6 +872,7 @@ const I={
   inbox:'<path d="M3.5 13.5h5l1.5 3h4l1.5-3h5"/><path d="M6 4h12l3 9.5v6.5H3v-6.5z"/>',
   print:'<path d="M7 9V3.5h10V9"/><path d="M3.5 9h17v7h-3.5v4.5h-10V16H3.5z"/>',
   arrow:'<path d="M4 12h15"/><path d="M13.5 6.5L20 12l-6.5 5.5"/>',
+  dots:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
   quad:'<path d="M3.5 3.5h7.5v7.5h-7.5zM13 3.5h7.5v7.5h-7.5zM3.5 13h7.5v7.5h-7.5zM13 13h7.5v7.5h-7.5z"/>'
 };
 const icon=(n,s=17)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none"
@@ -1281,7 +1175,7 @@ const tk = () => tasks.data;
 function renderTasks(){
   const live=tk().filter(t=>t.t.trim()), done=live.filter(t=>t.d).length;
   const pct=live.length?Math.round(done/live.length*100):0;
-  $('tkCnt').textContent=live.length?done+' / '+live.length:'';
+  $('tkMeta').textContent=live.length?done+' / '+live.length:'';
   $('tasksBox').innerHTML=
     (tk().length?tk().map((t,i)=>`<div class="task${t.d?' done':''}">
         <button class="tick${t.d?' on':''}" onclick="toggleTask(${i})" title="Отметить">${icon('check',10)}</button>
@@ -1289,12 +1183,12 @@ function renderTasks(){
           oninput="tk()[${i}].t=this.value; autoGrow(this); tasks.queue()"
           onkeydown="taskKey(event,${i})">${esc(t.t)}</textarea>
         <button class="rm" onclick="removeTask(${i})" title="Убрать">${icon('x',12)}</button>
-      </div>`).join('') : '<div class="task-empty">Пока ничего не запланировано</div>')+
-    `<div class="task-acts">
+      </div>`).join('') : '<div class="empty">Пока ничего не запланировано</div>')+
+    `<div class="acts">
       <button class="btn quiet tiny" onclick="addTask()">${icon('plus',12)}Добавить</button>
       ${done?`<button class="btn quiet tiny" onclick="clearDone()">${icon('trash',12)}Убрать сделанные</button>`:''}
     </div>`+
-    (live.length?`<div class="task-bar"><span>${pct}%</span><span class="track"><i style="width:${pct}%"></i></span></div>`:'');
+    (live.length?`<div class="bar-p"><span>${pct}%</span><span class="track"><i style="width:${pct}%"></i></span></div>`:'');
   growAll($('tasksBox'));
 }
 function focusIn(box,i){ const n=box.querySelectorAll('textarea'); if(n[i]){ n[i].focus(); n[i].setSelectionRange(99,99); } }
@@ -1322,7 +1216,7 @@ const inbox=makeStore({
 const ib = () => inbox.data;
 
 function renderInbox(){
-  $('inCnt').textContent=ib().length||'';
+  $('inMeta').textContent=ib().length||'';
   $('inboxBox').innerHTML=
     (ib().length?ib().map((x,i)=>`<div class="task">
         <button class="st" onclick="inboxToTask(${i})" title="В задачи">${icon('arrow',13)}</button>
@@ -1330,8 +1224,8 @@ function renderInbox(){
           oninput="ib()[${i}].t=this.value; autoGrow(this); inbox.queue()"
           onkeydown="inboxKey(event,${i})">${esc(x.t)}</textarea>
         <button class="rm" onclick="inboxRemove(${i})">${icon('x',12)}</button>
-      </div>`).join('') : '<div class="task-empty">Сюда быстро — разберёшь потом</div>')+
-    `<div class="task-acts"><button class="btn quiet tiny" onclick="inboxAdd()">${icon('plus',12)}Записать</button></div>`;
+      </div>`).join('') : '<div class="empty">Сюда быстро — разберёшь потом</div>')+
+    `<div class="acts"><button class="btn quiet tiny" onclick="inboxAdd()">${icon('plus',12)}Записать</button></div>`;
   growAll($('inboxBox'));
 }
 function inboxAdd(){ ib().push({t:''}); renderInbox(); focusIn($('inboxBox'),ib().length-1); }
@@ -1386,12 +1280,12 @@ function hbStreak(h){                       // сколько дней подр�
   return n;
 }
 function shiftHb(n){ hbMonth=new Date(hbMonth.getFullYear(),hbMonth.getMonth()+n,1); renderHabits(); }
-function renderHabits(){
+function renderHabitsWide(){
   const y=hbMonth.getFullYear(), mo=hbMonth.getMonth();
   const pref=`${y}-${String(mo+1).padStart(2,'0')}`, days=new Date(y,mo+1,0).getDate();
   $('hbLabel').textContent=hbMonth.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
   const best=hb().reduce((s,h)=>Math.max(s,hbStreak(h)),0);
-  $('hbTag').textContent=hb().length?(best?'серия '+best+' '+plural(best,'день','дня','дней'):hb().length+' '+plural(hb().length,'привычка','привычки','привычек')):'';
+  $('hbMeta').textContent=hb().length?(best?'серия '+best+' '+plural(best,'день','дня','дней'):hb().length+' '+plural(hb().length,'привычка','привычки','привычек')):'';
 
   const cols=`grid-template-columns:118px repeat(${days},minmax(14px,1fr)) 54px`;
   const t=today();
@@ -1418,10 +1312,10 @@ function renderHabits(){
     html+=`<div class="hb-streak${s>=3?' hot':''}">${s?s+' дн':''}</div>`;
   });
   html+='</div>';
-  $('habits').innerHTML=hb().length?html:'<div class="task-empty">Привычек пока нет</div>';
+  $('habits').innerHTML=hb().length?html:'<div class="empty">Привычек пока нет</div>';
   growAll($('habits'));
 }
-function hbAdd(){ hb().push({n:'',days:[]}); setTab('planner'); openBlock('habits'); renderHabits(); habits.queue(); }
+function hbAdd(){ hb().push({n:'',days:[]}); setTab('planner'); openSec('habits'); renderHabits(); habits.queue(); }
 function hbRemove(i){
   if((hb()[i].n||'').trim()&&!confirm('Удалить привычку «'+hb()[i].n+'»?')) return;
   hb().splice(i,1); renderHabits(); habits.queue();
@@ -1466,7 +1360,7 @@ function renderRepeat(){
       <textarea class="grow" rows="1" placeholder="Что повторяется"
              oninput="rp()[${i}].t=this.value; autoGrow(this); repeat.queue()">${esc(r.t||'')}</textarea>
       <button class="rm" onclick="repRemove(${i})">${icon('x',13)}</button>
-    </div>`).join('') : '<div class="task-empty">Ни одного правила. Например: Пн, Ср, Пт · 07:00 · Зал</div>';
+    </div>`).join('') : '<div class="empty">Ни одного правила. Например: Пн, Ср, Пт · 07:00 · Зал</div>';
   growAll($('repList'));
 }
 function repAdd(){ rp().push({days:[],time:'',t:''}); renderRepeat(); repeat.queue(); }
@@ -1694,10 +1588,10 @@ function plDays(){
   return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(d.getDate()+i); return d; });
 }
 
-function renderPlanner(){
+function renderPlannerWide(){
   const days=plDays(), t=today(), nowH=new Date().getHours();
   $('plLabel').textContent=plLabel();
-  $('plWeekTag').textContent=plMode==='day'?plLabel():weekLabel(mondayOf(plDate));
+  $('plMeta').textContent=plLabel();
   $('mDay').className=plMode==='day'?'on':'';
   $('mWeek').className=plMode==='week'?'on':'';
   renderCarry();
@@ -1755,7 +1649,7 @@ function renderPlanner(){
     const list=day.tasks||[], stars=list.filter(x=>x.s).length;
     below=`<div class="day-view">
       <div>
-        <div class="task-acts" style="margin:0 0 6px">
+        <div class="acts" style="margin:0 0 6px">
           <span class="mit">Главное на сегодня: <b>${stars}</b> из 3</span>
         </div>
         <div class="day-tasks">`+
@@ -1766,9 +1660,9 @@ function renderPlanner(){
               onkeydown="plTaskKey(event,'${key}',${i})">${esc(x.t)}</textarea>
             <button class="st${x.s?' on':''}" onclick="plStar('${key}',${i})" title="Главное">${icon('star',13)}</button>
             <button class="rm" onclick="plRemove('${key}',${i})">${icon('x',12)}</button>
-          </div>`).join('') : '<div class="task-empty">На сегодня пока пусто</div>')+
+          </div>`).join('') : '<div class="empty">На сегодня пока пусто</div>')+
         `</div>
-        <div class="task-acts"><button class="btn quiet tiny" onclick="plAdd('${key}')">${icon('plus',12)}Добавить дело</button></div>
+        <div class="acts"><button class="btn quiet tiny" onclick="plAdd('${key}')">${icon('plus',12)}Добавить дело</button></div>
       </div>
       <div class="day-sum">
         <div><label>Что получилось</label>
@@ -1865,7 +1759,7 @@ function pjDeadline(p){
 }
 function renderProjects(){
   const active=pj().filter(p=>!pjDone(p)).length;
-  $('pjTag').textContent=pj().length?`${active} в работе · ${pj().length-active} завершено`:'';
+  $('pjMeta').textContent=pj().length?`${active} в работе · ${pj().length-active} завершено`:'';
   $('projects').innerHTML=pj().length?pj().map((p,i)=>{
     const st=p.s||[], done=st.filter(x=>x.d).length, fin=pjDone(p), dl=pjDeadline(p);
     return `<div class="proj${fin?' done':''}">
@@ -1879,7 +1773,7 @@ function renderProjects(){
             onchange="pj()[${i}].to=this.value; projects.queue(); renderProjects()">
         </span>
         <span class="proj-cnt${dl.late?' late':''}">${st.length?done+' / '+st.length:'нет этапов'}${dl.txt?' · '+dl.txt:''}</span>
-        <button class="proj-rm" onclick="pjRemove(${i})" title="Удалить">${icon('x',13)}</button>
+        <button class="rm-x" onclick="pjRemove(${i})" title="Удалить">${icon('x',13)}</button>
       </div>
       <div class="proj-line">
         ${st.length?st.map((x,j)=>`<button class="seg${x.d?' on':''}" onclick="pjToggle(${i},${j})"
@@ -1901,7 +1795,7 @@ function renderProjects(){
         <button class="stage-add" onclick="pjAddStage(${i})">+ этап</button>
       </div>
     </div>`;
-  }).join('') : '<div class="task-empty">Проектов пока нет</div>';
+  }).join('') : '<div class="empty">Проектов пока нет</div>';
   growAll($('projects'));
   renderRoadmap();
 }
@@ -1919,7 +1813,8 @@ function pjSpan(p){                                  // границы прое�
 const TRACK_PX=600;                       // расчётная ширина шкалы для переносов текста
 const LINE_H=14;
 
-function renderRoadmap(){
+function renderRoadmapWide(){
+  $('rmBar').style.display='';
   const start=new Date(rmStart);
   const end=new Date(rmStart); end.setDate(end.getDate()+RM_WEEKS*7);
   const span=end-start;
@@ -1933,8 +1828,8 @@ function renderRoadmap(){
   $('rmLabel').textContent=fmtShort(start)+' – '+fmtShort(new Date(end-86400000))+' '+end.getFullYear();
 
   const withSpan=pj().filter(p=>pjSpan(p)), noSpan=pj().filter(p=>!pjSpan(p));
-  $('rmTag').textContent=pj().length?`${withSpan.length} на шкале${noSpan.length?' · '+noSpan.length+' без сроков':''}`:'';
-  if(!pj().length){ $('roadmap').innerHTML='<div class="task-empty">Добавь проект — он появится на шкале</div>'; return; }
+  $('rmMeta').textContent=pj().length?`${withSpan.length} на шкале${noSpan.length?' · '+noSpan.length+' без сроков':''}`:'';
+  if(!pj().length){ $('roadmap').innerHTML='<div class="empty">Добавь проект — он появится на шкале</div>'; return; }
 
   /* шапка: месяцы сверху, недели снизу */
   const months=[];
@@ -2028,7 +1923,7 @@ function renderRoadmap(){
   });
 
   $('roadmap').innerHTML=`<div class="rm">${head}${msRow}${rows}</div>`+
-    (noSpan.length?`<p class="rm-none">Без сроков: <b>${noSpan.map(p=>esc(p.n||'без названия')).join(', ')}</b>.
+    (noSpan.length?`<p class="note-t">Без сроков: <b>${noSpan.map(p=>esc(p.n||'без названия')).join(', ')}</b>.
        Поставь даты в карточке проекта — и они встанут на шкалу.</p>`:'')+
     `<div class="rm-legend">
       <span><i class="d"></i>сделано</span><span><i class="n"></i>в работе</span>
@@ -2049,7 +1944,7 @@ function rmAddStage(i){                       // новый этап прямо 
 }
 
 function pjAdd(){
-  pj().push({n:'',from:'',to:'',s:[]}); setTab('projects'); openBlock('projects'); renderProjects(); projects.queue();
+  pj().push({n:'',from:'',to:'',s:[]}); setTab('projects'); openSec('projects'); renderProjects(); projects.queue();
   const n=$('projects').querySelectorAll('.proj-name');
   if(n.length) n[n.length-1].focus();
 }
@@ -2107,7 +2002,7 @@ let wIdx=-1, wDraft=null;
 
 function renderWishes(){
   const live=wl().filter(w=>!wDone(w)).length;
-  $('wCnt').textContent=wl().length?live+' в пути':'';
+  $('wMeta').textContent=wl().length?live+' в пути':'';
   $('wishes').innerHTML=wl().length?wl().map((w,i)=>{
     const st=w.steps||[], done=st.filter(s=>s.d).length, fin=wDone(w);
     return `<button class="wish${fin?' done':''}" onclick="openWish(${i})">
@@ -2115,7 +2010,7 @@ function renderWishes(){
       ${st.length?`<span class="wl-line">${st.map(s=>`<i class="${s.d?'on':''}"></i>`).join('')}</span>`:''}
       <span class="wm">${st.length?done+' из '+st.length+' шагов':'шаги не заданы'}${fin?' · исполнено':''}</span>
     </button>`;
-  }).join('') : '<div class="task-empty">Здесь будет то, чего хочется</div>';
+  }).join('') : '<div class="empty">Здесь будет то, чего хочется</div>';
 }
 function newWish(){ setTab('projects'); wIdx=-1; wDraft={n:'',why:'',gain:'',result:'',prize:'',steps:[]}; fillWish('Новое желание'); }
 function openWish(i){ wIdx=i; wDraft=JSON.parse(JSON.stringify(wl()[i])); fillWish('Желание'); }
@@ -2135,7 +2030,7 @@ function renderWishSteps(){
       <textarea class="tx grow" rows="1" placeholder="Шаг ${i+1}"
         oninput="wDraft.steps[${i}].t=this.value; autoGrow(this)" onkeydown="wStepKey(event,${i})">${esc(s.t)}</textarea>
       <button class="rm" onclick="wRemoveStep(${i})">${icon('x',12)}</button>
-    </div>`).join('') : '<div class="task-empty">Разбей путь на шаги</div>';
+    </div>`).join('') : '<div class="empty">Разбей путь на шаги</div>';
   growAll($('wSteps'));
 }
 function wAddStep(){ wDraft.steps.push({t:'',d:false}); renderWishSteps(); focusIn($('wSteps'),wDraft.steps.length-1); }
@@ -2220,13 +2115,13 @@ function swLoadDraft(){
 function swClearDraft(){ try{ localStorage.removeItem(LS.swotDraft); }catch(e){} }
 
 function swRender(){
-  $('swTag').textContent = swIdx>=0 ? 'правка · '+swCount(swDraft)+' пунктов'
+  $('swMeta').textContent = swIdx>=0 ? 'правка · '+swCount(swDraft)+' пунктов'
                         : (swEmpty(swDraft) ? '' : 'черновик · '+swCount(swDraft)+' пунктов');
   $('swDelBtn').style.display = swIdx>=0 ? '' : 'none';
   $('swNote').innerHTML = swIdx>=0
-    ? `<div class="sw-draft">Правишь сохранённый анализ. <b>Сохранить</b> обновит его.</div>`
+    ? `<div class="sw-note">Правишь сохранённый анализ. <b>Сохранить</b> обновит его.</div>`
     : (swEmpty(swDraft) ? ''
-      : `<div class="sw-draft">Это <b>черновик</b> — он живёт только на этом устройстве.
+      : `<div class="sw-note">Это <b>черновик</b> — он живёт только на этом устройстве.
          Нажми <b>Сохранить</b>, чтобы он попал в список и в GitHub.</div>`);
 
   $('swGrid').innerHTML=SW_Q.map(([k,letter,label,neg])=>{
@@ -2246,7 +2141,7 @@ function swRender(){
   }).join('');
   growAll($('swGrid'));
 }
-function swTag(){ $('swTag').textContent = swIdx>=0 ? 'правка · '+swCount(swDraft)+' пунктов'
+function swTag(){ $('swMeta').textContent = swIdx>=0 ? 'правка · '+swCount(swDraft)+' пунктов'
                         : (swEmpty(swDraft)?'':'черновик · '+swCount(swDraft)+' пунктов'); }
 function swFocus(k,i){
   const box=[...$('swGrid').children][SW_Q.findIndex(q=>q[0]===k)];
@@ -2266,12 +2161,12 @@ function swFill(){
 function swNew(){
   if(!swEmpty(swDraft) && swIdx<0 && !confirm('Текущий черновик пропадёт. Начать новый анализ?')) return;
   swDraft=blankSwot(); swIdx=-1; swClearDraft();
-  setTab('swot'); openBlock('swot'); swFill(); renderSwotList(); $('swName').focus();
+  setTab('swot'); openSec('swot'); swFill(); renderSwotList(); $('swName').focus();
 }
 function swOpen(i){
   if(!swEmpty(swDraft) && swIdx<0 && !confirm('Незаконченный черновик пропадёт. Открыть сохранённый анализ?')) return;
   swDraft=JSON.parse(JSON.stringify(sw()[i])); swIdx=i; swSaveDraft();
-  setTab('swot'); openBlock('swot'); swFill(); renderSwotList();
+  setTab('swot'); openSec('swot'); swFill(); renderSwotList();
 }
 function swSave(){
   const a={n:($('swName').value||'').trim()||'Без названия', dt:$('swDate').value||today()};
@@ -2295,12 +2190,12 @@ function swDelete(){
   swFill(); renderSwotList(); swot.queue(); toast('Анализ удалён');
 }
 function renderSwotList(){
-  $('swCnt').textContent=sw().length||'';
+  $('swListMeta').textContent=sw().length||'';
   $('swList').innerHTML=sw().length?sw().map((a,i)=>
     `<button class="sw-item${i===swIdx?' on':''}" onclick="swOpen(${i})">
       <span class="t">${icon('quad',14)}<span>${esc(a.n||'Без названия')}</span></span>
       <span class="m">${a.dt?fmtDate(a.dt).replace(/ г\.$/,''):''} · ${swCount(a)} ${plural(swCount(a),'пункт','пункта','пунктов')}</span>
-    </button>`).join('') : '<div class="task-empty">Сохранённых анализов пока нет</div>';
+    </button>`).join('') : '<div class="empty">Сохранённых анализов пока нет</div>';
 }
 
 /* =============== цитата дня =============== */
@@ -2397,7 +2292,7 @@ function newEntry(){
   $('fTitle').value=''; $('fDate').value=today(); $('fTags').value=''; $('fBody').value='';
   renderMoods(''); ph={path:'',data:'',dirty:false,loading:false}; renderPhoto();
   $('delBtn').style.display='none'; $('editHint').textContent='Новая запись';
-  setTab('diary'); openBlock('entry'); autoGrow($('fTitle')); render(); $('fTitle').focus();
+  setTab('diary'); openSec('entry'); autoGrow($('fTitle')); render(); $('fTitle').focus();
 }
 async function openEntry(file){
   const e=entries.find(x=>x.file===file); if(!e) return;
@@ -2406,10 +2301,10 @@ async function openEntry(file){
   $('fTags').value=(e.tags||[]).join(', '); $('fBody').value=e.body;
   renderMoods(pickedMood); $('delBtn').style.display='';
   $('editHint').textContent='Правка · '+fmtDate(e.date);
-  setTab('diary'); openBlock('entry'); autoGrow($('fTitle'));
+  setTab('diary'); openSec('entry'); autoGrow($('fTitle'));
   ph={path:e.photo||'', data:e.photoData||'', dirty:false, loading:!!(e.photo&&!e.photoData)};
   renderPhoto(); render();
-  $('blkEntry').scrollIntoView({behavior:'smooth',block:'start'});
+  $('secEntry').scrollIntoView({behavior:'smooth',block:'start'});
   if(ph.loading){
     const d=await fetchPhoto(e.photo);
     if(currentFile!==file) return;
@@ -2472,10 +2367,10 @@ function findEverywhere(q){
     (day.tasks||[]).forEach(t=>add('Дело · '+k,t.t));
   }));
   if(!hits.length) return '';
-  return `<div style="margin-top:14px"><p class="sect-title" style="cursor:default">Найдено ещё</p>`+
+  return `<div style="margin-top:14px"><p class="sub" style="cursor:default">Найдено ещё</p>`+
     hits.slice(0,12).map(([w,t])=>`<div class="item" style="cursor:default;border-left-color:transparent">
       <span class="d">${esc(w)}</span><span class="t"><span class="txt">${esc(t)}</span></span></div>`).join('')+
-    (hits.length>12?`<div class="task-empty">и ещё ${hits.length-12}</div>`:'')+'</div>';
+    (hits.length>12?`<div class="empty">и ещё ${hits.length-12}</div>`:'')+'</div>';
 }
 
 function render(){
@@ -2484,7 +2379,7 @@ function render(){
   const all=[...new Set(entries.flatMap(e=>e.tags||[]))].sort((a,b)=>a.localeCompare(b,'ru'));
   $('tagFilters').innerHTML=all.length
     ? all.map(t=>`<button class="tag${activeTags.has(t)?' on':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}')">${esc(t)}</button>`).join('')
-    : '<span class="task-empty">Теги появятся вместе с записями</span>';
+    : '<span class="empty">Теги появятся вместе с записями</span>';
   $('findAll').innerHTML=findEverywhere(q);
 
   const list=filtered();
@@ -2495,7 +2390,7 @@ function render(){
       <span class="d">${fmtDate(e.date)}
         ${(e.photo||e.photoData)?icon('camera',12):''}${e.sha?icon('cloud',12):''}</span>
       <span class="p">${esc((e.body||'').slice(0,140))}</span>
-      ${(e.tags||[]).length?`<span class="tags-row">${e.tags.slice(0,4).map(t=>`<span class="tag mini">${esc(t)}</span>`).join('')}</span>`:''}
+      ${(e.tags||[]).length?`<span class="tags">${e.tags.slice(0,4).map(t=>`<span class="tag mini">${esc(t)}</span>`).join('')}</span>`:''}
     </button>`;
   }).join('') : '<div class="empty">Пока пусто<br>Нажми «Новая запись»</div>';
   renderCal();
@@ -2535,14 +2430,15 @@ function renderCal(){
     html+=`<div class="day${list.length?' has':''}${onPlanner?' pick':''}${inWeek?' inweek':''}${sel?' sel':''}${key===t?' today':''}"
       ${click?`onclick="${click}"`:''}${tips.length?` title="${esc(tips.join(' · '))}"`:''}>
       <span>${d}</span>${list.length?icon(m?m.i:'doc',11):(busy?icon('grid',9):'')}
-      ${list.length>1?`<span class="more">${list.length}</span>`:''}</div>`;
+      ${list.length>1?`<span class="more-n">${list.length}</span>`:''}</div>`;
   }
   $('cal').innerHTML=html;
   renderStats(monthEntries, Object.keys(byDay).length, days);
 }
 function renderStats(list,daysUsed,daysTotal){
   const box=$('stats');
-  if(!list.length){ box.innerHTML='<p class="stat-note" style="text-align:center;margin:0">В этом месяце записей нет</p>'; return; }
+  $('stMeta').textContent=calDate.toLocaleDateString('ru-RU',{month:'long'});
+  if(!list.length){ box.innerHTML='<p class="note-t" style="text-align:center;margin:0">В этом месяце записей нет</p>'; return; }
   const counts={};
   list.forEach(e=>{ const k=e.mood||'none'; counts[k]=(counts[k]||0)+1; });
   const rows=MOODS.concat([NO_MOOD]).filter(m=>counts[m.k]).sort((a,b)=>counts[b.k]-counts[a.k]);
@@ -2558,11 +2454,11 @@ function renderStats(list,daysUsed,daysTotal){
      </div>`+
     rows.map((m,i)=>`<div class="mb${i===0?' top':''}">
         <span class="mb-l">${icon(m.i,13)}<span>${m.l}</span></span>
-        <span class="mb-track"><i style="width:${Math.round(counts[m.k]/max*100)}%"></i></span>
+        <span class="mb-t"><i style="width:${Math.round(counts[m.k]/max*100)}%"></i></span>
         <span class="mb-n">${counts[m.k]}</span>
       </div>`).join('')+
-    `<p class="stat-note">Чаще всего — <b>${rows[0].l.toLowerCase()}</b>${photos?`. Фото: <b>${photos}</b>`:''}</p>`+
-    (top.length?`<div class="tags-row">${top.map(([t,n])=>`<span class="tag mini">${esc(t)} · ${n}</span>`).join('')}</div>`:'');
+    `<p class="note-t">Чаще всего — <b>${rows[0].l.toLowerCase()}</b>${photos?`. Фото: <b>${photos}</b>`:''}</p>`+
+    (top.length?`<div class="tags">${top.map(([t,n])=>`<span class="tag mini">${esc(t)} · ${n}</span>`).join('')}</div>`:'');
 }
 
 /* =============== вкладки =============== */
@@ -2580,24 +2476,27 @@ function setTab(name, silent){
 }
 
 /* =============== сворачивание =============== */
-const BLOCKS={planner:'blkPlanner', habits:'blkHabits', roadmap:'blkRoadmap', projects:'blkProjects',
-  swot:'blkSwot', entry:'blkEntry',
-  cal:'secCal', tasks:'secTasks', inbox:'secInbox', wishes:'secWishes', swotList:'secSwot', list:'secList'};
+const SECS={planner:'secPlanner', inbox:'secInbox', habits:'secHabits',
+  roadmap:'secRoadmap', projects:'secProjects', swot:'secSwot', entry:'secEntry', stats:'secStats'};
 function uiState(){ try{ return JSON.parse(localStorage.getItem(LS.ui)||'{}'); }catch(e){ return {}; } }
 function saveUi(patch){ localStorage.setItem(LS.ui, JSON.stringify({...uiState(),...patch})); }
-function applyBlocks(){
+function applySecs(){
   const s=uiState();
-  Object.entries(BLOCKS).forEach(([k,id])=>{
+  Object.entries(SECS).forEach(([k,id])=>{
     const el=$(id); if(el) el.classList.toggle('closed', s[k]===true);
   });
   growAll();
 }
-function toggleBlock(name){
-  const el=$(BLOCKS[name]); if(!el) return;
+function toggleSec(name){
+  const el=$(SECS[name]); if(!el) return;
   saveUi({[name]:!el.classList.contains('closed')});
-  applyBlocks();
+  applySecs();
 }
-function openBlock(name){ saveUi({[name]:false}); applyBlocks(); }
+function openSec(name){ saveUi({[name]:false}); applySecs(); }
+
+function toggleMore(id){ const e=$(id); e.classList.toggle('open'); }
+function closeMore(){ document.querySelectorAll('.more.open').forEach(e=>e.classList.remove('open')); }
+document.addEventListener('click', e=>{ if(!e.target.closest || !e.target.closest('.more')) closeMore(); });
 
 /* =============== настройки =============== */
 function openSettings(){
@@ -2704,46 +2603,131 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
   window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
+
+/* =============== телефонные версии широких блоков =============== */
+let phone=isPhone();
+window.addEventListener('resize', ()=>{
+  const p=isPhone();
+  if(p===phone) return;
+  phone=p; renderPlanner(); renderHabits(); renderProjects();
+});
+
+function renderPlanner(){
+  if(phone && plMode==='week') renderWeekList(); else renderPlannerWide();
+}
+function renderHabits(){ phone?renderHabitsPhone():renderHabitsWide(); }
+function renderRoadmap(){ phone?renderRoadmapPhone():renderRoadmapWide(); }
+
+/* неделя списком: обзор по дням, тап открывает день */
+function renderWeekList(){
+  const mon=mondayOf(plDate), t=today();
+  $('plLabel').textContent=weekLabel(mon);
+  $('plMeta').textContent=weekLabel(mon);
+  $('mDay').className=''; $('mWeek').className='on';
+  renderCarry();
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(mon); d.setDate(d.getDate()+i);
+    const k=iso(d), day=plDayRead(k)||{slots:{},tasks:[]};
+    const slots=Object.keys(day.slots||{}).filter(h=>((day.slots[h]||{}).t||'').trim()).sort();
+    const tk=(day.tasks||[]).filter(x=>(x.t||'').trim());
+    const openTk=tk.filter(x=>!x.d).length;
+    const lines=slots.slice(0,3).map(h=>`<b>${h}</b> ${esc(day.slots[h].t)}`)
+      .concat(tk.slice(0,3).map(x=>(x.s?'★ ':'')+(x.d?'✓ ':'')+esc(x.t)));
+    const extra=(slots.length+tk.length)-lines.length;
+    html+=`<button class="wk-day${k===t?' today':''}" onclick="goDate('${k}')">
+      <span class="h">${WD[i]}<em>${d.getDate()} ${d.toLocaleDateString('ru-RU',{month:'short'}).replace('.','')}</em>
+        <span class="n">${slots.length?slots.length+' соб.':''}${openTk?(slots.length?' · ':'')+openTk+' дел':''}</span></span>
+      ${lines.length?`<span class="l">${lines.join('<br>')}${extra>0?`<br>и ещё ${extra}`:''}</span>`
+                    :'<span class="l">пусто</span>'}</button>`;
+  }
+  $('planner').innerHTML=html;
+}
+
+/* привычки: последние 14 дней */
+function renderHabitsPhone(){
+  const days=14, t=today(), list=[];
+  for(let i=days-1;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); list.push(d); }
+  $('hbLabel').textContent='последние 2 недели';
+  const best=hb().reduce((s,h)=>Math.max(s,hbStreak(h)),0);
+  $('hbMeta').textContent=hb().length?(best?'серия '+best+' '+plural(best,'день','дня','дней'):hb().length+' шт'):'';
+  if(!hb().length){ $('habits').innerHTML='<div class="empty">Привычек пока нет</div>'; return; }
+  let html=`<div class="hb-grid" style="grid-template-columns:104px repeat(${days},minmax(0,1fr)) 42px">`;
+  html+='<div></div>'+list.map(d=>`<div class="hb-d${iso(d)===t?' today':''}">${d.getDate()}</div>`).join('')+'<div></div>';
+  hb().forEach((h,i)=>{
+    html+=`<div class="hb-name hb-row">
+      <textarea class="grow" rows="1" placeholder="Привычка"
+        oninput="hb()[${i}].n=this.value; autoGrow(this); habits.queue()">${esc(h.n||'')}</textarea>
+      <button class="rm" onclick="hbRemove(${i})">${icon('x',11)}</button></div>`;
+    list.forEach(d=>{
+      const k=iso(d), wd=d.getDay();
+      html+=`<button class="hb-c${hbHas(h,k)?' on':''}${(wd===0||wd===6)?' wknd':''}" onclick="hbToggle(${i},'${k}')"></button>`;
+    });
+    const st=hbStreak(h);
+    html+=`<div class="hb-streak${st>=3?' hot':''}">${st?st+' дн':''}</div>`;
+  });
+  $('habits').innerHTML=html+'</div>';
+  growAll($('habits'));
+}
+
+/* roadmap списком */
+function renderRoadmapPhone(){
+  $('rmBar').style.display='none';
+  const t=today();
+  $('rmMeta').textContent=pj().length?pj().filter(p=>!pjDone(p)).length+' в работе':'';
+  if(!pj().length){ $('roadmap').innerHTML='<div class="empty">Добавь проект — он появится здесь</div>'; return; }
+  $('roadmap').innerHTML=pj().map((p,i)=>{
+    const st=p.s||[], done=st.filter(x=>x.d).length, fin=pjDone(p), dl=pjDeadline(p);
+    const dated=st.map((x,j)=>({x,j})).sort((a,b)=>(a.x.dt||'9').localeCompare(b.x.dt||'9'));
+    return `<div class="rl${fin?' done':''}">
+      <div class="rl-h"><b>${esc(p.n||'Без названия')}</b>
+        <span class="n">${st.length?done+' / '+st.length:'нет этапов'}</span></div>
+      <div class="rl-d">${p.from?fmtDate(p.from).replace(/ г\.$/,''):'—'} → ${p.to?fmtDate(p.to).replace(/ г\.$/,''):'—'}${dl.txt?' · '+dl.txt:''}</div>
+      ${st.length?`<div class="rl-line">${st.map(x=>`<i class="${x.d?'on':(x.dt&&x.dt<t?'late':'')}"></i>`).join('')}</div>`:''}
+      ${dated.map(({x,j})=>`<div class="rl-s${x.d?' done':''}">
+          <button class="tick${x.d?' on':''}" onclick="pjToggle(${i},${j})">${icon('check',10)}</button>
+          <textarea class="grow" rows="1" placeholder="этап"
+            oninput="pj()[${i}].s[${j}].t=this.value; autoGrow(this); projects.queue()">${esc(x.t)}</textarea>
+          <input type="date" class="rm-date" value="${x.dt||''}"
+            onchange="pj()[${i}].s[${j}].dt=this.value; projects.queue(); renderProjects()">
+          <button class="rm-x" onclick="pjDelStage(${i},${j})">${icon('x',11)}</button>
+        </div>`).join('')}
+      <div class="acts"><button class="btn quiet tiny" onclick="rmAddStage(${i})">+ этап</button></div>
+    </div>`;
+  }).join('');
+  growAll($('roadmap'));
+}
+
 /* =============== старт =============== */
 function paintStaticIcons(){
-  $('logoMark').innerHTML=icon('book',18);
-  $('setBtn').innerHTML=icon('gear',14)+'<span class="lbl">Настройки</span>';
-  $('newBtn').innerHTML=icon('pen',14)+'<span class="lbl">Новая запись</span>';
-  $('saveBtn').innerHTML=icon('check',14)+'<span class="lbl">Сохранить</span>';
-  $('delBtn').innerHTML=icon('trash',14)+'<span class="lbl">Удалить</span>';
-  $('prevBtn').innerHTML=icon('left',14);
-  $('nextBtn').innerHTML=icon('right',14);
-  $('plPrev').innerHTML=icon('left',14);
-  $('plNext').innerHTML=icon('right',14);
-  $('hbPrev').innerHTML=icon('left',14);
-  $('hbNext').innerHTML=icon('right',14);
+  $('logoMark').innerHTML=icon('book',17);
+  $('setBtn').innerHTML=icon('gear',15);
+  $('saveBtn').innerHTML=icon('check',14)+'<span class="lb">Сохранить</span>';
+  $('newBtn').innerHTML=icon('plus',13)+'<span class="lb">Новая</span>';
+  $('delBtn').innerHTML=icon('trash',14)+'<span class="lb">Удалить</span>';
+  $('swSaveBtn').innerHTML=icon('check',14)+'Сохранить';
+  $('swDropBtn').innerHTML=icon('x',13)+'Не сохранять';
+  $('swDelBtn').innerHTML=icon('trash',13)+'Удалить';
+  $('swNewBtn').innerHTML=icon('plus',12)+'Новый анализ';
+  $('pjAddBtn').innerHTML=icon('plus',12)+'Новый проект';
+  $('hbAddBtn').innerHTML=icon('plus',12)+'Новая привычка';
+  $('wAddBtn').innerHTML=icon('plus',12)+'Новое желание';
+  $('expBtn').innerHTML=icon('download',13)+'Скачать всё';
+  $('outBtn').innerHTML=icon('x',13)+'Выйти';
+  $('eyeBtn').innerHTML=icon('eye',13)+'Показать';
+  $('copyBtn').innerHTML=icon('copy',13)+'Копировать';
+  $('repBtn').innerHTML=icon('loop',13)+'Повторяющиеся дела';
+  $('prnBtn').innerHTML=icon('print',13)+'Распечатать неделю';
+  $('plMoreIc').innerHTML=icon('dots',15);
+  [['prevBtn','left'],['nextBtn','right'],['plPrev','left'],['plNext','right'],
+   ['hbPrev','left'],['hbNext','right'],['rmPrev','left'],['rmNext','right']]
+    .forEach(([id,n])=>$(id).innerHTML=icon(n,14));
+  ['plChev','inChev','hbChev','rmChev','pjChev','swChev','enChev','stChev']
+    .forEach(id=>$(id).innerHTML=icon('down',14));
   $('tabPlanner').insertAdjacentHTML('afterbegin', icon('grid',16));
   $('tabProjects').insertAdjacentHTML('afterbegin', icon('flag',16));
   $('tabSwot').insertAdjacentHTML('afterbegin', icon('quad',16));
   $('tabDiary').insertAdjacentHTML('afterbegin', icon('book',16));
-  $('swIcon').innerHTML=icon('quad',15);
-  $('swSaveBtn').innerHTML=icon('check',14)+'<span class="lbl">Сохранить</span>';
-  $('swDropBtn').innerHTML=icon('x',13)+'Не сохранять';
-  $('swDelBtn').innerHTML=icon('trash',14)+'<span class="lbl">Удалить</span>';
-  $('swNewBtn').innerHTML=icon('plus',12)+'Новый анализ';
-  $('plIcon').innerHTML=icon('grid',15);
-  $('hbIcon').innerHTML=icon('loop',15);
-  $('pjIcon').innerHTML=icon('flag',15);
-  $('rmIcon').innerHTML=icon('arrow',15);
-  $('rmPrev').innerHTML=icon('left',14);
-  $('rmNext').innerHTML=icon('right',14);
-  $('enIcon').innerHTML=icon('pen',15);
-  ['plChev','hbChev','rmChev','pjChev','swChev','enChev','calChev','tkChev','inChev','wChev','swlChev','lsChev']
-    .forEach(id=>$(id).innerHTML=icon('down',14));
-  $('eyeBtn').innerHTML=icon('eye',13)+'Показать';
-  $('copyBtn').innerHTML=icon('copy',13)+'Копировать';
-  $('expBtn').innerHTML=icon('download',13)+'Скачать всё';
-  $('outBtn').innerHTML=icon('x',13)+'Выйти';
-  $('pjAddBtn').innerHTML=icon('plus',12)+'Новый проект';
-  $('hbAddBtn').innerHTML=icon('plus',12)+'Новая привычка';
-  $('wAddBtn').innerHTML=icon('plus',12)+'Новое желание';
-  $('repBtn').innerHTML=icon('loop',12)+'Повторы';
-  $('prnBtn').innerHTML=icon('print',12)+'Печать';
   $('searchWrap').insertAdjacentHTML('afterbegin', icon('search',15));
 }
 
@@ -2775,7 +2759,7 @@ paintStaticIcons();
 loadLocal(); loadPlLocal();
 ['tasks','inbox','habits','repeat','projects','wishes','swot'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
-applyBlocks();
+applySecs();
 const startTab = uiState().tab || 'planner';     // запоминаем до newEntry, он уводит на «Дневник»
 renderQuote(); renderInstall();
 newEntry();
