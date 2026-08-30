@@ -50,8 +50,7 @@ button{cursor:pointer; border:none; background:none; padding:0}
   body{padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right)}
 }
 header.top{display:flex; align-items:center; gap:14px; padding:16px 0 14px; position:sticky; top:0; z-index:35;
-  background:rgba(242,242,247,.82); backdrop-filter:saturate(180%) blur(20px);
-  -webkit-backdrop-filter:saturate(180%) blur(20px); margin:0 -20px; padding-left:20px; padding-right:20px}
+  background:var(--bg); box-shadow:0 6px 12px -10px rgba(0,0,0,.25)}
 @supports(padding:max(0px)){ header.top{padding-top:max(16px, calc(8px + env(safe-area-inset-top)))} }
 .logo{display:flex; align-items:center; gap:11px; min-width:0}
 .logo .mark{width:34px; height:34px; border-radius:9px; background:var(--ink); color:#fff;
@@ -185,7 +184,7 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 
 /* ---------- календарь ---------- */
 .cal-h{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
-.cal-h b{font-size:15px; font-weight:600; letter-spacing:-.02em; text-transform:capitalize}
+.cal-h b{font-size:15px; font-weight:600; letter-spacing:-.02em}
 .nav-sq{width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
   color:var(--red); flex:none; transition:.15s}
 .nav-sq:hover{background:var(--red-soft)}
@@ -222,7 +221,7 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .note-t b{color:var(--ink); font-weight:600}
 /* ---------- планер ---------- */
 .pl-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px}
-.pl-bar b{font-size:15px; font-weight:600; letter-spacing:-.02em; text-transform:capitalize}
+.pl-bar b{font-size:15px; font-weight:600; letter-spacing:-.02em}
 .modes{display:inline-flex; gap:2px; padding:2px; background:var(--fill); border-radius:9px}
 .modes button{padding:6px 14px; min-height:30px; border-radius:7px; font-size:13.5px;
   font-weight:500; color:var(--ink2); transition:.18s}
@@ -304,9 +303,11 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .hb-streak{font-size:12px; color:var(--ink3); padding-left:9px; display:flex; align-items:center; line-height:1.2}
 .hb-streak.hot{color:var(--red); font-weight:600}
 /* ---------- roadmap ---------- */
-.rm-wrap{overflow-x:auto; border-radius:10px; box-shadow:0 0 0 .5px var(--sep)}
-.rm{min-width:760px}
-.rm-row{display:grid; grid-template-columns:158px minmax(0,1fr); align-items:stretch}
+.rm-wrap{overflow-x:auto; margin:0 -18px; padding:2px 18px 0}
+.rm-wrap::-webkit-scrollbar{height:6px}
+.rm-wrap::-webkit-scrollbar-thumb{background:var(--dim); border-radius:3px}
+.rmap{min-width:764px; border-radius:10px; overflow:hidden; box-shadow:0 0 0 .5px var(--sep)}
+.rm-row{display:grid; grid-template-columns:176px minmax(0,1fr); align-items:stretch}
 .rm-l{padding:10px 12px 10px 14px; font-size:12.5px; line-height:1.3; min-width:0;
   border-bottom:.5px solid var(--sep2); display:flex; align-items:flex-start; gap:8px;
   overflow-wrap:anywhere; color:var(--ink2)}
@@ -321,20 +322,21 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
   padding:2px 0 8px; border-left:.5px solid var(--sep2)}
 .rm-row.grp .rm-l{background:var(--fill); font-size:13.5px; font-weight:600; color:var(--ink);
   padding:12px 14px; align-items:center}
-.rm-row.grp .rm-l .n{margin-left:auto; color:var(--ink3); font-weight:400; font-size:12px}
+.rm-row.grp .rm-l .n{margin-left:auto; color:var(--ink3); font-weight:400; font-size:12px; white-space:nowrap}
 .rm-row.grp.done .rm-l{color:var(--ink3)}
 .rm-sum{position:absolute; top:50%; height:4px; margin-top:-2px; background:var(--dim); border-radius:2px}
 .rm-row.grp.done .rm-sum{background:var(--sep)}
 .rm-bar{position:absolute; top:6px; min-height:24px; padding:5px 10px; font-size:12.5px;
   line-height:1.3; border-radius:7px; overflow-wrap:anywhere; background:var(--fill);
   color:var(--ink2); display:flex; align-items:center}
-.rm-bar.done{background:var(--ink); color:#fff}
+.rm-bar.done{background:#8E8E93; color:#fff}
 .rm-bar.now{background:var(--red-soft); color:var(--red); box-shadow:inset 0 0 0 1.5px var(--red)}
 .rm-bar.late{background:var(--red); color:#fff}
 .rm-bar.empty{padding:0; min-width:4px}
 .rm-out{position:absolute; top:9px; font-size:12.5px; line-height:1.3; width:180px;
   overflow-wrap:anywhere; color:var(--ink)}
 .rm-out.muted{color:var(--ink3)}
+.rm-out.flip{text-align:right}
 .rm-bar textarea,.rm-out textarea,.rm-nd textarea,.rl-s textarea{flex:1; width:100%; min-width:0;
   border:none; outline:none; background:none; color:inherit; font:inherit; padding:0;
   line-height:1.35; resize:none; overflow:hidden; word-break:break-word}
@@ -343,7 +345,7 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .rm-l .tick{width:17px; height:17px; margin-top:1px}
 .rm-l .tick svg{width:10px; height:10px}
 .rm-date{border:none; background:none; outline:none; font-family:inherit; font-size:11.5px;
-  color:var(--ink3); padding:2px 0; width:104px; min-width:0; border-radius:5px}
+  color:var(--ink3); padding:2px 0; flex:1; width:auto; min-width:0; border-radius:5px}
 .rm-date:hover{color:var(--ink2)}
 .rm-date:focus{color:var(--ink); background:var(--fill)}
 .rm-x{color:var(--dim); flex:none; margin-top:1px; display:grid; place-items:center; opacity:0}
@@ -363,7 +365,7 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .rm-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; font-size:12.5px; color:var(--ink2)}
 .rm-legend span{display:flex; align-items:center; gap:7px}
 .rm-legend i{width:18px; height:10px; border-radius:4px; background:var(--fill); display:block}
-.rm-legend i.d{background:var(--ink)}
+.rm-legend i.d{background:#8E8E93}
 .rm-legend i.n{background:var(--red-soft); box-shadow:inset 0 0 0 1.5px var(--red)}
 .rm-legend i.l{background:var(--red)}
 
@@ -541,7 +543,6 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 /* ---------- телефон ---------- */
 @media(max-width:920px){
   .app{padding:0 16px calc(96px + env(safe-area-inset-bottom))}
-  header.top{margin:0 -16px; padding-left:16px; padding-right:16px}
   .grid{grid-template-columns:minmax(0,1fr); gap:26px}
   aside .stick{position:static}
   .tabs{position:fixed; left:0; right:0; bottom:0; z-index:40; margin:0; border-radius:0; padding:0;
@@ -559,6 +560,10 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
   .mask{padding:12px; align-items:end}
   .title-in{font-size:23px}
   .body-in{min-height:220px; padding:14px 15px}
+  .pl-bar{gap:8px}
+  .pl-bar .modes{width:100%}
+  .pl-bar .modes button{flex:1}
+  .pl-bar b{flex:1; text-align:center; font-size:14px; min-width:0}
   .quote{margin-bottom:20px}
   .item,.wish,.sw-item,.wk-day{margin:0 -8px; padding-left:8px; padding-right:8px}
   .wk-day{width:calc(100% + 16px)}
@@ -950,7 +955,9 @@ function slug(s){
   return (s||'').toLowerCase().split('').map(c=>TR[c]!==undefined?TR[c]:c).join('')
     .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,42)||'zapis';
 }
-function fmtDate(d){ const t=parseISO(d); return isNaN(t)?d:t.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); }
+function fmtDate(d){ const t=parseISO(d); return isNaN(t)?d:t.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}).replace(/\s*г\.$/,''); }
+const cap = s => s ? s[0].toUpperCase()+s.slice(1) : s;
+const monthYear = d => cap( d.toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(/\s*г\.$/,''));
 function mondayOf(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
 const isPhone = () => window.matchMedia && window.matchMedia('(max-width:760px)').matches;
 const parseCheck = l => l.match(/^\s*[-*]\s*\[([ xX])\]\s?(.*)$/);
@@ -1283,7 +1290,7 @@ function shiftHb(n){ hbMonth=new Date(hbMonth.getFullYear(),hbMonth.getMonth()+n
 function renderHabitsWide(){
   const y=hbMonth.getFullYear(), mo=hbMonth.getMonth();
   const pref=`${y}-${String(mo+1).padStart(2,'0')}`, days=new Date(y,mo+1,0).getDate();
-  $('hbLabel').textContent=hbMonth.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+  $('hbLabel').textContent=monthYear(hbMonth);
   const best=hb().reduce((s,h)=>Math.max(s,hbStreak(h)),0);
   $('hbMeta').textContent=hb().length?(best?'серия '+best+' '+plural(best,'день','дня','дней'):hb().length+' '+plural(hb().length,'привычка','привычки','привычек')):'';
 
@@ -1397,7 +1404,7 @@ function weekLabel(mon){
 }
 function plLabel(){
   return plMode==='day'
-    ? plDate.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'})
+    ? cap(plDate.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'}))
     : weekLabel(mondayOf(plDate));
 }
 
@@ -1856,7 +1863,7 @@ function renderRoadmapWide(){
         ${icon('flag',12)}<span>${esc(p.n||'Проект')}<small>${fmtDate(p.to||p.from)}</small></span></span>`;
   }).join('');
   const msRow = withSpan.length
-    ? `<div class="rm-row"><div class="rm-l" style="font-weight:700;letter-spacing:1.4px;text-transform:uppercase;font-size:9.5px">Вехи</div>
+    ? `<div class="rm-row"><div class="rm-l" style="font-weight:600;color:var(--ink)">Вехи</div>
         <div class="rm-t" style="--wk:${wk};min-height:46px">${now}${ms}</div></div>` : '';
 
   /* группы: проект и его этапы */
@@ -1903,7 +1910,8 @@ function renderRoadmapWide(){
         </div>
         <div class="rm-t" style="--wk:${wk};min-height:${rowH}px">${now}
           <span class="rm-bar ${cls}${inside?'':' empty'}" style="left:${A}%;width:${W}%">${inside?field:''}</span>
-          ${inside?'':`<span class="rm-out${x.d?' muted':''}" style="left:calc(${B}% + 8px)">${field}</span>`}
+          ${inside?'':`<span class="rm-out${x.d?' muted':''}${B>68?' flip':''}"
+              style="${B>68?`right:calc(${100-A}% + 8px)`:`left:calc(${B}% + 8px)`}">${field}</span>`}
         </div></div>`;
       prev=x.dt;
     });
@@ -1922,7 +1930,7 @@ function renderRoadmapWide(){
           </span>`).join('')}</div></div></div>`;
   });
 
-  $('roadmap').innerHTML=`<div class="rm">${head}${msRow}${rows}</div>`+
+  $('roadmap').innerHTML=`<div class="rm-wrap"><div class="rmap">${head}${msRow}${rows}</div></div>`+
     (noSpan.length?`<p class="note-t">Без сроков: <b>${noSpan.map(p=>esc(p.n||'без названия')).join(', ')}</b>.
        Поставь даты в карточке проекта — и они встанут на шкалу.</p>`:'')+
     `<div class="rm-legend">
@@ -2401,7 +2409,7 @@ function shiftMonth(n){ calDate=new Date(calDate.getFullYear(),calDate.getMonth(
 function renderCal(){
   const y=calDate.getFullYear(), mo=calDate.getMonth();
   const pref=`${y}-${String(mo+1).padStart(2,'0')}`;
-  $('calLabel').textContent=calDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+  $('calLabel').textContent=monthYear(calDate);
   const pad=(new Date(y,mo,1).getDay()+6)%7, days=new Date(y,mo+1,0).getDate();
   const byDay={}, monthEntries=[];
   entries.forEach(e=>{ if(e.date&&e.date.startsWith(pref)){
@@ -2646,13 +2654,13 @@ function renderWeekList(){
 
 /* привычки: последние 14 дней */
 function renderHabitsPhone(){
-  const days=14, t=today(), list=[];
+  const days=10, t=today(), list=[];
   for(let i=days-1;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); list.push(d); }
-  $('hbLabel').textContent='последние 2 недели';
+  $('hbLabel').textContent='Последние 10 дней';
   const best=hb().reduce((s,h)=>Math.max(s,hbStreak(h)),0);
   $('hbMeta').textContent=hb().length?(best?'серия '+best+' '+plural(best,'день','дня','дней'):hb().length+' шт'):'';
   if(!hb().length){ $('habits').innerHTML='<div class="empty">Привычек пока нет</div>'; return; }
-  let html=`<div class="hb-grid" style="grid-template-columns:104px repeat(${days},minmax(0,1fr)) 42px">`;
+  let html=`<div class="hb-grid" style="grid-template-columns:86px repeat(${days},minmax(0,1fr)) 34px">`;
   html+='<div></div>'+list.map(d=>`<div class="hb-d${iso(d)===t?' today':''}">${d.getDate()}</div>`).join('')+'<div></div>';
   hb().forEach((h,i)=>{
     html+=`<div class="hb-name hb-row">
