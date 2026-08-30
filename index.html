@@ -92,6 +92,7 @@ header.top{display:flex; align-items:center; gap:14px; padding:16px 0 14px; posi
 body[data-tab="home"] [data-view="home"],
 body[data-tab="planner"] [data-view="planner"],
 body[data-tab="projects"] [data-view="projects"],
+body[data-tab="house"] [data-view="house"],
 body[data-tab="swot"] [data-view="swot"],
 body[data-tab="diary"] [data-view="diary"]{display:block}
 
@@ -176,6 +177,46 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .sw.on{background:#34C759}
 .sw.on::after{transform:translateX(18px)}
 .sw:disabled{opacity:.4}
+
+/* ---------- дом ---------- */
+.cl{display:flex; align-items:center; gap:11px; padding:11px 0; border-bottom:.5px solid var(--sep); flex-wrap:wrap}
+.cl:last-of-type{border-bottom:none}
+.cl textarea{flex:1; min-width:130px; border:none; outline:none; background:none;
+  font-size:14.5px; line-height:1.4; padding:0; resize:none; overflow:hidden; font-family:inherit}
+.cl .every{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink3); flex:none}
+.cl .every input{width:46px; border:none; background:var(--fill); border-radius:7px; outline:none;
+  font-family:inherit; font-size:13px; padding:5px 0; text-align:center; color:var(--ink2)}
+.cl .every input:focus{color:var(--ink); box-shadow:0 0 0 2px var(--red-soft)}
+.cl .due{font-size:12.5px; color:var(--ink2); flex:none; white-space:nowrap}
+.cl .due.now{color:var(--red); font-weight:600}
+.cl .did{flex:none}
+
+.menu-grid{display:grid; grid-template-columns:64px repeat(3,minmax(0,1fr)); gap:8px}
+.menu-h{font-size:12px; color:var(--ink2); font-weight:600; padding-bottom:2px}
+.menu-d{display:flex; align-items:center; font-size:13.5px; font-weight:600; color:var(--ink2)}
+.menu-d.today{color:var(--red)}
+.menu-grid textarea{width:100%; border:none; background:var(--fill); border-radius:9px; outline:none;
+  font-size:13.5px; line-height:1.35; padding:8px 10px; min-height:36px; resize:none; overflow:hidden; font-family:inherit}
+.menu-grid textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+@media(max-width:920px){
+  .menu-grid{grid-template-columns:minmax(0,1fr); gap:6px}
+  .menu-h{display:none}
+  .menu-d{padding-top:10px; font-size:14px; color:var(--ink)}
+}
+.rec{border-bottom:.5px solid var(--sep); padding:12px 0}
+.rec:last-of-type{border-bottom:none}
+.rec-h{display:flex; align-items:center; gap:10px; width:100%; text-align:left}
+.rec-h textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:15px;
+  font-weight:600; line-height:1.35; padding:0; resize:none; overflow:hidden; font-family:inherit}
+.rec-b{padding-top:10px; display:none}
+.rec.open .rec-b{display:block}
+.rec-b label{display:block; font-size:12.5px; font-weight:600; color:var(--ink2); margin:0 0 6px}
+.rec-b textarea{width:100%; border:none; background:var(--fill); border-radius:10px; outline:none;
+  font-size:14px; line-height:1.5; padding:10px 12px; min-height:44px; resize:none; overflow:hidden; font-family:inherit}
+.rec-b textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.rec-b .f-row+.f-row{margin-top:14px}
+.rec .chev{color:var(--ink3); transition:transform .2s; flex:none}
+.rec.open .chev{transform:rotate(90deg)}
 
 /* ---------- цитата ---------- */
 .quote{background:var(--card); border-radius:var(--r); padding:16px 18px; margin-bottom:26px;
@@ -771,6 +812,62 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
         </section>
       </div>
 
+      <!-- ДОМ -->
+      <div data-view="house">
+        <section class="sec" id="secClean">
+          <button class="sec-h" onclick="toggleSec('clean')">
+            <h2>Уборка</h2><span class="meta" id="clMeta"></span><span class="chev" id="clChev"></span>
+          </button>
+          <div class="sec-b">
+            <div id="cleanBox"></div>
+            <div class="acts"><button class="btn quiet tiny" id="clAddBtn" onclick="clAdd()">Добавить дело</button></div>
+          </div>
+        </section>
+
+        <section class="sec" id="secMenu">
+          <button class="sec-h" onclick="toggleSec('menu')">
+            <h2>Меню недели</h2><span class="meta" id="mnMeta"></span><span class="chev" id="mnChev"></span>
+          </button>
+          <div class="sec-b">
+            <div class="pl-bar">
+              <button class="nav-sq" id="mnPrev" onclick="shiftMenu(-1)"></button>
+              <b id="mnLabel"></b>
+              <button class="nav-sq" id="mnNext" onclick="shiftMenu(1)"></button>
+              <button class="btn quiet tiny" onclick="menuToday()">Эта неделя</button>
+            </div>
+            <div id="menuBox"></div>
+          </div>
+        </section>
+
+        <section class="sec" id="secRecipes">
+          <button class="sec-h" onclick="toggleSec('recipes')">
+            <h2>Рецепты</h2><span class="meta" id="rcMeta"></span><span class="chev" id="rcChev"></span>
+          </button>
+          <div class="sec-b">
+            <div id="recBox"></div>
+            <div class="acts"><button class="btn quiet tiny" id="rcAddBtn" onclick="recAdd()">Новый рецепт</button></div>
+          </div>
+        </section>
+
+        <section class="sec" id="secChores">
+          <button class="sec-h" onclick="toggleSec('chores')">
+            <h2>Домашние дела</h2><span class="meta" id="chMeta"></span><span class="chev" id="chChev"></span>
+          </button>
+          <div class="sec-b">
+            <div id="choresBox"></div>
+          </div>
+        </section>
+
+        <section class="sec" id="secRepair">
+          <button class="sec-h" onclick="toggleSec('repair')">
+            <h2>Ремонт</h2><span class="meta" id="rpMeta"></span><span class="chev" id="rpChev"></span>
+          </button>
+          <div class="sec-b">
+            <div id="repairBox"></div>
+          </div>
+        </section>
+      </div>
+
       <!-- SWOT -->
       <div data-view="swot">
         <section class="sec" id="secSwot">
@@ -841,6 +938,11 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
         <div data-view="planner">
           <p class="sub">Задачи <span id="tkMeta" class="mut"></span></p>
           <div id="tasksBox"></div>
+        </div>
+
+        <div data-view="house">
+          <p class="sub">Покупки <span id="shMeta" class="mut"></span></p>
+          <div id="shopBox"></div>
         </div>
 
         <div data-view="swot">
@@ -968,6 +1070,8 @@ const I={
   print:'<path d="M7 9V3.5h10V9"/><path d="M3.5 9h17v7h-3.5v4.5h-10V16H3.5z"/>',
   arrow:'<path d="M4 12h15"/><path d="M13.5 6.5L20 12l-6.5 5.5"/>',
   dots:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+  pot:'<path d="M4 9h16v6.5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2.5 9h19"/><path d="M9 5.5c0-1 1-1.5 1-2.5M12.5 5.5c0-1 1-1.5 1-2.5M16 5.5c0-1 1-1.5 1-2.5"/>',
+  cart:'<circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/><path d="M2.5 3.5h2.6l2.4 11h11l2-8H6.6"/>',
   home:'<path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/>',
   target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
   quad:'<path d="M3.5 3.5h7.5v7.5h-7.5zM13 3.5h7.5v7.5h-7.5zM3.5 13h7.5v7.5h-7.5zM13 13h7.5v7.5h-7.5z"/>'
@@ -2328,6 +2432,7 @@ const MODULES=[
   {id:'home',    name:'Главная',  ic:'home', hint:'Дашборд дня'},
   {id:'planner', name:'Планер',   ic:'grid', hint:'День, неделя, привычки'},
   {id:'projects',name:'Проекты',  ic:'flag', hint:'Roadmap и этапы'},
+  {id:'house',   name:'Дом',      ic:'pot',  hint:'Уборка, меню, рецепты, покупки'},
   {id:'swot',    name:'SWOT',     ic:'quad', hint:'Анализ по квадрантам'},
   {id:'diary',   name:'Дневник',  ic:'book', hint:'Записи и статистика'}
 ];
@@ -2403,6 +2508,220 @@ const monthKey = () => today().slice(0,7);
 const weekKey  = () => iso(mondayOf(new Date()));
 function curYear(){ const y=fc().y||(fc().y={}); return y[yearKey()]=y[yearKey()]||{word:'',goals:[]}; }
 
+
+
+/* =============== дом =============== */
+const HOUSE_LISTS={shop:'Покупки', chores:'Домашние дела', repair:'Ремонт'};
+const house=makeStore({
+  key:'house', label:'Дом', ls:'diary_house_v1', file:'home.md',
+  init:()=>({clean:[], shop:[], chores:[], repair:[], menu:{}, rec:[]}),
+  toMd:d=>{
+    const out=['# Дом',''];
+    const cl=(d.clean||[]).filter(x=>(x.t||'').trim());
+    if(cl.length){ out.push('## Уборка','');
+      cl.forEach(x=>out.push('- '+x.t.trim()+' | '+(x.every||7)+' | '+(x.last||'—')));
+      out.push(''); }
+    Object.entries(HOUSE_LISTS).forEach(([k,name])=>{
+      const l=(d[k]||[]).filter(x=>(x.t||'').trim());
+      if(!l.length) return;
+      out.push('## '+name,'');
+      l.forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+x.t.trim()));
+      out.push('');
+    });
+    Object.keys(d.menu||{}).sort().forEach(wk=>{
+      const rows=d.menu[wk]||[];
+      if(!rows.some(r=>(r||[]).some(c=>(c||'').trim()))) return;
+      out.push('## Меню '+wk,'');
+      rows.forEach((r,i)=>{
+        const c=(r||['','','']).map(x=>(x||'').trim());
+        if(!c.some(Boolean)) return;
+        out.push('- '+WD[i]+' | '+c[0]+' | '+c[1]+' | '+c[2]);
+      });
+      out.push('');
+    });
+    const rc=(d.rec||[]).filter(r=>(r.n||'').trim());
+    if(rc.length){ out.push('## Рецепты','');
+      rc.forEach(r=>{ out.push('### '+r.n.trim(),'');
+        if((r.ing||'').trim())   out.push('Ингредиенты: '+r.ing.trim(),'');
+        if((r.steps||'').trim()) out.push(r.steps.trim(),''); }); }
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const d={clean:[],shop:[],chores:[],repair:[],menu:{},rec:[]};
+    const byName={'Уборка':'clean','Покупки':'shop','Домашние дела':'chores','Ремонт':'repair'};
+    let mode=null, wk=null, rec=null;
+    text.split(/\r?\n/).forEach(line=>{
+      const h2=line.match(/^##\s+(.*)$/);
+      if(h2){
+        const t=h2[1].trim(); rec=null;
+        const mn=t.match(/^Меню\s+(\d{4}-\d{2}-\d{2})$/);
+        if(mn){ mode='menu'; wk=mn[1]; d.menu[wk]=Array.from({length:7},()=>['','','']); return; }
+        if(t==='Рецепты'){ mode='rec'; return; }
+        mode=byName[t]||null; return;
+      }
+      const h3=line.match(/^###\s+(.*)$/);
+      if(h3 && mode==='rec'){ rec={n:h3[1].trim(),ing:'',steps:''}; d.rec.push(rec); return; }
+      if(mode==='clean'){
+        const m=line.match(/^\s*-\s*(.*?)\s*\|\s*(\d+)\s*\|\s*(\S*)\s*$/);
+        if(m) d.clean.push({t:m[1].trim(), every:+m[2]||7, last:/\d{4}-\d{2}-\d{2}/.test(m[3])?m[3]:''});
+        return;
+      }
+      if(mode==='menu' && wk){
+        const m=line.match(/^\s*-\s*(\S+)\s*\|(.*)$/);
+        if(m){ const i=WD.indexOf(m[1]); if(i>=0){
+          const c=m[2].split('|').map(s=>s.trim()); d.menu[wk][i]=[c[0]||'',c[1]||'',c[2]||'']; } }
+        return;
+      }
+      if(mode==='rec' && rec){
+        const ing=line.match(/^Ингредиенты:\s*(.*)$/);
+        if(ing){ rec.ing=ing[1].trim(); return; }
+        if(line.trim()) rec.steps=(rec.steps?rec.steps+'\n':'')+line;
+        return;
+      }
+      if(mode && d[mode]){
+        const c=parseCheck(line);
+        if(c) d[mode].push({t:c[2].trim(), d:c[1].toLowerCase()==='x'});
+      }
+    });
+    d.rec.forEach(r=>r.steps=(r.steps||'').trim());
+    return d;
+  },
+  render:()=>renderHouse()
+});
+const hs = () => house.data;
+
+/* ---- уборка ---- */
+function clDue(x){
+  if(!x.last) return {txt:'ещё не делала', now:true};
+  const left=(+x.every||7)-daysSince(x.last);
+  if(left<=0) return {txt:'пора', now:true};
+  if(left===1) return {txt:'завтра', now:false};
+  return {txt:'через '+left+' '+plural(left,'день','дня','дней'), now:false};
+}
+function renderClean(){
+  const list=hs().clean||[];
+  const due=list.filter(x=>(x.t||'').trim() && clDue(x).now).length;
+  $('clMeta').textContent=list.length?(due?due+' пора':'всё свежо'):'';
+  $('cleanBox').innerHTML=list.length?list.map((x,i)=>{
+    const d=clDue(x);
+    return `<div class="cl">
+      <textarea class="grow" rows="1" placeholder="Что делаем"
+        oninput="hs().clean[${i}].t=this.value; autoGrow(this); house.queue()">${esc(x.t||'')}</textarea>
+      <span class="every">каждые <input type="number" min="1" max="365" value="${x.every||7}"
+        onchange="hs().clean[${i}].every=Math.max(1,+this.value||7); house.queue(); renderClean()"> дн</span>
+      <span class="due${d.now?' now':''}">${d.txt}</span>
+      <button class="btn quiet tiny did" onclick="clDid(${i})">Сделала</button>
+      <button class="rm" style="opacity:1" onclick="clRemove(${i})">${icon('x',12)}</button>
+    </div>`;}).join('') : '<div class="empty">Пылесосить, полить цветы, помыть окна…</div>';
+  growAll($('cleanBox'));
+}
+function clAdd(){ (hs().clean=hs().clean||[]).push({t:'',every:7,last:''}); renderClean(); focusIn($('cleanBox'),hs().clean.length-1); house.queue(); }
+function clRemove(i){ hs().clean.splice(i,1); renderClean(); house.queue(); }
+function clDid(i){ hs().clean[i].last=today(); renderClean(); house.queue(); toast('Отмечено'); }
+
+/* ---- простые списки ---- */
+function renderList(key, boxId, metaId, placeholder){
+  const l=hs()[key]||(hs()[key]=[]);
+  const live=l.filter(x=>(x.t||'').trim()), done=live.filter(x=>x.d).length;
+  if($(metaId)) $(metaId).textContent=live.length?done+' / '+live.length:'';
+  $(boxId).innerHTML=
+    (l.length?l.map((x,i)=>`<div class="task${x.d?' done':''}">
+        <button class="tick${x.d?' on':''}" onclick="hsToggle('${key}',${i})">${icon('check',10)}</button>
+        <textarea class="tx grow" rows="1" placeholder="${placeholder}"
+          oninput="hs().${key}[${i}].t=this.value; autoGrow(this); house.queue()"
+          onkeydown="hsKey(event,'${key}',${i})">${esc(x.t)}</textarea>
+        <button class="rm" onclick="hsRemove('${key}',${i})">${icon('x',12)}</button>
+      </div>`).join('') : `<div class="empty">${placeholder}</div>`)+
+    `<div class="acts">
+      <button class="btn quiet tiny" onclick="hsAdd('${key}')">${icon('plus',12)}Добавить</button>
+      ${done?`<button class="btn quiet tiny" onclick="hsClear('${key}')">${icon('trash',12)}Убрать сделанные</button>`:''}
+    </div>`;
+  growAll($(boxId));
+}
+const HS_BOX={shop:['shopBox','shMeta','Что купить'],chores:['choresBox','chMeta','Что сделать по дому'],repair:['repairBox','rpMeta','Что по ремонту']};
+function renderHsList(key){ const [b,m,p]=HS_BOX[key]; renderList(key,b,m,p); }
+function hsAdd(key){ (hs()[key]=hs()[key]||[]).push({t:'',d:false}); renderHsList(key); focusIn($(HS_BOX[key][0]),hs()[key].length-1); house.queue(); }
+function hsRemove(key,i){ hs()[key].splice(i,1); renderHsList(key); house.queue(); }
+function hsToggle(key,i){ hs()[key][i].d=!hs()[key][i].d; renderHsList(key); house.queue(); }
+function hsClear(key){
+  if(!confirm('Убрать отмеченные из списка?')) return;
+  hs()[key]=hs()[key].filter(x=>!x.d); renderHsList(key); house.queue();
+}
+function hsKey(ev,key,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); hs()[key].splice(i+1,0,{t:'',d:false}); renderHsList(key); focusIn($(HS_BOX[key][0]),i+1); }
+  else if(ev.key==='Backspace'&&!hs()[key][i].t){ ev.preventDefault(); hsRemove(key,i); focusIn($(HS_BOX[key][0]),Math.max(0,i-1)); }
+}
+
+/* ---- меню недели ---- */
+let mnMon=mondayOf(new Date());
+const MEALS=['Завтрак','Обед','Ужин'];
+function shiftMenu(n){ mnMon=new Date(mnMon.getFullYear(),mnMon.getMonth(),mnMon.getDate()+n*7); renderMenu(); }
+function menuToday(){ mnMon=mondayOf(new Date()); renderMenu(); }
+function menuWeek(){
+  const k=iso(mnMon), m=hs().menu||(hs().menu={});
+  return m[k]=m[k]||Array.from({length:7},()=>['','','']);
+}
+function renderMenu(){
+  const rows=menuWeek(), t=today();
+  $('mnLabel').textContent=weekLabel(mnMon);
+  const filled=rows.filter(r=>r.some(c=>(c||'').trim())).length;
+  $('mnMeta').textContent=filled?filled+' из 7 дней':'';
+  let html='<div class="menu-grid"><div></div>'+MEALS.map(m=>`<div class="menu-h">${m}</div>`).join('');
+  rows.forEach((r,i)=>{
+    const d=new Date(mnMon); d.setDate(d.getDate()+i);
+    html+=`<div class="menu-d${iso(d)===t?' today':''}">${WD[i]} ${d.getDate()}</div>`;
+    for(let j=0;j<3;j++) html+=`<textarea class="grow" rows="1" placeholder="${MEALS[j]}"
+        oninput="menuWeek()[${i}][${j}]=this.value; autoGrow(this); house.queue()">${esc(r[j]||'')}</textarea>`;
+  });
+  $('menuBox').innerHTML=html+'</div>';
+  growAll($('menuBox'));
+}
+
+/* ---- рецепты ---- */
+let recOpen=-1;
+function renderRecipes(){
+  const l=hs().rec||(hs().rec=[]);
+  $('rcMeta').textContent=l.length?l.length+' '+plural(l.length,'рецепт','рецепта','рецептов'):'';
+  $('recBox').innerHTML=l.length?l.map((r,i)=>`<div class="rec${i===recOpen?' open':''}">
+      <div class="rec-h">
+        <span class="chev" onclick="recToggle(${i})" style="cursor:pointer">${icon('right',14)}</span>
+        <textarea class="grow" rows="1" placeholder="Название"
+          oninput="hs().rec[${i}].n=this.value; autoGrow(this); house.queue()">${esc(r.n||'')}</textarea>
+        <button class="btn quiet tiny" onclick="recToShop(${i})" title="Ингредиенты в покупки">${icon('cart',13)}В покупки</button>
+        <button class="rm" style="opacity:1" onclick="recRemove(${i})">${icon('x',12)}</button>
+      </div>
+      <div class="rec-b">
+        <div class="f-row"><label>Ингредиенты — через запятую</label>
+          <textarea class="grow" rows="1" placeholder="спагетти, бекон, яйца"
+            oninput="hs().rec[${i}].ing=this.value; autoGrow(this); house.queue()">${esc(r.ing||'')}</textarea></div>
+        <div class="f-row"><label>Как готовить</label>
+          <textarea class="grow" rows="2" placeholder="Шаги"
+            oninput="hs().rec[${i}].steps=this.value; autoGrow(this); house.queue()">${esc(r.steps||'')}</textarea></div>
+      </div>
+    </div>`).join('') : '<div class="empty">Любимые рецепты под рукой</div>';
+  growAll($('recBox'));
+}
+function recAdd(){ (hs().rec=hs().rec||[]).push({n:'',ing:'',steps:''}); recOpen=hs().rec.length-1; renderRecipes(); house.queue(); }
+function recRemove(i){
+  if((hs().rec[i].n||'').trim() && !confirm('Удалить рецепт «'+hs().rec[i].n+'»?')) return;
+  hs().rec.splice(i,1); recOpen=-1; renderRecipes(); house.queue();
+}
+function recToggle(i){ recOpen = recOpen===i ? -1 : i; renderRecipes(); }
+function recToShop(i){
+  const items=(hs().rec[i].ing||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if(!items.length){ toast('Сначала впиши ингредиенты'); return; }
+  hs().shop=hs().shop||[];
+  const have=new Set(hs().shop.map(x=>(x.t||'').toLowerCase()));
+  let n=0;
+  items.forEach(t=>{ if(!have.has(t.toLowerCase())){ hs().shop.push({t,d:false}); n++; } });
+  renderHsList('shop'); house.queue();
+  toast(n?('В покупки: '+n):'Всё уже в списке');
+}
+
+function renderHouse(){
+  renderClean(); renderMenu(); renderRecipes();
+  renderHsList('shop'); renderHsList('chores'); renderHsList('repair');
+}
 
 /* =============== виджеты дашборда =============== */
 function renderYear(){
@@ -2777,11 +3096,13 @@ function setTab(name, silent){
   growAll();
   if(name==='planner') renderPlanner();
   if(name==='home') renderHome();
+  if(name==='house') renderHouse();
   if(typeof renderCal==='function' && $('cal')) renderCal();
 }
 
 /* =============== сворачивание =============== */
-const SECS={year:'secYear', focus:'secFocus', prio:'secPrio', mood:'secMood', quick:'secQuick',
+const SECS={clean:'secClean', menu:'secMenu', recipes:'secRecipes', chores:'secChores', repair:'secRepair',
+  year:'secYear', focus:'secFocus', prio:'secPrio', mood:'secMood', quick:'secQuick',
   planner:'secPlanner', inbox:'secInbox', habits:'secHabits',
   roadmap:'secRoadmap', projects:'secProjects', swot:'secSwot', entry:'secEntry', stats:'secStats'};
 function uiState(){ try{ return JSON.parse(localStorage.getItem(LS.ui)||'{}'); }catch(e){ return {}; } }
@@ -2851,7 +3172,7 @@ function signOut(){
 function exportAll(){
   const files=[];
   entries.forEach(e=>files.push([e.file, toMd(e)]));
-  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus'].forEach(k=>{
+  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house'].forEach(k=>{
     const st=ST[k];
     if(st && st.data && st.data.length) files.push([st.file(), st.md()]);
   });
@@ -3017,6 +3338,9 @@ function paintStaticIcons(){
   $('swDelBtn').innerHTML=icon('trash',13)+'Удалить';
   $('swNewBtn').innerHTML=icon('plus',12)+'Новый анализ';
   $('pjAddBtn').innerHTML=icon('plus',12)+'Новый проект';
+  $('clAddBtn').innerHTML=icon('plus',12)+'Добавить дело';
+  $('rcAddBtn').innerHTML=icon('plus',12)+'Новый рецепт';
+  $('mnPrev').innerHTML=icon('left',14); $('mnNext').innerHTML=icon('right',14);
   $('hbAddBtn').innerHTML=icon('plus',12)+'Новая привычка';
   $('wAddBtn').innerHTML=icon('plus',12)+'Новое желание';
   $('expBtn').innerHTML=icon('download',13)+'Скачать всё';
@@ -3030,15 +3354,15 @@ function paintStaticIcons(){
    ['hbPrev','left'],['hbNext','right'],['rmPrev','left'],['rmNext','right']]
     .forEach(([id,n])=>$(id).innerHTML=icon(n,14));
   ['plChev','inChev','hbChev','rmChev','pjChev','swChev','enChev','stChev',
-   'yrChev','fcChev','prChev','mdChev','qkChev']
+   'yrChev','fcChev','prChev','mdChev','qkChev','clChev','mnChev','rcChev','chChev','rpChev']
     .forEach(id=>$(id).innerHTML=icon('down',14));
   $('searchWrap').insertAdjacentHTML('afterbegin', icon('search',15));
 }
 
 async function bootSync(after){
   await pullAll();
-  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus']) await ST[k].pull();
-  pruneTasks(); renderSwotList(); renderHome();
+  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house']) await ST[k].pull();
+  pruneTasks(); renderSwotList(); renderHome(); renderHouse();
   const k=curKey(), prev=iso(new Date(parseISO(k).getTime()-7*86400000));
   await pullWeek(k); await pullWeek(prev);
   if(applyRepeats()) queuePl();
@@ -3061,7 +3385,7 @@ setInterval(syncPending, 60000);
 
 paintStaticIcons();
 loadLocal(); loadPlLocal();
-['tasks','inbox','habits','repeat','projects','wishes','swot','focus'].forEach(k=>ST[k].load());
+['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applySecs();
 const startTab = uiState().tab || 'home';     // запоминаем до newEntry, он уводит на «Дневник»
@@ -3069,7 +3393,7 @@ renderQuote(); renderInstall();
 newEntry();
 renderTabs();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
-pruneTasks(); renderHome();
+pruneTasks(); renderHome(); renderHouse();
 swLoadDraft(); swFill(); renderSwotList();
 applyRepeats(); renderPlanner();
 setTab(startTab, true);
