@@ -79,10 +79,12 @@ header.top{display:flex; align-items:center; gap:14px; padding:16px 0 14px; posi
 .btn.icon:hover{background:var(--fill2); color:var(--ink)}
 
 /* ---------- вкладки ---------- */
-.tabs{display:inline-flex; gap:2px; padding:2px; background:var(--fill); border-radius:10px; margin:6px 0 26px}
+.tabs{display:flex; gap:2px; padding:2px; background:var(--fill); border-radius:10px; margin:6px 0 26px;
+  max-width:100%; overflow-x:auto; scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
 .tabs button{display:inline-flex; align-items:center; justify-content:center; gap:7px;
-  padding:7px 16px; min-height:32px; border-radius:8px; font-size:13.5px; font-weight:500;
-  color:var(--ink2); transition:.18s; white-space:nowrap}
+  padding:7px 15px; min-height:32px; border-radius:8px; font-size:13.5px; font-weight:500;
+  color:var(--ink2); transition:.18s; white-space:nowrap; flex:0 0 auto}
 .tabs button:hover{color:var(--ink)}
 .tabs button.on{background:var(--card); color:var(--ink); font-weight:600;
   box-shadow:0 1px 3px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.04)}
@@ -96,6 +98,10 @@ body[data-tab="house"] [data-view="house"],
 body[data-tab="brain"] [data-view="brain"],
 body[data-tab="ideas"] [data-view="ideas"],
 body[data-tab="pets"] [data-view="pets"],
+body[data-tab="travel"] [data-view="travel"],
+body[data-tab="people"] [data-view="people"],
+body[data-tab="tools"] [data-view="tools"],
+body[data-tab="map"] [data-view="map"],
 body[data-tab="swot"] [data-view="swot"],
 body[data-tab="diary"] [data-view="diary"]{display:block}
 
@@ -274,6 +280,106 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .vet input[type=date]:focus{background:var(--fill); color:var(--ink)}
 .vet textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:14px;
   line-height:1.45; padding:0; resize:none; overflow:hidden; font-family:inherit}
+
+/* ---------- поездки и люди ---------- */
+.trip{border-bottom:.5px solid var(--sep); padding:13px 0}
+.trip:last-of-type{border-bottom:none}
+.trip-h{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.trip-h textarea{flex:1; min-width:130px; border:none; outline:none; background:none; font-size:15.5px;
+  font-weight:600; line-height:1.35; padding:0; resize:none; overflow:hidden; font-family:inherit}
+.trip-h .chev{color:var(--ink3); transition:transform .2s; flex:none; cursor:pointer}
+.trip.open .chev{transform:rotate(90deg)}
+.trip-when{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink3)}
+.trip-when input{border:none; background:var(--fill); border-radius:7px; outline:none; font-family:inherit;
+  font-size:12px; color:var(--ink2); padding:5px 8px; width:114px}
+.trip-when input:focus{color:var(--ink); box-shadow:0 0 0 2px var(--red-soft)}
+.trip-cd{font-size:12.5px; color:var(--ink2); white-space:nowrap}
+.trip-cd.soon{color:var(--red); font-weight:600}
+.trip-b{display:none; padding-top:12px}
+.trip.open .trip-b{display:block}
+.trip-b .sub{margin-top:18px}
+.trip-b .sub:first-child{margin-top:0}
+.money{display:flex; align-items:center; gap:8px}
+.money input{width:130px; border:none; background:var(--fill); border-radius:9px; outline:none;
+  font-family:inherit; font-size:15px; padding:9px 11px; text-align:right}
+.money input:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.money .u{font-size:13px; color:var(--ink3)}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+@media(max-width:920px){ .two{grid-template-columns:1fr} }
+.bigtext{width:100%; border:none; background:var(--fill); border-radius:10px; outline:none;
+  font-size:14.5px; line-height:1.55; padding:11px 13px; min-height:52px; resize:none; overflow:hidden; font-family:inherit}
+.bigtext:focus{box-shadow:0 0 0 2px var(--red-soft)}
+
+.soon-row{display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:.5px solid var(--sep)}
+.soon-row:last-of-type{border-bottom:none}
+.soon-row .ic{color:var(--red); flex:none}
+.soon-row b{font-size:14.5px; font-weight:600}
+.soon-row .w{font-size:12.5px; color:var(--ink2)}
+.soon-row .d{margin-left:auto; font-size:12.5px; color:var(--ink2); white-space:nowrap}
+.soon-row .d.hot{color:var(--red); font-weight:600}
+.age{font-size:12.5px; color:var(--ink3)}
+
+/* ---------- инструменты ---------- */
+.tl-pick{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px}
+.tl-desc{font-size:13.5px; color:var(--ink2); line-height:1.5; margin:0 0 18px}
+.tl-f+.tl-f{margin-top:18px}
+.tl-f label{display:block; font-size:12.5px; font-weight:600; color:var(--ink2); margin-bottom:7px}
+.tl-f textarea{width:100%; border:none; background:var(--fill); border-radius:10px; outline:none;
+  font-size:14.5px; line-height:1.55; padding:11px 13px; min-height:46px; resize:none; overflow:hidden; font-family:inherit}
+.tl-f textarea:focus{box-shadow:0 0 0 2px var(--red-soft)}
+.tl-li{display:flex; align-items:flex-start; gap:10px; padding:6px 0; border-bottom:.5px solid var(--sep2)}
+.tl-li:last-of-type{border-bottom:none}
+.tl-li .d{width:6px; height:6px; border-radius:50%; margin-top:9px; flex:none; background:var(--ink3)}
+.tl-li textarea{flex:1; min-width:0; border:none; outline:none; background:none; font-size:14.5px;
+  line-height:1.45; padding:2px 0; resize:none; overflow:hidden; font-family:inherit}
+.tl-add{font-size:13px; color:var(--red); margin-top:8px; min-height:26px; text-align:left}
+.tl-quad{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media(max-width:920px){ .tl-quad{grid-template-columns:1fr} }
+.tl-q{background:var(--wash); border-radius:12px; padding:14px 15px}
+.tl-q h4{margin:0 0 9px; font-size:13px; font-weight:600}
+.tl-q.urgent h4{color:var(--red)}
+.sc-row{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:.5px solid var(--sep2)}
+.sc-row:last-of-type{border-bottom:none}
+.sc-row textarea{width:130px; flex:none; border:none; outline:none; background:none; font-size:14px;
+  line-height:1.4; padding:0; resize:none; overflow:hidden; font-family:inherit}
+.sc-row input[type=range]{flex:1; min-width:80px; accent-color:var(--red)}
+.sc-row .v{width:26px; text-align:right; font-size:14px; font-weight:600; color:var(--ink2)}
+.wheel{display:block; margin:8px auto 16px; max-width:420px; width:100%}
+.wheel .grid-c{fill:none; stroke:var(--sep); stroke-width:1}
+.wheel .axis{stroke:var(--sep); stroke-width:1}
+.wheel .poly{fill:rgba(255,59,48,.18); stroke:var(--red); stroke-width:2; stroke-linejoin:round}
+.wheel .dot{fill:var(--red)}
+.wheel text{font-size:10.5px; fill:var(--ink2); font-family:inherit}
+
+/* ---------- карта идей ---------- */
+.mp-bar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
+.mp-hint{font-size:12.5px; color:var(--ink2)}
+.mp-hint b{color:var(--red)}
+.mp-wrap{position:relative; height:62vh; min-height:420px; overflow:hidden; border-radius:12px;
+  background:var(--wash); box-shadow:0 0 0 .5px var(--sep); touch-action:none; cursor:grab;
+  background-image:radial-gradient(var(--sep) 1px, transparent 1px); background-size:22px 22px}
+.mp-wrap.pan{cursor:grabbing}
+.mp-canvas{position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform}
+.mp-edges{position:absolute; left:0; top:0; overflow:visible; pointer-events:none}
+.mp-edges line{stroke:var(--dim); stroke-width:2}
+.mp-edges line.hot{stroke:var(--red)}
+.mp-node{position:absolute; width:172px; background:var(--card); border-radius:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.06); overflow:hidden}
+.mp-node.sel{box-shadow:0 2px 10px rgba(255,59,48,.22), 0 0 0 2px var(--red)}
+.mp-h{height:20px; display:flex; align-items:center; justify-content:center; gap:3px;
+  background:var(--fill); cursor:grab; touch-action:none}
+.mp-h i{width:3px; height:3px; border-radius:50%; background:var(--dim); display:block}
+.mp-node.sel .mp-h{background:var(--red-soft)}
+.mp-node textarea{width:100%; border:none; outline:none; background:none; font-family:inherit;
+  font-size:13.5px; line-height:1.4; padding:9px 11px; resize:none; overflow:hidden; display:block}
+.mp-node textarea::placeholder{color:var(--ink3)}
+.mp-zoom{position:absolute; right:10px; bottom:10px; display:flex; flex-direction:column; gap:6px; z-index:5}
+.mp-zoom button{width:34px; height:34px; border-radius:9px; background:rgba(255,255,255,.9);
+  backdrop-filter:blur(10px); box-shadow:0 1px 4px rgba(0,0,0,.12); display:grid; place-items:center;
+  font-size:17px; color:var(--ink2)}
+.mp-zoom button:hover{color:var(--red)}
+.mp-empty{position:absolute; inset:0; display:grid; place-items:center; text-align:center;
+  color:var(--ink3); font-size:14px; line-height:1.6; padding:20px; pointer-events:none}
 
 /* ---------- цитата ---------- */
 .quote{background:var(--card); border-radius:var(--r); padding:16px 18px; margin-bottom:26px;
@@ -1006,6 +1112,11 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
           <div id="shopBox"></div>
         </div>
 
+        <div data-view="tools">
+          <p class="sub">Сохранённое <span id="tlListMeta" class="mut"></span></p>
+          <div id="tlListBox"></div>
+        </div>
+
         <div data-view="swot">
           <p class="sub">Сохранённые <span id="swListMeta" class="mut"></span></p>
           <div id="swList"></div>
@@ -1131,6 +1242,11 @@ const I={
   print:'<path d="M7 9V3.5h10V9"/><path d="M3.5 9h17v7h-3.5v4.5h-10V16H3.5z"/>',
   arrow:'<path d="M4 12h15"/><path d="M13.5 6.5L20 12l-6.5 5.5"/>',
   dots:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+  graph:'<circle cx="6" cy="6.5" r="2.6"/><circle cx="18" cy="9" r="2.6"/><circle cx="9" cy="18" r="2.6"/><path d="M8.4 7.3l7.1 1.4M7.2 8.9l1.3 6.6M15.9 11l-5.2 5.2"/>',
+  link:'<path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.6-2.6a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.6 2.6a4 4 0 0 0 5.7 5.7l1.2-1.2"/>',
+  tools:'<path d="M14.5 6.5a3.8 3.8 0 0 0 5 5l-8 8a3.8 3.8 0 0 1-5-5z"/><path d="M17 4l3 3"/><path d="M4.5 19.5l3-3"/>',
+  plane:'<path d="M10.5 19.5l1.5-4.5 7.5-2.2a2 2 0 0 0-.6-3.9L12 9.7 9 4.5H6.8l1.7 5.8-3.5.6-1.6-2.2H2l1.3 3.6L2 15.9h1.4l1.6-2.2 3.5.6L6.8 20H9z"/>',
+  heart:'<path d="M12 20s-7.5-4.7-7.5-9.5A4 4 0 0 1 12 7.6 4 4 0 0 1 19.5 10.5C19.5 15.3 12 20 12 20z"/>',
   brain:'<path d="M9.5 4.2a2.8 2.8 0 0 0-2.8 2.8 2.9 2.9 0 0 0-1.7 5.2v3.3a3.4 3.4 0 0 0 5 3M14.5 4.2a2.8 2.8 0 0 1 2.8 2.8 2.9 2.9 0 0 1 1.7 5.2v3.3a3.4 3.4 0 0 1-5 3"/><path d="M12 4v16"/>',
   bulb:'<path d="M9.2 17.5h5.6M10.2 20.5h3.6"/><path d="M12 3.5a5.5 5.5 0 0 0-3.2 10c.5.4.8 1 .8 1.6h4.8c0-.6.3-1.2.8-1.6A5.5 5.5 0 0 0 12 3.5z"/>',
   paw:'<ellipse cx="12" cy="15.8" rx="4.2" ry="3.4"/><circle cx="6.3" cy="11" r="1.9"/><circle cx="17.7" cy="11" r="1.9"/><circle cx="9.3" cy="6.8" r="1.9"/><circle cx="14.7" cy="6.8" r="1.9"/>',
@@ -2499,7 +2615,11 @@ const MODULES=[
   {id:'house',   name:'Дом',      ic:'pot',  hint:'Уборка, меню, рецепты, покупки'},
   {id:'brain',   name:'Второй мозг', ic:'brain', hint:'Мысли, факты, цитаты, ссылки'},
   {id:'ideas',   name:'Идеи',     ic:'bulb', hint:'Стартапы, проекты, дизайн'},
+  {id:'map',     name:'Карта',    ic:'graph', hint:'Идеи, соединённые связями'},
   {id:'pets',    name:'Питомцы',  ic:'paw',  hint:'Прививки, вес, ветеринар'},
+  {id:'travel',  name:'Путешествия', ic:'plane', hint:'Страны, поездки, чемодан'},
+  {id:'people',  name:'Отношения', ic:'heart', hint:'Дни рождения, подарки, встречи'},
+  {id:'tools',   name:'Инструменты', ic:'tools', hint:'Колесо баланса, SMART, Ikigai и другие'},
   {id:'swot',    name:'SWOT',     ic:'quad', hint:'Анализ по квадрантам'},
   {id:'diary',   name:'Дневник',  ic:'book', hint:'Записи и статистика'}
 ];
@@ -2691,6 +2811,851 @@ function colAdd(id){
 }
 
 
+
+
+
+/* =============== карта идей =============== */
+let mpSel=null, mpLink=false, mpView={x:40,y:40,k:1};
+const mindmap=makeStore({
+  key:'map', label:'Карта', ls:'diary_map_v1', file:'map.md',
+  init:()=>({n:[], e:[]}),
+  toMd:d=>{
+    const out=['# Карта идей',''];
+    const nodes=(d.n||[]).filter(x=>(x.t||'').trim()||x.id);
+    if(nodes.length){ out.push('## Узлы','');
+      nodes.forEach(x=>out.push('- '+x.id+' | '+Math.round(x.x)+','+Math.round(x.y)+' | '+(x.t||'').replace(/\n/g,' ').trim()));
+      out.push(''); }
+    const ids=new Set(nodes.map(x=>x.id));
+    const es=(d.e||[]).filter(e=>ids.has(e.a)&&ids.has(e.b));
+    if(es.length){ out.push('## Связи','');
+      es.forEach(e=>out.push('- '+e.a+' → '+e.b)); out.push(''); }
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const d={n:[],e:[]}; let mode=null;
+    text.split(/\r?\n/).forEach(line=>{
+      const h2=line.match(/^##\s+(.*)$/);
+      if(h2){ const t=h2[1].trim(); mode = t==='Узлы'?'n' : (t==='Связи'?'e':null); return; }
+      if(mode==='n'){
+        const m=line.match(/^\s*-\s*(\S+)\s*\|\s*(-?\d+)\s*,\s*(-?\d+)\s*\|\s*(.*)$/);
+        if(m) d.n.push({id:m[1], x:+m[2], y:+m[3], t:m[4].trim()});
+      } else if(mode==='e'){
+        const m=line.match(/^\s*-\s*(\S+)\s*(?:→|->)\s*(\S+)\s*$/);
+        if(m) d.e.push({a:m[1], b:m[2]});
+      }
+    });
+    return d;
+  },
+  render:()=>renderMap()
+});
+const mp = () => mindmap.data;
+function mpNewId(){
+  let n=1; const used=new Set((mp().n||[]).map(x=>x.id));
+  while(used.has('n'+n)) n++;
+  return 'n'+n;
+}
+
+function mapViewHTML(){
+  return `<div data-view="map">
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Карта идей</h2><span class="meta" id="mpMeta"></span></div>
+      <div class="sec-b">
+        <div class="mp-bar">
+          <button class="btn tiny" onclick="mpAdd()">${icon('plus',13)}Узел</button>
+          <button class="btn quiet tiny" id="mpLinkBtn" onclick="mpStartLink()">${icon('link',13)}Связать</button>
+          <button class="btn quiet tiny" id="mpDelBtn" onclick="mpRemove()">${icon('trash',13)}Удалить</button>
+          <button class="btn quiet tiny" onclick="mpImport()">${icon('bulb',13)}Взять из идей</button>
+          <button class="btn quiet tiny sp" onclick="mpFit()">${icon('quad',13)}Показать всё</button>
+          <span class="mp-hint" id="mpHint"></span>
+        </div>
+        <div class="mp-wrap" id="mpWrap">
+          <div class="mp-canvas" id="mpCanvas">
+            <svg class="mp-edges" id="mpEdges" width="1" height="1"></svg>
+            <div id="mpNodes"></div>
+          </div>
+          <div class="mp-empty" id="mpEmpty"></div>
+          <div class="mp-zoom">
+            <button onclick="mpZoom(1.2)">+</button>
+            <button onclick="mpZoom(1/1.2)">−</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>`;
+}
+
+function mpApplyView(){
+  const c=$('mpCanvas');
+  if(c) c.style.transform=`translate(${mpView.x}px,${mpView.y}px) scale(${mpView.k})`;
+}
+function renderMap(){
+  if(!$('mpNodes')) return;
+  const d=mp(), nodes=d.n||[], edges=d.e||[];
+  $('mpMeta').textContent=nodes.length?nodes.length+' '+plural(nodes.length,'узел','узла','узлов')+
+    (edges.length?' · '+edges.length+' '+plural(edges.length,'связь','связи','связей'):''):'';
+  $('mpEmpty').innerHTML=nodes.length?'':'Пусто.<br>Нажми «Узел» или «Взять из идей»';
+  $('mpHint').innerHTML = mpLink ? 'Выбери <b>второй узел</b> для связи'
+    : (mpSel ? 'Узел выбран — можно связать или удалить' : 'Перетаскивай за полоску сверху, холст двигается мышью');
+  $('mpLinkBtn').className='btn quiet tiny'+(mpLink?' on':'');
+  $('mpNodes').innerHTML=nodes.map((x,i)=>`<div class="mp-node${mpSel===x.id?' sel':''}" data-id="${x.id}"
+      style="left:${x.x}px; top:${x.y}px">
+      <div class="mp-h" data-drag="${x.id}"><i></i><i></i><i></i></div>
+      <textarea class="grow" rows="1" placeholder="Идея"
+        oninput="mpSetText('${x.id}',this.value); autoGrow(this); mpEdges()"
+        onfocus="mpPick('${x.id}')">${esc(x.t||'')}</textarea>
+    </div>`).join('');
+  growAll($('mpNodes'));
+  mpApplyView(); mpEdges();
+}
+function mpSetText(id,v){ const n=(mp().n||[]).find(x=>x.id===id); if(n){ n.t=v; mindmap.queue(); } }
+function mpEdges(){
+  const svg=$('mpEdges'); if(!svg) return;
+  const box={}, host=$('mpNodes');
+  [...host.children].forEach(el=>{ const id=el.dataset.id;
+    box[id]={x:parseFloat(el.style.left), y:parseFloat(el.style.top), w:el.offsetWidth, h:el.offsetHeight}; });
+  const c=id=>{ const b=box[id]; return b?[b.x+b.w/2, b.y+b.h/2]:null; };
+  let maxX=0, maxY=0;
+  Object.values(box).forEach(b=>{ maxX=Math.max(maxX,b.x+b.w); maxY=Math.max(maxY,b.y+b.h); });
+  svg.setAttribute('width', maxX+200); svg.setAttribute('height', maxY+200);
+  svg.innerHTML=(mp().e||[]).map(e=>{
+    const a=c(e.a), b=c(e.b); if(!a||!b) return '';
+    const hot = mpSel && (e.a===mpSel||e.b===mpSel);
+    return `<line class="${hot?'hot':''}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`;
+  }).join('');
+}
+function mpPick(id){
+  if(mpLink && mpSel && mpSel!==id){ mpConnect(mpSel,id); return; }
+  mpSel=id; mpLink=false; renderMap();
+}
+function mpConnect(a,b){
+  const e=mp().e||(mp().e=[]);
+  const has=e.some(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a));
+  if(has){ e.splice(e.findIndex(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a)),1); toast('Связь убрана'); }
+  else { e.push({a,b}); toast('Связано'); }
+  mpLink=false; mpSel=b; renderMap(); mindmap.queue();
+}
+function mpStartLink(){
+  if(!mpSel){ toast('Сначала выбери узел'); return; }
+  mpLink=!mpLink; renderMap();
+}
+function mpAdd(){
+  const w=$('mpWrap'), r=w.getBoundingClientRect();
+  const x=Math.round((r.width/2-mpView.x)/mpView.k-86), y=Math.round((r.height/2-mpView.y)/mpView.k-30);
+  const id=mpNewId();
+  (mp().n=mp().n||[]).push({id, x, y, t:''});
+  mpSel=id; mpLink=false; renderMap(); mindmap.queue();
+  const el=$('mpNodes').querySelector('[data-id="'+id+'"] textarea'); if(el) el.focus();
+}
+function mpRemove(){
+  if(!mpSel){ toast('Сначала выбери узел'); return; }
+  const n=(mp().n||[]).find(x=>x.id===mpSel);
+  if(n && (n.t||'').trim() && !confirm('Удалить узел «'+n.t.trim()+'» и его связи?')) return;
+  mp().n=(mp().n||[]).filter(x=>x.id!==mpSel);
+  mp().e=(mp().e||[]).filter(e=>e.a!==mpSel&&e.b!==mpSel);
+  mpSel=null; mpLink=false; renderMap(); mindmap.queue();
+}
+function mpImport(){
+  const have=new Set((mp().n||[]).map(x=>(x.t||'').trim().toLowerCase()));
+  const add=colData('ideas').filter(x=>(x.n||'').trim() && !have.has(x.n.trim().toLowerCase()));
+  if(!add.length){ toast('Все идеи уже на карте'); return; }
+  const start=(mp().n||[]).length;
+  add.forEach((x,i)=>{
+    const k=start+i, col=k%4, row=Math.floor(k/4);
+    (mp().n=mp().n||[]).push({id:mpNewId(), x:60+col*210, y:60+row*140, t:x.n.trim()});
+  });
+  renderMap(); mindmap.queue(); toast('Добавлено: '+add.length);
+}
+function mpZoom(f){
+  const w=$('mpWrap'), r=w.getBoundingClientRect();
+  const cx=r.width/2, cy=r.height/2;
+  const k=Math.max(0.3, Math.min(2.2, mpView.k*f));
+  mpView.x = cx-(cx-mpView.x)*(k/mpView.k);
+  mpView.y = cy-(cy-mpView.y)*(k/mpView.k);
+  mpView.k=k; mpApplyView();
+}
+function mpFit(){
+  const nodes=mp().n||[]; if(!nodes.length){ mpView={x:40,y:40,k:1}; mpApplyView(); return; }
+  const host=$('mpNodes'), r=$('mpWrap').getBoundingClientRect();
+  let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;
+  [...host.children].forEach(el=>{ const x=parseFloat(el.style.left), y=parseFloat(el.style.top);
+    x1=Math.min(x1,x); y1=Math.min(y1,y); x2=Math.max(x2,x+el.offsetWidth); y2=Math.max(y2,y+el.offsetHeight); });
+  const k=Math.max(0.3, Math.min(1.4, Math.min((r.width-60)/(x2-x1||1), (r.height-60)/(y2-y1||1))));
+  mpView.k=k;
+  mpView.x=(r.width-(x2-x1)*k)/2-x1*k;
+  mpView.y=(r.height-(y2-y1)*k)/2-y1*k;
+  mpApplyView();
+}
+
+function mpBind(){
+  const wrap=$('mpWrap'); if(!wrap||wrap._bound) return; wrap._bound=true;
+  let mode=null, id=null, sx=0, sy=0, ox=0, oy=0;
+  wrap.addEventListener('pointerdown', e=>{
+    const handle=e.target.closest('.mp-h');
+    const node=e.target.closest('.mp-node');
+    if(handle){
+      id=handle.dataset.drag; mode='node';
+      const n=(mp().n||[]).find(x=>x.id===id); if(!n) return;
+      ox=n.x; oy=n.y; sx=e.clientX; sy=e.clientY;
+      mpSel=id; mpLink=false; renderMap();
+      wrap.setPointerCapture(e.pointerId); e.preventDefault(); return;
+    }
+    if(node){ mpPick(node.dataset.id); return; }
+    mode='pan'; sx=e.clientX; sy=e.clientY; ox=mpView.x; oy=mpView.y;
+    wrap.classList.add('pan'); wrap.setPointerCapture(e.pointerId);
+    if(mpSel){ mpSel=null; mpLink=false; renderMap(); }
+  });
+  wrap.addEventListener('pointermove', e=>{
+    if(!mode) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(mode==='pan'){ mpView.x=ox+dx; mpView.y=oy+dy; mpApplyView(); return; }
+    const n=(mp().n||[]).find(x=>x.id===id); if(!n) return;
+    n.x=Math.round(ox+dx/mpView.k); n.y=Math.round(oy+dy/mpView.k);
+    const el=$('mpNodes').querySelector('[data-id="'+id+'"]');
+    if(el){ el.style.left=n.x+'px'; el.style.top=n.y+'px'; }
+    mpEdges();
+  });
+  const end=()=>{ if(mode==='node') mindmap.queue(); mode=null; id=null; wrap.classList.remove('pan'); };
+  wrap.addEventListener('pointerup', end);
+  wrap.addEventListener('pointercancel', end);
+  wrap.addEventListener('wheel', e=>{ e.preventDefault(); mpZoom(e.deltaY<0?1.1:1/1.1); }, {passive:false});
+  wrap.addEventListener('dblclick', e=>{
+    if(e.target.closest('.mp-node')) return;
+    const r=wrap.getBoundingClientRect();
+    const x=Math.round((e.clientX-r.left-mpView.x)/mpView.k-86);
+    const y=Math.round((e.clientY-r.top-mpView.y)/mpView.k-30);
+    const nid=mpNewId(); (mp().n=mp().n||[]).push({id:nid,x,y,t:''});
+    mpSel=nid; renderMap(); mindmap.queue();
+    const el=$('mpNodes').querySelector('[data-id="'+nid+'"] textarea'); if(el) el.focus();
+  });
+}
+
+/* =============== инструменты =============== */
+const TOOLS=[
+ {id:'wheel', name:'Колесо баланса', wheel:true,
+  desc:'Оцени каждую сферу от 1 до 10 — увидишь, где просело.',
+  f:[{k:'sp', t:'scale', l:'Сферы жизни',
+      def:['Здоровье','Отношения','Работа','Деньги','Развитие','Отдых','Дом','Творчество']},
+     {k:'note', t:'text', l:'Что бросается в глаза', ph:'Какая сфера просит внимания'}]},
+ {id:'smart', name:'SMART',
+  desc:'Превращает расплывчатое «хочу» в цель, которую видно.',
+  f:[{k:'s', t:'text', l:'Конкретно — что именно', ph:'Не «похудеть», а «бегать 3 раза в неделю»'},
+     {k:'m', t:'text', l:'Измеримо — как пойму, что достигла', ph:'Цифра или факт'},
+     {k:'a', t:'text', l:'Достижимо — что для этого есть', ph:'Время, деньги, навыки'},
+     {k:'r', t:'text', l:'Важно — зачем мне это', ph:'Как связано с тем, что мне дорого'},
+     {k:'t', t:'text', l:'Срок — к какому числу', ph:'Дата'}]},
+ {id:'ikigai', name:'Ikigai',
+  desc:'Четыре круга: любовь, умение, польза и деньги. Смысл там, где они пересекаются.',
+  f:[{k:'love', t:'list', l:'Что я люблю'},
+     {k:'good', t:'list', l:'В чём я хороша'},
+     {k:'need', t:'list', l:'Что нужно миру'},
+     {k:'pay',  t:'list', l:'За что платят'},
+     {k:'sum',  t:'text', l:'Что получается на пересечении', ph:'Одной фразой'}]},
+ {id:'eisen', name:'Матрица Эйзенхауэра',
+  desc:'Разложи дела по срочности и важности — видно, что делать, а что не делать вовсе.',
+  f:[{k:'q', t:'quad', l:'', quads:[
+      {k:'a', t:'Срочно и важно', hint:'Делать сейчас', urgent:true},
+      {k:'b', t:'Важно, не срочно', hint:'Планировать'},
+      {k:'c', t:'Срочно, не важно', hint:'Делегировать', urgent:true},
+      {k:'d', t:'Ни то ни другое', hint:'Не делать'}]}]},
+ {id:'values', name:'Ценности',
+  desc:'Не список красивых слов, а то, по чему ты правда принимаешь решения.',
+  f:[{k:'v', t:'list', l:'Мои ценности'},
+     {k:'how', t:'text', l:'Как это проявляется в буднях', ph:'Конкретные поступки, а не намерения'}]},
+ {id:'anti', name:'Анти-цели',
+  desc:'Чего точно не хочу. Иногда полезнее, чем список желаний.',
+  f:[{k:'no', t:'list', l:'Чего я не хочу в своей жизни'},
+     {k:'why', t:'text', l:'Что сделаю, чтобы этого не случилось'}]},
+ {id:'audit', name:'Life Audit',
+  desc:'Честный обзор: где сейчас, чем доволен, что менять.',
+  f:[{k:'sp', t:'scale', l:'Оценка по сферам',
+      def:['Здоровье','Отношения','Работа','Финансы','Дом','Развитие']},
+     {k:'keep', t:'list', l:'Что оставить как есть'},
+     {k:'stop', t:'list', l:'Что перестать делать'},
+     {k:'start', t:'list', l:'Что начать'}]},
+ {id:'decision', name:'Decision Journal',
+  desc:'Записывай решения до того, как узнаешь результат. Через время — сверяйся.',
+  f:[{k:'what', t:'text', l:'Какое решение принимаю'},
+     {k:'ctx',  t:'text', l:'Что происходит вокруг', ph:'Обстоятельства, давление, сроки'},
+     {k:'opt',  t:'list', l:'Какие были варианты'},
+     {k:'why',  t:'text', l:'Что выбрала и почему'},
+     {k:'exp',  t:'text', l:'Чего жду в результате'},
+     {k:'check',t:'text', l:'Когда проверю и по чему пойму', ph:'Дата и признак'},
+     {k:'real', t:'text', l:'Что вышло на самом деле', ph:'Заполнить потом'}]}
+];
+const toolOf = id => TOOLS.find(t=>t.id===id);
+let tlCur='wheel', tlIdx=-1, tlDraft=null;
+
+const tools=makeStore({
+  key:'tools', label:'Инструменты', ls:'diary_tools_v1', file:'tools.md', init:()=>[],
+  toMd:d=>{
+    const out=['# Инструменты',''];
+    d.forEach(e=>{
+      const T=toolOf(e.tool); if(!T) return;
+      out.push('## '+T.name+' · '+(e.dt||today())+' · '+((e.n||'').trim()||'Без названия'),'');
+      T.f.forEach(f=>{
+        const v=(e.v||{})[f.k];
+        if(f.t==='text'){ if((v||'').trim()) out.push('**'+f.l+':** '+String(v).trim(),''); }
+        else if(f.t==='list'){ const l=(v||[]).filter(x=>(x||'').trim());
+          if(l.length){ out.push('**'+f.l+':**',''); l.forEach(x=>out.push('- '+x.trim())); out.push(''); } }
+        else if(f.t==='scale'){ const l=(v||[]).filter(x=>(x.n||'').trim());
+          if(l.length){ out.push('**'+f.l+':**',''); l.forEach(x=>out.push('- '+x.n.trim()+': '+(x.v||0))); out.push(''); } }
+        else if(f.t==='quad'){ f.quads.forEach(q=>{ const l=((v||{})[q.k]||[]).filter(x=>(x||'').trim());
+          if(l.length){ out.push('**'+q.t+':**',''); l.forEach(x=>out.push('- '+x.trim())); out.push(''); } }); }
+      });
+    });
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const out=[]; let e=null, T=null, cur=null, curType=null, quadKey=null;
+    const byName={}; TOOLS.forEach(t=>byName[t.name]=t);
+    text.split(/\r?\n/).forEach(line=>{
+      const h2=line.match(/^##\s+(.*)$/);
+      if(h2){
+        const parts=h2[1].split('·').map(s=>s.trim());
+        T=byName[parts[0]]; cur=null;
+        if(!T){ e=null; return; }
+        e={tool:T.id, dt:/\d{4}-\d{2}-\d{2}/.test(parts[1]||'')?parts[1]:today(), n:parts[2]||'', v:{}};
+        out.push(e); return;
+      }
+      if(!e||!T) return;
+      const lb=line.match(/^\*\*(.+?):\*\*\s*(.*)$/);
+      if(lb){
+        const label=lb[1].trim(), rest=lb[2].trim();
+        const f=T.f.find(x=>x.l===label);
+        if(f){ cur=f; curType=f.t; quadKey=null;
+          if(f.t==='text') e.v[f.k]=rest;
+          else if(!e.v[f.k]) e.v[f.k]= f.t==='quad'?{}:[];
+          return; }
+        const qf=T.f.find(x=>x.t==='quad' && x.quads.some(q=>q.t===label));
+        if(qf){ cur=qf; curType='quad'; quadKey=qf.quads.find(q=>q.t===label).k;
+          e.v[qf.k]=e.v[qf.k]||{}; e.v[qf.k][quadKey]=[]; }
+        return;
+      }
+      const bl=line.match(/^\s*-\s+(.*)$/);
+      if(!bl||!cur) return;
+      if(curType==='list'){ e.v[cur.k].push(bl[1].trim()); }
+      else if(curType==='scale'){ const m=bl[1].match(/^(.*?):\s*(\d+)\s*$/);
+        if(m) e.v[cur.k].push({n:m[1].trim(), v:+m[2]}); }
+      else if(curType==='quad'&&quadKey){ e.v[cur.k][quadKey].push(bl[1].trim()); }
+    });
+    return out;
+  },
+  render:()=>renderToolList()
+});
+const tls = () => tools.data;
+
+function blankTool(id){
+  const T=toolOf(id), v={};
+  T.f.forEach(f=>{
+    if(f.t==='text') v[f.k]='';
+    else if(f.t==='list') v[f.k]=[''];
+    else if(f.t==='scale') v[f.k]=(f.def||[]).map(n=>({n, v:5}));
+    else if(f.t==='quad'){ v[f.k]={}; f.quads.forEach(q=>v[f.k][q.k]=['']); }
+  });
+  return {tool:id, dt:today(), n:'', v};
+}
+
+function toolsViewHTML(){
+  return `<div data-view="tools">
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Инструменты</h2><span class="meta" id="tlMeta"></span></div>
+      <div class="sec-b">
+        <div class="tl-pick" id="tlPick"></div>
+        <p class="tl-desc" id="tlDesc"></p>
+        <div id="tlNote"></div>
+        <div class="sw-meta">
+          <textarea class="sw-name grow" id="tlName" rows="1" placeholder="Название"
+            oninput="tlDraft.n=this.value; autoGrow(this); tlSaveDraft()"></textarea>
+          <input class="date-in" id="tlDate" type="date" onchange="tlDraft.dt=this.value; tlSaveDraft()">
+        </div>
+        <div id="tlForm"></div>
+        <div class="foot">
+          <button class="btn primary" onclick="tlSave()">${icon('check',14)}Сохранить</button>
+          <button class="btn quiet" onclick="tlDrop()">${icon('x',13)}Не сохранять</button>
+          <button class="btn quiet sp" id="tlDel" onclick="tlDelete()" style="display:none">${icon('trash',13)}Удалить</button>
+        </div>
+      </div>
+    </section>
+  </div>`;
+}
+
+function wheelSVG(items){
+  const list=items.filter(x=>(x.n||'').trim());
+  if(list.length<3) return '';
+  const W=400, H=330, CX=W/2, CY=H/2+4, R=112;
+  const pt=(i,r)=>{ const a=-Math.PI/2 + i*2*Math.PI/list.length;
+    return [CX+Math.cos(a)*r, CY+Math.sin(a)*r]; };
+  let g='';
+  [2,4,6,8,10].forEach(v=>{
+    const p=list.map((_,i)=>pt(i,R*v/10).map(n=>n.toFixed(1)).join(',')).join(' ');
+    g+=`<polygon class="grid-c" points="${p}"/>`;
+  });
+  list.forEach((_,i)=>{ const [x,y]=pt(i,R); g+=`<line class="axis" x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; });
+  const poly=list.map((x,i)=>pt(i,R*Math.max(0,Math.min(10,+x.v||0))/10).map(n=>n.toFixed(1)).join(',')).join(' ');
+  g+=`<polygon class="poly" points="${poly}"/>`;
+  list.forEach((x,i)=>{ const [px,py]=pt(i,R*Math.max(0,Math.min(10,+x.v||0))/10);
+    g+=`<circle class="dot" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3"/>`; });
+  list.forEach((x,i)=>{ const [lx,ly]=pt(i,R+22);
+    const anchor=Math.abs(lx-CX)<6?'middle':(lx>CX?'start':'end');
+    g+=`<text x="${lx.toFixed(1)}" y="${(ly+3).toFixed(1)}" text-anchor="${anchor}">${esc(x.n)} ${x.v||0}</text>`; });
+  return `<svg class="wheel" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+}
+
+function renderToolForm(){
+  const T=toolOf(tlCur), v=tlDraft.v;
+  let html='';
+  T.f.forEach((f,fi)=>{
+    if(f.t==='text'){
+      html+=`<div class="tl-f"><label>${f.l}</label>
+        <textarea class="grow" rows="1" placeholder="${f.ph||''}"
+          oninput="tlDraft.v['${f.k}']=this.value; autoGrow(this); tlSaveDraft()">${esc(v[f.k]||'')}</textarea></div>`;
+    } else if(f.t==='list'){
+      const l=v[f.k]||(v[f.k]=['']);
+      html+=`<div class="tl-f"><label>${f.l}</label>`+
+        l.map((x,i)=>`<div class="tl-li"><span class="d"></span>
+          <textarea class="grow" rows="1" placeholder="Пункт"
+            oninput="tlDraft.v['${f.k}'][${i}]=this.value; autoGrow(this); tlSaveDraft()"
+            onkeydown="tlListKey(event,'${f.k}',${i})">${esc(x)}</textarea>
+          <button class="rm" style="opacity:1" onclick="tlListDel('${f.k}',${i})">${icon('x',12)}</button></div>`).join('')+
+        `<button class="tl-add" onclick="tlListAdd('${f.k}')">+ пункт</button></div>`;
+    } else if(f.t==='scale'){
+      const l=v[f.k]||(v[f.k]=[]);
+      html+=`<div class="tl-f"><label>${f.l}</label>`+
+        (T.wheel?wheelSVG(l):'')+
+        l.map((x,i)=>`<div class="sc-row">
+          <textarea class="grow" rows="1" placeholder="Сфера"
+            oninput="tlDraft.v['${f.k}'][${i}].n=this.value; autoGrow(this); tlSaveDraft()">${esc(x.n||'')}</textarea>
+          <input type="range" min="0" max="10" value="${x.v||0}"
+            oninput="tlDraft.v['${f.k}'][${i}].v=+this.value; tlSaveDraft(); renderToolForm()">
+          <span class="v">${x.v||0}</span>
+          <button class="rm" style="opacity:1" onclick="tlScaleDel('${f.k}',${i})">${icon('x',12)}</button></div>`).join('')+
+        `<button class="tl-add" onclick="tlScaleAdd('${f.k}')">+ сфера</button></div>`;
+    } else if(f.t==='quad'){
+      const q=v[f.k]||(v[f.k]={});
+      html+=`<div class="tl-quad">`+f.quads.map(qq=>{
+        const l=q[qq.k]||(q[qq.k]=['']);
+        return `<div class="tl-q${qq.urgent?' urgent':''}"><h4>${qq.t}<br><span class="mut" style="font-weight:400;font-size:12px">${qq.hint}</span></h4>`+
+          l.map((x,i)=>`<div class="tl-li"><span class="d"></span>
+            <textarea class="grow" rows="1" placeholder="Дело"
+              oninput="tlDraft.v['${f.k}']['${qq.k}'][${i}]=this.value; autoGrow(this); tlSaveDraft()"
+              onkeydown="tlQuadKey(event,'${f.k}','${qq.k}',${i})">${esc(x)}</textarea>
+            <button class="rm" style="opacity:1" onclick="tlQuadDel('${f.k}','${qq.k}',${i})">${icon('x',12)}</button></div>`).join('')+
+          `<button class="tl-add" onclick="tlQuadAdd('${f.k}','${qq.k}')">+ дело</button></div>`;
+      }).join('')+`</div>`;
+    }
+  });
+  $('tlForm').innerHTML=html;
+  growAll($('tlForm'));
+}
+function tlListAdd(k){ tlDraft.v[k].push(''); tlSaveDraft(); renderToolForm(); }
+function tlListDel(k,i){ tlDraft.v[k].splice(i,1); if(!tlDraft.v[k].length) tlDraft.v[k]=['']; tlSaveDraft(); renderToolForm(); }
+function tlListKey(ev,k,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); tlDraft.v[k].splice(i+1,0,''); tlSaveDraft(); renderToolForm(); }
+  else if(ev.key==='Backspace'&&!tlDraft.v[k][i]&&tlDraft.v[k].length>1){ ev.preventDefault(); tlListDel(k,i); }
+}
+function tlQuadAdd(k,q){ tlDraft.v[k][q].push(''); tlSaveDraft(); renderToolForm(); }
+function tlQuadDel(k,q,i){ tlDraft.v[k][q].splice(i,1); if(!tlDraft.v[k][q].length) tlDraft.v[k][q]=['']; tlSaveDraft(); renderToolForm(); }
+function tlQuadKey(ev,k,q,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); tlDraft.v[k][q].splice(i+1,0,''); tlSaveDraft(); renderToolForm(); }
+  else if(ev.key==='Backspace'&&!tlDraft.v[k][q][i]&&tlDraft.v[k][q].length>1){ ev.preventDefault(); tlQuadDel(k,q,i); }
+}
+function tlScaleAdd(k){ tlDraft.v[k].push({n:'',v:5}); tlSaveDraft(); renderToolForm(); }
+function tlScaleDel(k,i){ tlDraft.v[k].splice(i,1); tlSaveDraft(); renderToolForm(); }
+
+const LS_TLD='diary_tools_draft_v1';
+function tlSaveDraft(){ try{ localStorage.setItem(LS_TLD, JSON.stringify({d:tlDraft,i:tlIdx,t:tlCur})); }catch(e){} }
+function tlLoadDraft(){
+  try{ const j=JSON.parse(localStorage.getItem(LS_TLD)||'null');
+    if(j&&j.d&&toolOf(j.t)){ tlDraft=j.d; tlIdx=typeof j.i==='number'?j.i:-1; tlCur=j.t; return true; } }catch(e){}
+  return false;
+}
+function tlClearDraft(){ try{ localStorage.removeItem(LS_TLD); }catch(e){} }
+
+const tlEmpty = d => !(d.n||'').trim() && JSON.stringify(d.v)===JSON.stringify(blankTool(d.tool).v);
+
+function renderTools(){
+  if(!$('tlPick')) return;
+  if(!tlDraft) tlDraft=blankTool(tlCur);
+  const T=toolOf(tlCur);
+  $('tlPick').innerHTML=TOOLS.map(t=>
+    `<button class="tag${t.id===tlCur?' on':''}" onclick="tlPick('${t.id}')">${t.name}</button>`).join('')+
+    `<button class="tag" onclick="setTab('swot')">SWOT ${icon('right',11)}</button>`;
+  $('tlDesc').textContent=T.desc;
+  $('tlName').value=tlDraft.n||''; autoGrow($('tlName'));
+  $('tlDate').value=tlDraft.dt||today();
+  $('tlDel').style.display=tlIdx>=0?'':'none';
+  $('tlNote').innerHTML = tlIdx>=0
+    ? '<div class="sw-note">Правишь сохранённое. <b>Сохранить</b> обновит его.</div>'
+    : (tlEmpty(tlDraft) ? '' : '<div class="sw-note">Это <b>черновик</b> — он живёт только на этом устройстве.</div>');
+  renderToolForm();
+  renderToolList();
+}
+function renderToolList(){
+  if(!$('tlListBox')) return;
+  const list=tls();
+  $('tlListMeta').textContent=list.length||'';
+  $('tlMeta') && ($('tlMeta').textContent=list.length?list.length+' '+plural(list.length,'запись','записи','записей'):'');
+  $('tlListBox').innerHTML=list.length?list.map((e,i)=>{
+    const T=toolOf(e.tool);
+    return `<button class="sw-item${i===tlIdx?' on':''}" onclick="tlOpen(${i})">
+      <span class="t">${icon('tools',14)}<span>${esc((e.n||'').trim()||'Без названия')}</span></span>
+      <span class="m">${T?T.name:e.tool} · ${e.dt?fmtDate(e.dt):''}</span></button>`;
+  }).join('') : '<div class="empty">Сохранённые разборы появятся здесь</div>';
+}
+function tlPick(id){
+  if(!tlEmpty(tlDraft) && tlIdx<0 && !confirm('Незаконченный черновик пропадёт. Перейти к другому инструменту?')) return;
+  tlCur=id; tlIdx=-1; tlDraft=blankTool(id); tlClearDraft(); renderTools();
+}
+function tlOpen(i){
+  if(!tlEmpty(tlDraft) && tlIdx<0 && !confirm('Незаконченный черновик пропадёт. Открыть сохранённое?')) return;
+  const e=tls()[i]; tlCur=e.tool; tlIdx=i;
+  tlDraft=JSON.parse(JSON.stringify(e)); tlSaveDraft(); setTab('tools'); renderTools();
+}
+function tlSave(){
+  const d=JSON.parse(JSON.stringify(tlDraft));
+  d.n=($('tlName').value||'').trim()||toolOf(tlCur).name;
+  d.dt=$('tlDate').value||today();
+  if(tlEmpty(d)&&!d.n){ toast('Заполни хотя бы одно поле'); return; }
+  if(tlIdx>=0) tls()[tlIdx]=d; else { tls().unshift(d); tlIdx=0; }
+  tlDraft=JSON.parse(JSON.stringify(d)); tlSaveDraft();
+  renderTools(); tools.queue(); toast('Сохранено');
+}
+function tlDrop(){
+  if(tlEmpty(tlDraft)&&tlIdx<0){ toast('И так пусто'); return; }
+  if(!confirm(tlIdx>=0?'Закрыть без изменений?':'Стереть черновик? Он нигде не сохранён.')) return;
+  tlIdx=-1; tlDraft=blankTool(tlCur); tlClearDraft(); renderTools();
+}
+function tlDelete(){
+  if(tlIdx<0) return;
+  if(!confirm('Удалить «'+(tls()[tlIdx].n||'')+'» навсегда?')) return;
+  tls().splice(tlIdx,1); tlIdx=-1; tlDraft=blankTool(tlCur); tlClearDraft();
+  renderTools(); tools.queue(); toast('Удалено');
+}
+
+/* =============== путешествия =============== */
+let tripOpen=-1;
+const travel=makeStore({
+  key:'travel', label:'Путешествия', ls:'diary_travel_v1', file:'travel.md',
+  init:()=>({wish:[], trips:[]}),
+  toMd:d=>{
+    const out=['# Путешествия',''];
+    const w=(d.wish||[]).filter(x=>(x.t||'').trim());
+    if(w.length){ out.push('## Хочу побывать','');
+      w.forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+x.t.trim())); out.push(''); }
+    (d.trips||[]).filter(t=>(t.n||'').trim()).forEach(t=>{
+      out.push('## Поездка: '+t.n.trim(),'');
+      if(t.from||t.to) out.push('Даты: '+(t.from||'…')+' — '+(t.to||'…'));
+      if((t.budget||'').trim()) out.push('Бюджет: '+t.budget.trim());
+      if(t.from||t.to||(t.budget||'').trim()) out.push('');
+      if((t.route||'').trim()) out.push('### Маршрут','',t.route.trim(),'');
+      [['docs','Документы'],['bag','Чемодан']].forEach(([k,name])=>{
+        const l=(t[k]||[]).filter(x=>(x.t||'').trim());
+        if(!l.length) return;
+        out.push('### '+name,'');
+        l.forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+x.t.trim()));
+        out.push('');
+      });
+    });
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const d={wish:[],trips:[]}; let mode=null, trip=null;
+    text.split(/\r?\n/).forEach(line=>{
+      const h2=line.match(/^##\s+(?!#)(.*)$/);
+      if(h2){ const t=h2[1].trim();
+        const tp=t.match(/^Поездка:\s*(.*)$/);
+        if(tp){ trip={n:tp[1].trim(),from:'',to:'',budget:'',route:'',docs:[],bag:[]}; d.trips.push(trip); mode='trip'; }
+        else { mode = t==='Хочу побывать' ? 'wish' : null; trip=null; }
+        return; }
+      const h3=line.match(/^###\s+(.*)$/);
+      if(h3 && trip){ const n=h3[1].trim();
+        mode = n==='Маршрут'?'route' : n==='Документы'?'docs' : n==='Чемодан'?'bag' : 'trip';
+        return; }
+      if(mode==='wish'){ const c=parseCheck(line); if(c) d.wish.push({t:c[2].trim(), d:c[1].toLowerCase()==='x'}); return; }
+      if(!trip) return;
+      const dt=line.match(/^Даты:\s*(\S*)\s*—\s*(\S*)\s*$/);
+      if(dt){ trip.from=/\d{4}-\d{2}-\d{2}/.test(dt[1])?dt[1]:''; trip.to=/\d{4}-\d{2}-\d{2}/.test(dt[2])?dt[2]:''; return; }
+      const bg=line.match(/^Бюджет:\s*(.*)$/);
+      if(bg){ trip.budget=bg[1].trim(); return; }
+      if(mode==='route'){ if(line.trim()||trip.route) trip.route=(trip.route?trip.route+'\n':'')+line; return; }
+      if(mode==='docs'||mode==='bag'){ const c=parseCheck(line); if(c) trip[mode].push({t:c[2].trim(), d:c[1].toLowerCase()==='x'}); }
+    });
+    d.trips.forEach(t=>t.route=(t.route||'').trim());
+    return d;
+  },
+  render:()=>renderTravel()
+});
+const tv = () => travel.data;
+
+function travelViewHTML(){
+  return `<div data-view="travel">
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Хочу побывать</h2><span class="meta" id="wsMeta"></span></div>
+      <div class="sec-b"><div id="wishlistBox"></div></div>
+    </section>
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Поездки</h2><span class="meta" id="trMeta"></span></div>
+      <div class="sec-b">
+        <div id="tripBox"></div>
+        <div class="acts"><button class="btn quiet tiny" onclick="tripAdd()">${icon('plus',12)}Новая поездка</button></div>
+      </div>
+    </section>
+  </div>`;
+}
+function countdown(from){
+  if(!from) return null;
+  const n=-daysSince(from);
+  if(n>0) return {txt:'через '+n+' '+plural(n,'день','дня','дней'), soon:n<=14};
+  if(n===0) return {txt:'сегодня', soon:true};
+  return null;
+}
+function renderTravel(){
+  if(!$('wishlistBox')) return;
+  const w=tv().wish||(tv().wish=[]);
+  const been=w.filter(x=>x.d).length;
+  $('wsMeta').textContent=w.length?been+' из '+w.length+' уже была':'';
+  $('wishlistBox').innerHTML=
+    (w.length?w.map((x,i)=>`<div class="task${x.d?' done':''}">
+        <button class="tick${x.d?' on':''}" onclick="tv().wish[${i}].d=!tv().wish[${i}].d; renderTravel(); travel.queue()">${icon('check',10)}</button>
+        <textarea class="tx grow" rows="1" placeholder="Страна или город"
+          oninput="tv().wish[${i}].t=this.value; autoGrow(this); travel.queue()"
+          onkeydown="wsKey(event,${i})">${esc(x.t)}</textarea>
+        <button class="rm" onclick="tv().wish.splice(${i},1); renderTravel(); travel.queue()">${icon('x',12)}</button>
+      </div>`).join('') : '<div class="empty">Куда однажды хочется попасть</div>')+
+    `<div class="acts"><button class="btn quiet tiny" onclick="wsAdd()">${icon('plus',12)}Добавить</button></div>`;
+
+  const tr=tv().trips||(tv().trips=[]);
+  const next=tr.map(t=>countdown(t.from)).filter(Boolean).length;
+  $('trMeta').textContent=tr.length?(next?next+' впереди':tr.length+' '+plural(tr.length,'поездка','поездки','поездок')):'';
+  $('tripBox').innerHTML=tr.length?tr.map((t,i)=>{
+    const cd=countdown(t.from);
+    return `<div class="trip${i===tripOpen?' open':''}">
+      <div class="trip-h">
+        <span class="chev" onclick="tripToggle(${i})">${icon('right',14)}</span>
+        <textarea class="grow" rows="1" placeholder="Куда едем"
+          oninput="tv().trips[${i}].n=this.value; autoGrow(this); travel.queue()">${esc(t.n||'')}</textarea>
+        <span class="trip-when">
+          <input type="date" value="${t.from||''}" onchange="tv().trips[${i}].from=this.value; travel.queue(); renderTravel()">—
+          <input type="date" value="${t.to||''}" onchange="tv().trips[${i}].to=this.value; travel.queue(); renderTravel()">
+        </span>
+        ${cd?`<span class="trip-cd${cd.soon?' soon':''}">${cd.txt}</span>`:''}
+        <button class="rm" style="opacity:1" onclick="tripRemove(${i})">${icon('x',12)}</button>
+      </div>
+      <div class="trip-b">
+        <div class="two">
+          <div><p class="sub">Бюджет</p>
+            <span class="money"><input value="${esc(t.budget||'')}" inputmode="decimal" placeholder="0"
+              oninput="tv().trips[${i}].budget=this.value; travel.queue()"><span class="u">на поездку</span></span></div>
+          <div><p class="sub">Маршрут</p>
+            <textarea class="bigtext grow" rows="2" placeholder="Города, даты, перелёты"
+              oninput="tv().trips[${i}].route=this.value; autoGrow(this); travel.queue()">${esc(t.route||'')}</textarea></div>
+        </div>
+        <div class="two">
+          <div><p class="sub">Документы</p>${tripList(i,'docs','Паспорт, страховка, билеты')}</div>
+          <div><p class="sub">Чемодан</p>${tripList(i,'bag','Что взять')}</div>
+        </div>
+      </div>
+    </div>`;}).join('') : '<div class="empty">Ни одной поездки не запланировано</div>';
+  growAll($('wishlistBox')); growAll($('tripBox'));
+}
+function tripList(i,key,ph){
+  const l=(tv().trips[i][key]=tv().trips[i][key]||[]);
+  return (l.length?l.map((x,j)=>`<div class="task${x.d?' done':''}">
+      <button class="tick${x.d?' on':''}" onclick="tripItemToggle(${i},'${key}',${j})">${icon('check',10)}</button>
+      <textarea class="tx grow" rows="1" placeholder="${ph}"
+        oninput="tv().trips[${i}].${key}[${j}].t=this.value; autoGrow(this); travel.queue()"
+        onkeydown="tripItemKey(event,${i},'${key}',${j})">${esc(x.t)}</textarea>
+      <button class="rm" onclick="tv().trips[${i}].${key}.splice(${j},1); renderTravel(); travel.queue()">${icon('x',12)}</button>
+    </div>`).join('') : `<div class="empty">${ph}</div>`)+
+    `<div class="acts"><button class="btn quiet tiny" onclick="tripItemAdd(${i},'${key}')">${icon('plus',12)}Добавить</button></div>`;
+}
+function wsAdd(){ tv().wish.push({t:'',d:false}); renderTravel(); focusIn($('wishlistBox'),tv().wish.length-1); travel.queue(); }
+function wsKey(ev,i){
+  if(ev.key==='Enter'){ ev.preventDefault(); tv().wish.splice(i+1,0,{t:'',d:false}); renderTravel(); focusIn($('wishlistBox'),i+1); }
+  else if(ev.key==='Backspace'&&!tv().wish[i].t){ ev.preventDefault(); tv().wish.splice(i,1); renderTravel(); travel.queue(); focusIn($('wishlistBox'),Math.max(0,i-1)); }
+}
+function tripAdd(){ tv().trips.push({n:'',from:'',to:'',budget:'',route:'',docs:[],bag:[]}); tripOpen=tv().trips.length-1; renderTravel(); travel.queue();
+  const t=$('tripBox').querySelector('textarea'); if(t) t.focus(); }
+function tripToggle(i){ tripOpen = tripOpen===i ? -1 : i; renderTravel(); }
+function tripRemove(i){
+  if((tv().trips[i].n||'').trim() && !confirm('Удалить поездку «'+tv().trips[i].n+'»?')) return;
+  tv().trips.splice(i,1); tripOpen=-1; renderTravel(); travel.queue();
+}
+function tripItemAdd(i,key){ tv().trips[i][key].push({t:'',d:false}); renderTravel(); travel.queue(); }
+function tripItemToggle(i,key,j){ tv().trips[i][key][j].d=!tv().trips[i][key][j].d; renderTravel(); travel.queue(); }
+function tripItemKey(ev,i,key,j){
+  if(ev.key==='Enter'){ ev.preventDefault(); tv().trips[i][key].splice(j+1,0,{t:'',d:false}); renderTravel(); travel.queue(); }
+  else if(ev.key==='Backspace'&&!tv().trips[i][key][j].t){ ev.preventDefault(); tv().trips[i][key].splice(j,1); renderTravel(); travel.queue(); }
+}
+
+
+/* =============== отношения =============== */
+let personIdx=0;
+const people=makeStore({
+  key:'people', label:'Отношения', ls:'diary_people_v1', file:'people.md', init:()=>[],
+  toMd:d=>{
+    const out=['# Отношения',''];
+    d.filter(p=>(p.n||'').trim()).forEach(p=>{
+      out.push('## '+p.n.trim(),'');
+      if((p.bd||'').trim())   out.push('День рождения: '+p.bd.trim());
+      if((p.note||'').trim()) out.push('Заметка: '+p.note.trim());
+      if((p.bd||'').trim()||(p.note||'').trim()) out.push('');
+      const g=(p.gifts||[]).filter(x=>(x.t||'').trim());
+      if(g.length){ out.push('### Идеи подарков','');
+        g.forEach(x=>out.push('- ['+(x.d?'x':' ')+'] '+x.t.trim())); out.push(''); }
+      const dt=(p.dates||[]).filter(x=>(x.t||'').trim());
+      if(dt.length){ out.push('### Важные даты','');
+        dt.forEach(x=>out.push('- '+(x.dt?x.dt+' · ':'')+x.t.trim())); out.push(''); }
+      const m=(p.meets||[]).filter(x=>(x.t||'').trim());
+      if(m.length){ out.push('### Встречи','');
+        m.forEach(x=>out.push('- '+(x.dt?x.dt+' · ':'')+x.t.trim())); out.push(''); }
+    });
+    return out.join('\n');
+  },
+  fromMd:text=>{
+    const out=[]; let p=null, sec=null;
+    const names={'Идеи подарков':'gifts','Важные даты':'dates','Встречи':'meets'};
+    text.split(/\r?\n/).forEach(line=>{
+      const h2=line.match(/^##\s+(?!#)(.*)$/);
+      if(h2){ p={n:h2[1].trim(),bd:'',note:'',gifts:[],dates:[],meets:[]}; out.push(p); sec=null; return; }
+      if(!p) return;
+      const h3=line.match(/^###\s+(.*)$/);
+      if(h3){ sec=names[h3[1].trim()]||null; return; }
+      const kv=line.match(/^(День рождения|Заметка):\s*(.*)$/);
+      if(kv){ p[kv[1]==='Заметка'?'note':'bd']=kv[2].trim(); return; }
+      if(sec==='gifts'){ const c=parseCheck(line); if(c) p.gifts.push({t:c[2].trim(), d:c[1].toLowerCase()==='x'}); return; }
+      if(sec==='dates'||sec==='meets'){
+        const m=line.match(/^\s*-\s*(?:(\d{4}-\d{2}-\d{2})\s*·\s*)?(.*)$/);
+        if(m && m[2].trim()) p[sec].push({dt:m[1]||'', t:m[2].trim()});
+      }
+    });
+    return out;
+  },
+  render:()=>renderPeople()
+});
+const pp = () => people.data;
+const curPerson = () => pp()[personIdx];
+
+/* сколько дней до ближайшего повторения даты */
+function untilAnnual(dt){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dt)) return null;
+  const now=parseISO(today());
+  let next=new Date(now.getFullYear(), +dt.slice(5,7)-1, +dt.slice(8,10), 12);
+  if(next<now) next=new Date(now.getFullYear()+1, +dt.slice(5,7)-1, +dt.slice(8,10), 12);
+  return Math.round((next-now)/86400000);
+}
+const ageOn = dt => {
+  const y=+dt.slice(0,4); if(!y || y<1900) return null;
+  const n=untilAnnual(dt), now=parseISO(today());
+  const next=new Date(now.getTime()+n*86400000);
+  return next.getFullYear()-y;
+};
+function upcoming(days){
+  const out=[];
+  pp().forEach((p,i)=>{
+    if((p.bd||'').trim()){ const n=untilAnnual(p.bd);
+      if(n!==null && n<=days) out.push({i, who:p.n||'Без имени', what:'День рождения', n, age:ageOn(p.bd)}); }
+    (p.dates||[]).forEach(x=>{ if(!x.dt) return; const n=untilAnnual(x.dt);
+      if(n!==null && n<=days) out.push({i, who:p.n||'Без имени', what:x.t, n, age:null}); });
+  });
+  return out.sort((a,b)=>a.n-b.n);
+}
+
+function peopleViewHTML(){
+  return `<div data-view="people">
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Ближайшие даты</h2><span class="meta" id="soonMeta"></span></div>
+      <div class="sec-b"><div id="soonBox"></div></div>
+    </section>
+    <section class="sec">
+      <div class="sec-h" style="cursor:default"><h2>Люди</h2><span class="meta" id="ppMeta"></span></div>
+      <div class="sec-b">
+        <div class="col-bar" id="personBar"></div>
+        <div id="personBox"></div>
+      </div>
+    </section>
+  </div>`;
+}
+function renderSoon(){
+  const list=upcoming(60);
+  $('soonMeta').textContent=list.length?list.length+' в ближайшие 2 месяца':'';
+  $('soonBox').innerHTML=list.length?list.map(x=>`<div class="soon-row">
+      ${icon(x.what==='День рождения'?'heart':'star',16)}
+      <span><b>${esc(x.who)}</b> <span class="w">· ${esc(x.what)}</span>
+        ${x.age?`<span class="age"> · исполнится ${x.age}</span>`:''}</span>
+      <span class="d${x.n<=7?' hot':''}">${x.n===0?'сегодня':(x.n===1?'завтра':'через '+x.n+' '+plural(x.n,'день','дня','дней'))}</span>
+    </div>`).join('') : '<div class="empty">Дни рождения и важные даты появятся здесь за два месяца</div>';
+}
+function renderPeople(){
+  if(!$('personBox')) return;
+  renderSoon();
+  const list=pp();
+  if(personIdx>=list.length) personIdx=Math.max(0,list.length-1);
+  $('ppMeta').textContent=list.length?list.length+' '+plural(list.length,'человек','человека','человек'):'';
+  $('personBar').innerHTML=list.map((p,i)=>
+    `<button class="tag${i===personIdx?' on':''}" onclick="personSel(${i})">${esc((p.n||'').trim()||'Без имени')}</button>`).join('')+
+    `<button class="tag" onclick="personAdd()">${icon('plus',12)} человек</button>`;
+  if(!list.length){ $('personBox').innerHTML='<div class="empty">Добавь человека — появятся подарки, встречи и даты</div>'; return; }
+
+  const p=curPerson(), bdIn=untilAnnual(p.bd);
+  $('personBox').innerHTML=`
+    <div class="two">
+      <div><p class="sub">Имя</p><textarea class="bigtext grow" rows="1" placeholder="Кто это"
+        oninput="curPerson().n=this.value; autoGrow(this); people.queue(); renderPeople()">${esc(p.n||'')}</textarea></div>
+      <div><p class="sub">День рождения${bdIn!==null?` · через ${bdIn} ${plural(bdIn,'день','дня','дней')}`:''}</p>
+        <span class="trip-when"><input type="date" value="${p.bd||''}" style="width:150px"
+          onchange="curPerson().bd=this.value; people.queue(); renderPeople()"></span></div>
+    </div>
+    <div class="two" style="grid-template-columns:1fr; margin-top:14px">
+      <div><p class="sub">Заметка</p><textarea class="bigtext grow" rows="1" placeholder="Что любит, размер, что дарила"
+        oninput="curPerson().note=this.value; autoGrow(this); people.queue()">${esc(p.note||'')}</textarea></div>
+    </div>
+
+    <p class="sub" style="margin-top:22px">Идеи подарков</p>
+    ${(p.gifts||[]).length?(p.gifts||[]).map((x,i)=>`<div class="task${x.d?' done':''}">
+        <button class="tick${x.d?' on':''}" onclick="curPerson().gifts[${i}].d=!curPerson().gifts[${i}].d; renderPeople(); people.queue()">${icon('check',10)}</button>
+        <textarea class="tx grow" rows="1" placeholder="Что подарить"
+          oninput="curPerson().gifts[${i}].t=this.value; autoGrow(this); people.queue()">${esc(x.t)}</textarea>
+        <button class="rm" onclick="curPerson().gifts.splice(${i},1); renderPeople(); people.queue()">${icon('x',12)}</button>
+      </div>`).join('') : '<div class="empty">Записывай, когда услышишь намёк</div>'}
+    <div class="acts"><button class="btn quiet tiny" onclick="ppAdd('gifts')">${icon('plus',12)}Идея</button></div>
+
+    <p class="sub" style="margin-top:22px">Важные даты</p>
+    ${(p.dates||[]).length?(p.dates||[]).map((x,i)=>`<div class="vet">
+        <input type="date" value="${x.dt||''}" onchange="curPerson().dates[${i}].dt=this.value; people.queue(); renderPeople()">
+        <textarea class="grow" rows="1" placeholder="Годовщина, свадьба…"
+          oninput="curPerson().dates[${i}].t=this.value; autoGrow(this); people.queue()">${esc(x.t)}</textarea>
+        <button class="rm" style="opacity:1" onclick="curPerson().dates.splice(${i},1); renderPeople(); people.queue()">${icon('x',12)}</button>
+      </div>`).join('') : '<div class="empty">Даты, которые повторяются каждый год</div>'}
+    <div class="acts"><button class="btn quiet tiny" onclick="ppAdd('dates')">${icon('plus',12)}Дата</button></div>
+
+    <p class="sub" style="margin-top:22px">Встречи</p>
+    ${(p.meets||[]).length?(p.meets||[]).map((x,i)=>`<div class="vet">
+        <input type="date" value="${x.dt||''}" onchange="curPerson().meets[${i}].dt=this.value; people.queue(); renderPeople()">
+        <textarea class="grow" rows="1" placeholder="Где были, о чём говорили"
+          oninput="curPerson().meets[${i}].t=this.value; autoGrow(this); people.queue()">${esc(x.t)}</textarea>
+        <button class="rm" style="opacity:1" onclick="curPerson().meets.splice(${i},1); renderPeople(); people.queue()">${icon('x',12)}</button>
+      </div>`).join('') : '<div class="empty">История встреч</div>'}
+    <div class="acts">
+      <button class="btn quiet tiny" onclick="ppAdd('meets')">${icon('plus',12)}Встреча</button>
+      <button class="btn quiet tiny" onclick="personRemove()">${icon('trash',12)}Удалить человека</button>
+    </div>`;
+  growAll($('personBox'));
+}
+function personSel(i){ personIdx=i; renderPeople(); }
+function personAdd(){ pp().push({n:'',bd:'',note:'',gifts:[],dates:[],meets:[]}); personIdx=pp().length-1; renderPeople(); people.queue();
+  const t=$('personBox').querySelector('textarea'); if(t) t.focus(); }
+function personRemove(){
+  if(!pp().length) return;
+  if((curPerson().n||'').trim() && !confirm('Удалить «'+curPerson().n+'» со всеми записями?')) return;
+  pp().splice(personIdx,1); personIdx=0; renderPeople(); people.queue();
+}
+function ppAdd(key){
+  const p=curPerson(); p[key]=p[key]||[];
+  p[key].push(key==='gifts'?{t:'',d:false}:{dt:today(),t:''});
+  renderPeople(); people.queue();
+}
+
 /* =============== питомцы =============== */
 let petIdx=0;
 const pets=makeStore({
@@ -2876,7 +3841,7 @@ function petShopAdd(){ (curPet().shop=curPet().shop||[]).push({t:'',d:false}); r
 function petVacToggle(i){ const x=curPet().vac[i]; x.d=!x.d; renderPets(); pets.queue(); }
 
 function buildGenViews(){
-  $('genViews').innerHTML=COLS.map(colViewHTML).join('')+petsViewHTML();
+  $('genViews').innerHTML=COLS.map(colViewHTML).join('')+petsViewHTML()+travelViewHTML()+peopleViewHTML()+toolsViewHTML()+mapViewHTML();
 }
 
 /* =============== дом =============== */
@@ -3468,6 +4433,10 @@ function setTab(name, silent){
   if(name==='house') renderHouse();
   if(COLS.some(c=>c.id===name)) renderCol(name);
   if(name==='pets') renderPets();
+  if(name==='travel') renderTravel();
+  if(name==='people') renderPeople();
+  if(name==='tools') renderTools();
+  if(name==='map'){ renderMap(); mpBind(); }
   if(typeof renderCal==='function' && $('cal')) renderCal();
 }
 
@@ -3543,7 +4512,7 @@ function signOut(){
 function exportAll(){
   const files=[];
   entries.forEach(e=>files.push([e.file, toMd(e)]));
-  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets'].forEach(k=>{
+  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map'].forEach(k=>{
     const st=ST[k];
     if(st && st.data && st.data.length) files.push([st.file(), st.md()]);
   });
@@ -3732,8 +4701,8 @@ function paintStaticIcons(){
 
 async function bootSync(after){
   await pullAll();
-  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets']) await ST[k].pull();
-  pruneTasks(); renderSwotList(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets();
+  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map']) await ST[k].pull();
+  pruneTasks(); renderSwotList(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets(); renderTravel(); renderPeople(); renderTools(); renderMap();
   const k=curKey(), prev=iso(new Date(parseISO(k).getTime()-7*86400000));
   await pullWeek(k); await pullWeek(prev);
   if(applyRepeats()) queuePl();
@@ -3756,8 +4725,9 @@ setInterval(syncPending, 60000);
 
 buildGenViews();
 paintStaticIcons();
+mpBind();
 loadLocal(); loadPlLocal();
-['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets'].forEach(k=>ST[k].load());
+['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applySecs();
 const startTab = uiState().tab || 'home';     // запоминаем до newEntry, он уводит на «Дневник»
@@ -3765,8 +4735,8 @@ renderQuote(); renderInstall();
 newEntry();
 renderTabs();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
-pruneTasks(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets();
-swLoadDraft(); swFill(); renderSwotList();
+pruneTasks(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets(); renderTravel(); renderPeople(); renderTools(); renderMap();
+swLoadDraft(); swFill(); renderSwotList(); tlLoadDraft();
 applyRepeats(); renderPlanner();
 setTab(startTab, true);
 if(hasGH()) bootSync(); else setSync('','Локально');
