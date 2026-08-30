@@ -911,43 +911,10 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 
       <!-- ГЛАВНАЯ -->
       <div data-view="home">
-        <div class="quote"><p id="qText"></p><span id="qAuthor"></span></div>
-        <div class="dash">
-          <section class="sec" id="secYear">
-            <button class="sec-h" onclick="toggleSec('year')">
-              <h2>Цели года</h2><span class="meta" id="yrMeta"></span><span class="chev" id="yrChev"></span>
-            </button>
-            <div class="sec-b"><div id="yearBox"></div></div>
-          </section>
-
-          <section class="sec" id="secFocus">
-            <button class="sec-h" onclick="toggleSec('focus')">
-              <h2>Фокус</h2><span class="meta" id="fcMeta"></span><span class="chev" id="fcChev"></span>
-            </button>
-            <div class="sec-b"><div id="focusBox"></div></div>
-          </section>
-
-          <section class="sec" id="secPrio">
-            <button class="sec-h" onclick="toggleSec('prio')">
-              <h2>Приоритеты дня</h2><span class="meta" id="prMeta"></span><span class="chev" id="prChev"></span>
-            </button>
-            <div class="sec-b"><div id="prioBox"></div></div>
-          </section>
-
-          <section class="sec" id="secMood">
-            <button class="sec-h" onclick="toggleSec('mood')">
-              <h2>Настроение и привычки</h2><span class="meta" id="mdMeta"></span><span class="chev" id="mdChev"></span>
-            </button>
-            <div class="sec-b"><div id="moodBox"></div></div>
-          </section>
-
-          <section class="sec wide" id="secQuick">
-            <button class="sec-h" onclick="toggleSec('quick')">
-              <h2>Быстрые заметки</h2><span class="meta" id="qkMeta"></span><span class="chev" id="qkChev"></span>
-            </button>
-            <div class="sec-b"><div id="quickBox"></div></div>
-          </section>
+        <div class="row" style="margin-bottom:16px">
+          <button class="btn quiet tiny sp" id="lyBtn" onclick="openLayout()">Настроить главную</button>
         </div>
+        <div class="dash" id="dash"></div>
       </div>
 
       <!-- ПЛАНЕР -->
@@ -1264,6 +1231,18 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
       <button class="btn quiet tiny" onclick="applyRepeats(true)">Применить к этой неделе</button>
     </div>
     <div class="foot" style="margin-top:22px"><button class="btn primary" onclick="closeRepeat()">Готово</button></div>
+  </div>
+</div>
+
+<div class="mask" id="lyMask" onclick="if(event.target===this)closeLayout()">
+  <div class="modal">
+    <h2>Главная страница</h2>
+    <p class="sub-t">Выбери, что показывать, в каком порядке и какой ширины. Настройка общая для всех устройств.</p>
+    <div class="mods" id="lyList"></div>
+    <div class="foot" style="margin-top:22px">
+      <button class="btn primary" onclick="closeLayout()">Готово</button>
+      <button class="btn quiet sp" onclick="lyReset()">Сбросить</button>
+    </div>
   </div>
 </div>
 
@@ -2698,7 +2677,7 @@ function toggleMod(id){
   const s=mods(), next=!modOn(id);
   if(!next && liveModules().length<=1){ toast('Хотя бы один раздел нужен'); return; }
   s[id]=next; localStorage.setItem(LS_MODS, JSON.stringify(s));
-  renderMods(); renderTabs();
+  renderMods(); renderTabs(); buildDash();
   if(!modOn(curTab)) setTab(liveModules()[0].id);
 }
 function renderMods(){
@@ -4527,7 +4506,197 @@ function quickKey(ev,i){
   if(ev.key==='Enter'){ ev.preventDefault(); ib().splice(i+1,0,{t:''}); renderQuick(); focusIn($('quickBox'),i+1); }
   else if(ev.key==='Backspace'&&!ib()[i].t){ ev.preventDefault(); ib().splice(i,1); renderQuick(); inbox.queue(); focusIn($('quickBox'),Math.max(0,i-1)); }
 }
-function renderHome(){ renderYear(); renderFocus(); renderPrio(); renderMoodWidget(); renderQuick(); }
+
+
+/* =============== новые виджеты главной =============== */
+function renderMoneyDash(){
+  if(!$('moneyDashBox')) return;
+  const m=today().slice(0,7);
+  const ops=(mn().ops||[]).filter(o=>(o.dt||'').startsWith(m));
+  const inc=ops.filter(o=>+o.s>0).reduce((s,o)=>s+ +o.s,0);
+  const exp=ops.filter(o=>+o.s<0).reduce((s,o)=>s-o.s,0);
+  const by={}; ops.filter(o=>+o.s<0).forEach(o=>{ const c=o.c||'Прочее'; by[c]=(by[c]||0)-o.s; });
+  const b=(mn().budget||{})[m]||{};
+  const over=Object.keys(b).filter(c=>+b[c]>0 && (by[c]||0)>+b[c]);
+  $('mnDashMeta').textContent=ops.length?cap(monthYear(new Date())):'';
+  $('moneyDashBox').innerHTML=ops.length?
+    `<div class="mn-sum" style="margin-bottom:0">
+      <div class="plus"><b>+${fmtM(inc)}</b><span>доходы</span></div>
+      <div class="minus"><b>−${fmtM(exp)}</b><span>расходы</span></div>
+      <div class="rest"><b>${inc-exp>=0?'+':'−'}${fmtM(Math.abs(inc-exp))}</b><span>остаётся</span></div>
+     </div>`+
+    (over.length?`<p class="note-t" style="color:var(--red)">Превышен лимит: <b>${over.map(esc).join(', ')}</b></p>`:'')
+    : `<div class="dash-hint">За этот месяц операций нет. <a onclick="setTab('money')">Записать</a></div>`;
+}
+
+function renderDatesDash(){
+  if(!$('datesBox')) return;
+  const list=upcoming(45).slice(0,5);
+  $('dtMeta').textContent=list.length?list.length+'':'';
+  $('datesBox').innerHTML=list.length?list.map(x=>`<div class="soon-row">
+      ${icon(x.what==='День рождения'?'heart':'star',15)}
+      <span><b>${esc(x.who)}</b> <span class="w">· ${esc(x.what)}</span>${x.age?`<span class="age"> · ${x.age}</span>`:''}</span>
+      <span class="d${x.n<=7?' hot':''}">${x.n===0?'сегодня':(x.n===1?'завтра':'через '+x.n+' '+plural(x.n,'день','дня','дней'))}</span>
+    </div>`).join('') : `<div class="dash-hint">Ближайших дат нет. <a onclick="setTab('people')">Добавить людей</a></div>`;
+}
+
+function renderUrgentDash(){
+  if(!$('urgentBox')) return;
+  const t=today(), out=[];
+  (hs().clean||[]).filter(x=>(x.t||'').trim()).forEach(x=>{
+    const d=clDue(x); if(d.now) out.push({ic:'pot', t:x.t.trim(), w:'уборка', hot:true, tab:'house'});
+  });
+  (pj()||[]).forEach(p=>(p.s||[]).forEach(s=>{
+    if(!s.d && s.dt && s.dt<t) out.push({ic:'flag', t:s.t||'этап', w:(p.n||'проект'), hot:true, tab:'projects'});
+  }));
+  (pj()||[]).forEach(p=>{ const dl=pjDeadline(p);
+    if(dl.late) out.push({ic:'flag', t:p.n||'Проект', w:'дедлайн', hot:true, tab:'projects'}); });
+  (pt()||[]).forEach(p=>(p.vac||[]).forEach(v=>{
+    if(!v.d && v.dt && v.dt<=t) out.push({ic:'paw', t:v.t||'прививка', w:(p.n||'питомец'), hot:true, tab:'pets'});
+  }));
+  $('urMeta').textContent=out.length?out.length+'':'';
+  $('urgentBox').innerHTML=out.length?out.slice(0,6).map(x=>`<div class="soon-row">
+      ${icon(x.ic,15)}<span><b>${esc(x.t)}</b> <span class="w">· ${esc(x.w)}</span></span>
+      <span class="d hot" style="cursor:pointer" onclick="setTab('${x.tab}')">открыть</span>
+    </div>`).join('')+(out.length>6?`<div class="dash-hint">и ещё ${out.length-6}</div>`:'')
+    : '<div class="dash-hint">Ничего не горит. Хорошо.</div>';
+}
+
+function renderTripDash(){
+  if(!$('tripDashBox')) return;
+  const t=today();
+  const next=(tv().trips||[]).filter(x=>x.from&&x.from>=t).sort((a,b)=>a.from.localeCompare(b.from))[0];
+  $('tpMeta').textContent='';
+  if(!next){ $('tripDashBox').innerHTML=`<div class="dash-hint">Поездок не запланировано. <a onclick="setTab('travel')">Запланировать</a></div>`; return; }
+  const cd=countdown(next.from);
+  const docs=(next.docs||[]).filter(x=>(x.t||'').trim()), bag=(next.bag||[]).filter(x=>(x.t||'').trim());
+  const dd=docs.filter(x=>x.d).length, bd=bag.filter(x=>x.d).length;
+  $('tpMeta').textContent=cd?cd.txt:'';
+  $('tripDashBox').innerHTML=`
+    <div class="soon-row" style="border:none;padding-top:0">
+      ${icon('plane',16)}<span><b>${esc(next.n||'Поездка')}</b>
+        <span class="w">· ${fmtDate(next.from)}${next.to?' — '+fmtDate(next.to):''}</span></span>
+      ${cd?`<span class="d${cd.soon?' hot':''}">${cd.txt}</span>`:''}
+    </div>
+    ${docs.length?`<div class="bar"><span class="nm">Документы</span>
+      <span class="tr"><i class="${dd===docs.length?'ok':''}" style="width:${Math.round(dd/docs.length*100)}%"></i></span>
+      <span class="vl">${dd} / ${docs.length}</span></div>`:''}
+    ${bag.length?`<div class="bar"><span class="nm">Чемодан</span>
+      <span class="tr"><i class="${bd===bag.length?'ok':''}" style="width:${Math.round(bd/bag.length*100)}%"></i></span>
+      <span class="vl">${bd} / ${bag.length}</span></div>`:''}`;
+}
+
+function renderTasksDash(){
+  if(!$('tasksDashBox')) return;
+  const live=tk().filter(x=>(x.t||'').trim());
+  const open=live.filter(x=>!x.d);
+  $('tkDashMeta').textContent=live.length?live.filter(x=>x.d).length+' / '+live.length:'';
+  $('tasksDashBox').innerHTML=open.length?open.slice(0,5).map(x=>{
+    const i=tk().indexOf(x);
+    return `<div class="task">
+      <button class="tick" onclick="toggleTask(${i}); renderTasksDash()">${icon('check',10)}</button>
+      <span class="tx" style="padding-top:2px">${esc(x.t)}</span></div>`;
+  }).join('')+(open.length>5?`<div class="dash-hint">и ещё ${open.length-5}</div>`:'')
+    : `<div class="dash-hint">Задач нет. <a onclick="setTab('planner')">Открыть планер</a></div>`;
+}
+
+/* =============== главная: реестр и раскладка =============== */
+const WIDGETS=[
+ {id:'quote',  n:'Цитата дня',            kind:'quote'},
+ {id:'year',   n:'Цели года',             box:'yearBox',      meta:'yrMeta',      r:()=>renderYear()},
+ {id:'focus',  n:'Фокус месяца и недели', box:'focusBox',     meta:'fcMeta',      r:()=>renderFocus()},
+ {id:'prio',   n:'Приоритеты дня',        box:'prioBox',      meta:'prMeta',      r:()=>renderPrio(),        dep:'planner'},
+ {id:'mood',   n:'Настроение и привычки', box:'moodBox',      meta:'mdMeta',      r:()=>renderMoodWidget(),  dep:'planner'},
+ {id:'urgent', n:'Срочное',               box:'urgentBox',    meta:'urMeta',      r:()=>renderUrgentDash()},
+ {id:'dates',  n:'Ближайшие даты',        box:'datesBox',     meta:'dtMeta',      r:()=>renderDatesDash(),   dep:'people'},
+ {id:'money',  n:'Деньги за месяц',       box:'moneyDashBox', meta:'mnDashMeta',  r:()=>renderMoneyDash(),   dep:'money'},
+ {id:'trip',   n:'Ближайшая поездка',     box:'tripDashBox',  meta:'tpMeta',      r:()=>renderTripDash(),    dep:'travel'},
+ {id:'tasks',  n:'Задачи',                box:'tasksDashBox', meta:'tkDashMeta',  r:()=>renderTasksDash(),   dep:'planner'},
+ {id:'quick',  n:'Быстрые заметки',       box:'quickBox',     meta:'qkMeta',      r:()=>renderQuick(),       dep:'planner'}
+];
+const widgetOf = id => WIDGETS.find(w=>w.id===id);
+const DEF_LAYOUT=[
+ {id:'quote', w:'full', on:true},  {id:'year',   w:'half', on:true},
+ {id:'focus', w:'half', on:true},  {id:'prio',   w:'half', on:true},
+ {id:'mood',  w:'half', on:true},  {id:'urgent', w:'half', on:true},
+ {id:'dates', w:'half', on:true},  {id:'money',  w:'half', on:true},
+ {id:'trip',  w:'half', on:false}, {id:'tasks',  w:'half', on:false},
+ {id:'quick', w:'full', on:true}
+];
+const layout=makeStore({
+  key:'layout', label:'Главная', ls:'diary_layout_v1', file:'layout.md',
+  init:()=>DEF_LAYOUT.map(x=>({...x})),
+  toMd:d=>['# Главная','',...d.filter(x=>widgetOf(x.id))
+      .map(x=>'- '+x.id+' | '+(x.w==='full'?'широкий':'половина')+' | '+(x.on?'да':'нет')),''].join('\n'),
+  fromMd:text=>{
+    const out=[];
+    text.split(/\r?\n/).forEach(l=>{
+      const m=l.match(/^\s*-\s*(\S+)\s*\|\s*(\S+)\s*\|\s*(\S+)\s*$/);
+      if(m && widgetOf(m[1])) out.push({id:m[1], w:/широк/i.test(m[2])?'full':'half', on:/да/i.test(m[3])});
+    });
+    // новые виджеты, которых ещё нет в файле, дописываем в конец
+    DEF_LAYOUT.forEach(d0=>{ if(!out.some(x=>x.id===d0.id)) out.push({...d0}); });
+    return out.length?out:DEF_LAYOUT.map(x=>({...x}));
+  },
+  render:()=>{ buildDash(); }
+});
+const lay = () => layout.data;
+const layLive = () => lay().filter(x=>{ const w=widgetOf(x.id); return w && x.on && (!w.dep || modOn(w.dep)); });
+
+function buildDash(){
+  const host=$('dash'); if(!host) return;
+  const list=layLive();
+  host.innerHTML=list.map(x=>{
+    const w=widgetOf(x.id);
+    if(w.kind==='quote')
+      return `<div class="quote${x.w==='full'?' wide':''}" style="${x.w==='full'?'grid-column:1 / -1':''}">
+        <p id="qText"></p><span id="qAuthor"></span></div>`;
+    SECS['w_'+w.id]='sec_w_'+w.id;
+    return `<section class="sec${x.w==='full'?' wide':''}" id="sec_w_${w.id}">
+      <button class="sec-h" onclick="toggleSec('w_${w.id}')">
+        <h2>${w.n}</h2><span class="meta" id="${w.meta}"></span><span class="chev" id="chev_${w.id}"></span>
+      </button>
+      <div class="sec-b"><div id="${w.box}"></div></div>
+    </section>`;
+  }).join('') || '<div class="empty">Главная пустая. Нажми «Настроить» и выбери, что показывать.</div>';
+  list.forEach(x=>{ const c=$('chev_'+x.id); if(c) c.innerHTML=icon('down',14); });
+  applySecs();
+  renderHome();
+}
+function renderHome(){
+  if(!$('dash')) return;
+  layLive().forEach(x=>{ const w=widgetOf(x.id);
+    if(w.kind==='quote') renderQuote(); else { try{ w.r(); }catch(e){} } });
+}
+
+/* --- окно настройки --- */
+function openLayout(){ renderLayoutList(); $('lyMask').classList.add('open'); }
+function closeLayout(){ $('lyMask').classList.remove('open'); }
+function renderLayoutList(){
+  $('lyList').innerHTML=lay().map((x,i)=>{
+    const w=widgetOf(x.id); if(!w) return '';
+    const off = w.dep && !modOn(w.dep);
+    return `<div class="mod">
+      <b>${w.n}${off?'<br><small>раздел «'+(MODULES.find(m=>m.id===w.dep)||{}).name+'» выключен</small>':''}</b>
+      <button class="btn quiet tiny" onclick="lyWidth(${i})" title="Ширина">${x.w==='full'?'во всю':'половина'}</button>
+      <button class="btn quiet tiny" onclick="lyMove(${i},-1)" ${i===0?'disabled':''}>↑</button>
+      <button class="btn quiet tiny" onclick="lyMove(${i},1)" ${i===lay().length-1?'disabled':''}>↓</button>
+      <button class="sw${x.on&&!off?' on':''}" onclick="lyToggle(${i})"></button>
+    </div>`;
+  }).join('');
+}
+function lyToggle(i){ lay()[i].on=!lay()[i].on; layout.queue(); renderLayoutList(); buildDash(); }
+function lyWidth(i){ lay()[i].w = lay()[i].w==='full'?'half':'full'; layout.queue(); renderLayoutList(); buildDash(); }
+function lyMove(i,d){
+  const j=i+d; if(j<0||j>=lay().length) return;
+  const a=lay(); [a[i],a[j]]=[a[j],a[i]];
+  layout.queue(); renderLayoutList(); buildDash();
+}
+function lyReset(){
+  if(!confirm('Вернуть главную к исходному виду?')) return;
+  layout.data=DEF_LAYOUT.map(x=>({...x}));
+  layout.queue(); renderLayoutList(); buildDash();
+}
 
 /* =============== цитата дня =============== */
 const QUOTES=[
@@ -4802,7 +4971,7 @@ function setTab(name, silent){
   if(!silent) saveUi({tab:name});
   growAll();
   if(name==='planner') renderPlanner();
-  if(name==='home') renderHome();
+  if(name==='home'){ buildDash(); }
   if(name==='house') renderHouse();
   if(COLS.some(c=>c.id===name)) renderCol(name);
   if(name==='pets') renderPets();
@@ -4816,7 +4985,6 @@ function setTab(name, silent){
 
 /* =============== сворачивание =============== */
 const SECS={clean:'secClean', menu:'secMenu', recipes:'secRecipes', chores:'secChores', repair:'secRepair',
-  year:'secYear', focus:'secFocus', prio:'secPrio', mood:'secMood', quick:'secQuick',
   planner:'secPlanner', inbox:'secInbox', habits:'secHabits',
   roadmap:'secRoadmap', projects:'secProjects', swot:'secSwot', entry:'secEntry', stats:'secStats'};
 function uiState(){ try{ return JSON.parse(localStorage.getItem(LS.ui)||'{}'); }catch(e){ return {}; } }
@@ -4886,7 +5054,7 @@ function signOut(){
 function exportAll(){
   const files=[];
   entries.forEach(e=>files.push([e.file, toMd(e)]));
-  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map','money'].forEach(k=>{
+  ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map','money','layout'].forEach(k=>{
     const st=ST[k];
     if(st && st.data && st.data.length) files.push([st.file(), st.md()]);
   });
@@ -5042,6 +5210,7 @@ function renderRoadmapPhone(){
 
 /* =============== старт =============== */
 function paintStaticIcons(){
+  const set=(id,html)=>{ const e=$(id); if(e) e.innerHTML=html; };
   $('logoMark').innerHTML=icon('book',17);
   $('setBtn').innerHTML=icon('gear',15);
   $('saveBtn').innerHTML=icon('check',14)+'<span class="lb">Сохранить</span>';
@@ -5067,17 +5236,17 @@ function paintStaticIcons(){
   $('plMoreIc').innerHTML=icon('dots',15);
   [['prevBtn','left'],['nextBtn','right'],['plPrev','left'],['plNext','right'],
    ['hbPrev','left'],['hbNext','right'],['rmPrev','left'],['rmNext','right']]
-    .forEach(([id,n])=>$(id).innerHTML=icon(n,14));
+    .forEach(([id,n])=>set(id, icon(n,14)));
   ['plChev','inChev','hbChev','rmChev','pjChev','swChev','enChev','stChev',
-   'yrChev','fcChev','prChev','mdChev','qkChev','clChev','mnChev','rcChev','chChev','rpChev']
-    .forEach(id=>$(id).innerHTML=icon('down',14));
+   'clChev','mnChev','rcChev','chChev','rpChev']
+    .forEach(id=>set(id, icon('down',14)));
   $('searchWrap').insertAdjacentHTML('afterbegin', icon('search',15));
 }
 
 async function bootSync(after){
   await pullAll();
-  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map','money']) await ST[k].pull();
-  pruneTasks(); renderSwotList(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets(); renderTravel(); renderPeople(); renderTools(); renderMap(); renderMoney();
+  for(const k of ['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map','money','layout']) await ST[k].pull();
+  pruneTasks(); renderSwotList(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets(); renderTravel(); renderPeople(); renderTools(); renderMap(); renderMoney(); buildDash();
   const k=curKey(), prev=iso(new Date(parseISO(k).getTime()-7*86400000));
   await pullWeek(k); await pullWeek(prev);
   if(applyRepeats()) queuePl();
@@ -5088,7 +5257,7 @@ async function bootSync(after){
 document.addEventListener('keydown', ev=>{
   const wOpen=$('wMask').classList.contains('open');
   if((ev.metaKey||ev.ctrlKey)&&ev.key==='s'){ ev.preventDefault(); wOpen?saveWish():saveEntry(); }
-  if(ev.key==='Escape'){ closeSettings(); closeWish(); closeRepeat(); }
+  if(ev.key==='Escape'){ closeSettings(); closeWish(); closeRepeat(); closeLayout(); }
 });
 window.addEventListener('beforeunload', ()=>{
   Object.values(ST).forEach(s=>s.flush&&s.flush());
@@ -5102,16 +5271,16 @@ buildGenViews();
 paintStaticIcons();
 mpBind();
 loadLocal(); loadPlLocal();
-['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map','money'].forEach(k=>ST[k].load());
+['tasks','inbox','habits','repeat','projects','wishes','swot','focus','house','brain','ideas','pets','travel','people','tools','map','money','layout'].forEach(k=>ST[k].load());
 plMode = uiState().mode || (isPhone()?'day':'week');
 applySecs();
 const startTab = uiState().tab || 'home';     // запоминаем до newEntry, он уводит на «Дневник»
-renderQuote(); renderInstall();
+renderInstall();
 newEntry();
 renderTabs();
 renderTasks(); renderInbox(); renderHabits(); renderProjects(); renderWishes();
-pruneTasks(); renderHome(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets(); renderTravel(); renderPeople(); renderTools(); renderMap(); renderMoney();
-swLoadDraft(); swFill(); renderSwotList(); tlLoadDraft();
+pruneTasks(); renderHouse(); COLS.forEach(c=>renderCol(c.id)); renderPets(); renderTravel(); renderPeople(); renderTools(); renderMap(); renderMoney(); buildDash();
+swLoadDraft(); swFill(); renderSwotList(); tlLoadDraft(); buildDash();
 applyRepeats(); renderPlanner();
 setTab(startTab, true);
 if(hasGH()) bootSync(); else setSync('','Локально');
