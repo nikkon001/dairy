@@ -109,6 +109,9 @@ body[data-tab="diary"] [data-view="diary"]{display:block}
 .grid{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:26px; align-items:start}
 aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap:26px}
 
+/* Полоса во всю ширину сетки — в ней живёт недельный планер */
+.band{grid-column:1 / -1}
+
 /* ---------- секция как в «Настройках» ---------- */
 .sec{margin-bottom:26px}
 .sec:last-child{margin-bottom:0}
@@ -921,21 +924,8 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
   <nav class="tabs" id="tabs"></nav>
 
   <div class="grid">
-    <main>
-      <div id="installBox"></div>
-
-      <!-- ГЛАВНАЯ -->
-      <div data-view="home">
-        <div class="row" style="margin-bottom:16px">
-          <button class="btn quiet tiny sp" id="lyBtn" onclick="openLayout()">Настроить главную</button>
-        </div>
-        <div class="dash" id="dash"></div>
-      </div>
-
-      <!-- ПЛАНЕР -->
-      <div data-view="planner">
-
-        <section class="sec" id="secPlanner">
+    <div class="band" data-view="planner">
+      <section class="sec" id="secPlanner">
           <button class="sec-h" onclick="toggleSec('planner')">
             <h2>Планер</h2><span class="meta" id="plMeta"></span><span class="chev" id="plChev"></span>
           </button>
@@ -961,6 +951,21 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
             <div id="planner"></div>
           </div>
         </section>
+    </div>
+
+    <main>
+      <div id="installBox"></div>
+
+      <!-- ГЛАВНАЯ -->
+      <div data-view="home">
+        <div class="row" style="margin-bottom:16px">
+          <button class="btn quiet tiny sp" id="lyBtn" onclick="openLayout()">Настроить главную</button>
+        </div>
+        <div class="dash" id="dash"></div>
+      </div>
+
+      <!-- ПЛАНЕР -->
+      <div data-view="planner">
 
         <section class="sec" id="secInbox">
           <button class="sec-h" onclick="toggleSec('inbox')">
