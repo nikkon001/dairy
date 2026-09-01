@@ -2721,7 +2721,7 @@ function renderMods(){
 }
 
 /* =============== фокус: год, месяц, неделя =============== */
-const focus=makeStore({
+const focusStore=makeStore({
   key:'focus', label:'Фокус', ls:'diary_focus_v1', file:'focus.md',
   init:()=>({y:{},m:{},w:{}}),
   toMd:d=>{
@@ -2762,7 +2762,7 @@ const focus=makeStore({
   },
   render:()=>{ renderYear(); renderFocus(); }
 });
-const fc = () => focus.data;
+const fc = () => focusStore.data;
 const yearKey  = () => String(new Date().getFullYear());
 const monthKey = () => today().slice(0,7);
 const weekKey  = () => iso(mondayOf(new Date()));
@@ -2895,10 +2895,10 @@ const IMG_RE=/\.(png|jpe?g|gif|webp|heic|svg)$/i;
 const mpNode = id => (mp().n||[]).find(x=>x.id===id);
 
 function mpOpenNode(id){
-  mpOpenId=id; mpSel=id; mpLink=false; renderMap();
+  mpOpenId=id; mpSel=id; mpLink=false; mpMark();
   renderNodePanel(); $('ndMask').classList.add('open');
 }
-function closeNode(){ $('ndMask').classList.remove('open'); mpOpenId=null; }
+function closeNode(){ $('ndMask').classList.remove('open'); mpOpenId=null; renderMap(); }
 
 function renderNodePanel(){
   const n=mpNode(mpOpenId); if(!n){ closeNode(); return; }
@@ -3410,9 +3410,18 @@ function mpEdges(){
     return `<line class="${hot?'hot':''}" x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`;
   }).join('');
 }
+/* Отметить выбранный узел, не перерисовывая холст: иначе браузер теряет
+   элемент под пальцем и клик по кнопке или ввод текста не доходят. */
+function mpMark(){
+  const host=$('mpNodes'); if(!host) return;
+  [...host.children].forEach(el=>el.classList.toggle('sel', el.dataset.id===mpSel));
+  $('mpHint').innerHTML = mpLink ? 'Выбери <b>второй узел</b> для связи'
+    : (mpSel ? 'Узел выбран — можно связать или удалить' : 'Перетаскивай за полоску сверху, холст двигается мышью');
+  $('mpLinkBtn').className='btn quiet tiny'+(mpLink?' on':'');
+}
 function mpPick(id){
   if(mpLink && mpSel && mpSel!==id){ mpConnect(mpSel,id); return; }
-  mpSel=id; mpLink=false; renderMap();
+  mpSel=id; mpLink=false; mpMark();
 }
 function mpConnect(a,b){
   const e=mp().e||(mp().e=[]);
@@ -3483,13 +3492,14 @@ function mpBind(){
       id=handle.dataset.drag; mode='node';
       const n=(mp().n||[]).find(x=>x.id===id); if(!n) return;
       ox=n.x; oy=n.y; sx=e.clientX; sy=e.clientY;
-      mpSel=id; mpLink=false; renderMap();
+      mpSel=id; mpLink=false; mpMark();
       wrap.setPointerCapture(e.pointerId); e.preventDefault(); return;
     }
+    if(e.target.closest('.mp-more')) return;   // кнопке «…» нужен свой клик
     if(node){ mpPick(node.dataset.id); return; }
     mode='pan'; sx=e.clientX; sy=e.clientY; ox=mpView.x; oy=mpView.y;
     wrap.classList.add('pan'); wrap.setPointerCapture(e.pointerId);
-    if(mpSel){ mpSel=null; mpLink=false; renderMap(); }
+    if(mpSel){ mpSel=null; mpLink=false; mpMark(); }
   });
   wrap.addEventListener('pointermove', e=>{
     if(!mode) return;
@@ -4552,20 +4562,20 @@ function renderYear(){
   $('yearBox').innerHTML=
     `<div class="word">${icon('star',18)}
       <textarea class="w-in grow" rows="1" placeholder="Слово года"
-        oninput="curYear().word=this.value; autoGrow(this); focus.queue()">${esc(y.word||'')}</textarea></div>`+
+        oninput="curYear().word=this.value; autoGrow(this); focusStore.queue()">${esc(y.word||'')}</textarea></div>`+
     (goals.length?goals.map((g,i)=>`<div class="task${g.d?' done':''}">
         <button class="tick${g.d?' on':''}" onclick="yrToggle(${i})">${icon('check',10)}</button>
         <textarea class="tx grow" rows="1" placeholder="Цель года"
-          oninput="curYear().goals[${i}].t=this.value; autoGrow(this); focus.queue()"
+          oninput="curYear().goals[${i}].t=this.value; autoGrow(this); focusStore.queue()"
           onkeydown="yrKey(event,${i})">${esc(g.t)}</textarea>
         <button class="rm" onclick="yrRemove(${i})">${icon('x',12)}</button>
       </div>`).join('') : '<div class="empty">Чего хочу добиться в этом году</div>')+
     `<div class="acts"><button class="btn quiet tiny" onclick="yrAdd()">${icon('plus',12)}Добавить цель</button></div>`;
   growAll($('yearBox'));
 }
-function yrAdd(){ curYear().goals.push({t:'',d:false}); renderYear(); focusIn($('yearBox'),curYear().goals.length); focus.queue(); }
-function yrRemove(i){ curYear().goals.splice(i,1); renderYear(); focus.queue(); }
-function yrToggle(i){ const g=curYear().goals[i]; g.d=!g.d; renderYear(); focus.queue(); }
+function yrAdd(){ curYear().goals.push({t:'',d:false}); renderYear(); focusIn($('yearBox'),curYear().goals.length); focusStore.queue(); }
+function yrRemove(i){ curYear().goals.splice(i,1); renderYear(); focusStore.queue(); }
+function yrToggle(i){ const g=curYear().goals[i]; g.d=!g.d; renderYear(); focusStore.queue(); }
 function yrKey(ev,i){
   if(ev.key==='Enter'){ ev.preventDefault(); curYear().goals.splice(i+1,0,{t:'',d:false}); renderYear(); focusIn($('yearBox'),i+2); }
   else if(ev.key==='Backspace'&&!curYear().goals[i].t){ ev.preventDefault(); yrRemove(i); focusIn($('yearBox'),Math.max(1,i)); }
@@ -4578,10 +4588,10 @@ function renderFocus(){
   $('focusBox').innerHTML=
     `<div class="f-row"><label class="f-lbl">Фокус месяца</label>
       <textarea class="big-in grow" rows="1" placeholder="Одна вещь, которая важнее прочего"
-        oninput="fc().m['${mk}']=this.value; autoGrow(this); focus.queue()">${esc(m)}</textarea></div>
+        oninput="fc().m['${mk}']=this.value; autoGrow(this); focusStore.queue()">${esc(m)}</textarea></div>
      <div class="f-row"><label class="f-lbl">Главное событие недели</label>
       <textarea class="big-in grow" rows="1" placeholder="Что ждёт на этой неделе"
-        oninput="fc().w['${wk}']=this.value; autoGrow(this); focus.queue()">${esc(w)}</textarea></div>`;
+        oninput="fc().w['${wk}']=this.value; autoGrow(this); focusStore.queue()">${esc(w)}</textarea></div>`;
   growAll($('focusBox'));
 }
 
