@@ -435,6 +435,21 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
 .prog i.done{background:#34C759}
 .cats{display:flex; gap:7px; flex-wrap:wrap; margin-top:12px}
 
+/* ---------- карта: панель узла ---------- */
+.mp-more{position:absolute; right:2px; top:1px; width:18px; height:18px; display:grid; place-items:center;
+  color:var(--ink3); border-radius:5px; z-index:2}
+.mp-more:hover{color:var(--red); background:var(--card)}
+.mp-badges{display:flex; gap:8px; align-items:center; padding:0 11px 8px; font-size:11px; color:var(--ink3)}
+.mp-badges span{display:flex; align-items:center; gap:4px}
+.att{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:.5px solid var(--sep2)}
+.att:last-of-type{border-bottom:none}
+.att .ic{color:var(--ink2); flex:none}
+.att b{flex:1; min-width:0; font-size:14px; font-weight:500; overflow-wrap:anywhere}
+.att img{width:40px; height:40px; object-fit:cover; border-radius:8px; flex:none; background:var(--fill)}
+.att button{color:var(--red); font-size:13px; flex:none}
+.att .rm{color:var(--dim)} .att .rm:hover{color:var(--red)}
+.up-note{font-size:12.5px; color:var(--ink3); margin-top:10px; line-height:1.5}
+
 /* ---------- цитата ---------- */
 .quote{background:var(--card); border-radius:var(--r); padding:16px 18px; margin-bottom:26px;
   box-shadow:0 0 0 .5px rgba(0,0,0,.04)}
@@ -1242,6 +1257,24 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
     <div class="foot" style="margin-top:22px">
       <button class="btn primary" onclick="closeLayout()">Готово</button>
       <button class="btn quiet sp" onclick="lyReset()">Сбросить</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="ndMask" onclick="if(event.target===this)closeNode()">
+  <div class="modal">
+    <h2 id="ndHead">Узел</h2>
+    <div class="field"><label>Заметка</label>
+      <textarea class="grow" id="ndNote" rows="3" placeholder="Развёрнутое описание, ссылки, мысли"
+        oninput="mpSaveNote(this.value); autoGrow(this)"></textarea></div>
+    <div class="field"><label>Файлы</label>
+      <div id="ndFiles"></div>
+      <input type="file" id="ndFile" hidden onchange="mpFileUp(this)">
+      <div class="acts"><button class="btn quiet tiny" onclick="mpFilePick()">Прикрепить файл</button></div>
+      <div class="up-note" id="ndUpNote"></div>
+    </div>
+    <div class="foot" style="margin-top:20px">
+      <button class="btn primary" onclick="closeNode()">Готово</button>
     </div>
   </div>
 </div>
@@ -2855,6 +2888,86 @@ function colAdd(id){
 
 
 
+
+/* =============== карта: заметка и вложения узла =============== */
+let mpOpenId=null;
+const IMG_RE=/\.(png|jpe?g|gif|webp|heic|svg)$/i;
+const mpNode = id => (mp().n||[]).find(x=>x.id===id);
+
+function mpOpenNode(id){
+  mpOpenId=id; mpSel=id; mpLink=false; renderMap();
+  renderNodePanel(); $('ndMask').classList.add('open');
+}
+function closeNode(){ $('ndMask').classList.remove('open'); mpOpenId=null; }
+
+function renderNodePanel(){
+  const n=mpNode(mpOpenId); if(!n){ closeNode(); return; }
+  $('ndHead').textContent=(n.t||'').trim()||'Узел';
+  $('ndNote').value=n.note||''; autoGrow($('ndNote'));
+  const files=n.files||[];
+  $('ndFiles').innerHTML=files.length?files.map((f,i)=>`<div class="att">
+      ${IMG_RE.test(f.n)?`<img id="thumb_${i}" alt="">`:icon('doc',18)}
+      <b>${esc(f.n)}</b>
+      <button onclick="mpFileGet(${i})">Скачать</button>
+      <button class="rm" onclick="mpFileDel(${i})">${icon('x',13)}</button>
+    </div>`).join('') : '<div class="empty">Пока ничего не приложено</div>';
+  $('ndUpNote').textContent = hasGH()
+    ? 'Файлы лежат в папке files/ твоего репозитория. До 5 МБ.'
+    : 'Чтобы прикладывать файлы, подключи репозиторий в настройках.';
+  files.forEach((f,i)=>{ if(IMG_RE.test(f.n)) mpThumb(f.p,'thumb_'+i); });
+}
+async function mpThumb(path,elId){
+  const d=await fetchPhoto(path).catch(()=>null);
+  const el=$(elId); if(el && d) el.src=d;
+}
+function mpSaveNote(v){
+  const n=mpNode(mpOpenId); if(!n) return;
+  n.note=v; mindmap.queue(); 
+}
+function mpFilePick(){ $('ndFile').click(); }
+async function mpFileUp(input){
+  const f=input.files && input.files[0]; input.value='';
+  if(!f) return;
+  const n=mpNode(mpOpenId); if(!n) return;
+  if(!hasGH()){ toast('Сначала подключи репозиторий в настройках'); return; }
+  if(f.size>5*1024*1024){ toast('Файл больше 5 МБ'); return; }
+  setSync('busy','Загружаю файл');
+  try{
+    const buf=new Uint8Array(await f.arrayBuffer());
+    let bin=''; for(let i=0;i<buf.length;i++) bin+=String.fromCharCode(buf[i]);
+    const m=f.name.match(/(\.[A-Za-z0-9]+)$/), ext=m?m[1].toLowerCase():'';
+    const base=slug(f.name.replace(/\.[^.]+$/,''))||'file';
+    let path='files/'+mpOpenId+'-'+base+ext, k=2;
+    const used=new Set((mp().n||[]).flatMap(x=>(x.files||[]).map(y=>y.p)));
+    while(used.has(path)){ path='files/'+mpOpenId+'-'+base+'-'+(k++)+ext; }
+    await putFile(path, btoa(bin), 'diary: файл к узлу '+mpOpenId, null);
+    n.files=n.files||[]; n.files.push({n:f.name, p:path});
+    mindmap.queue(); renderNodePanel(); renderMap(); syncLabel(); toast('Файл приложен');
+  }catch(err){ setSync('err','Ошибка'); toast('Не удалось загрузить: '+err.message); }
+}
+async function mpFileGet(i){
+  const n=mpNode(mpOpenId); const f=n && (n.files||[])[i]; if(!f) return;
+  if(!hasGH()){ toast('Нужен доступ к репозиторию'); return; }
+  setSync('busy','Скачиваю');
+  try{
+    const r=await gh('/contents/'+encodeURI(f.p)+'?ref='+encodeURIComponent(branch()));
+    if(!r.ok) throw new Error('файл не найден');
+    const j=await r.json();
+    const bin=atob((j.content||'').replace(/\s/g,''));
+    const arr=Uint8Array.from(bin,c=>c.charCodeAt(0));
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([arr]));
+    a.download=f.n; a.click(); URL.revokeObjectURL(a.href);
+    syncLabel();
+  }catch(err){ setSync('err','Ошибка'); toast('Не вышло: '+err.message); }
+}
+async function mpFileDel(i){
+  const n=mpNode(mpOpenId); const f=n && (n.files||[])[i]; if(!f) return;
+  if(!confirm('Удалить файл «'+f.n+'» из репозитория?')) return;
+  try{ if(hasGH()) await delFile(f.p, null, 'diary: удалён файл '+f.n); }catch(e){}
+  n.files.splice(i,1); mindmap.queue(); renderNodePanel(); renderMap(); toast('Файл удалён');
+}
+
 /* =============== финансы =============== */
 let mnMonth=new Date();
 const DEF_CATS=['Еда','Дом','Транспорт','Здоровье','Одежда','Развлечения','Подарки','Прочее','Доход'];
@@ -3181,21 +3294,38 @@ const mindmap=makeStore({
     const es=(d.e||[]).filter(e=>ids.has(e.a)&&ids.has(e.b));
     if(es.length){ out.push('## Связи','');
       es.forEach(e=>out.push('- '+e.a+' → '+e.b)); out.push(''); }
+    const rich=nodes.filter(x=>(x.note||'').trim() || (x.files||[]).length);
+    if(rich.length){ out.push('## Заметки','');
+      rich.forEach(x=>{
+        out.push('### '+x.id,'');
+        if((x.note||'').trim()) out.push(x.note.trim(),'');
+        (x.files||[]).forEach(f=>out.push('- файл: '+f.n+' | '+f.p));
+        if((x.files||[]).length) out.push('');
+      }); }
     return out.join('\n');
   },
   fromMd:text=>{
-    const d={n:[],e:[]}; let mode=null;
+    const d={n:[],e:[]}; let mode=null, cur=null;
     text.split(/\r?\n/).forEach(line=>{
-      const h2=line.match(/^##\s+(.*)$/);
-      if(h2){ const t=h2[1].trim(); mode = t==='Узлы'?'n' : (t==='Связи'?'e':null); return; }
+      const h2=line.match(/^##\s+(?!#)(.*)$/);
+      if(h2){ const t=h2[1].trim();
+        mode = t==='Узлы'?'n' : (t==='Связи'?'e' : (t==='Заметки'?'note':null)); cur=null; return; }
+      const h3=line.match(/^###\s+(\S+)/);
+      if(h3 && mode==='note'){ cur=d.n.find(x=>x.id===h3[1]) || null;
+        if(cur){ cur.note=''; cur.files=[]; } return; }
       if(mode==='n'){
         const m=line.match(/^\s*-\s*(\S+)\s*\|\s*(-?\d+)\s*,\s*(-?\d+)\s*\|\s*(.*)$/);
-        if(m) d.n.push({id:m[1], x:+m[2], y:+m[3], t:m[4].trim()});
+        if(m) d.n.push({id:m[1], x:+m[2], y:+m[3], t:m[4].trim(), note:'', files:[]});
       } else if(mode==='e'){
         const m=line.match(/^\s*-\s*(\S+)\s*(?:→|->)\s*(\S+)\s*$/);
         if(m) d.e.push({a:m[1], b:m[2]});
+      } else if(mode==='note' && cur){
+        const f=line.match(/^\s*-\s*файл:\s*(.*?)\s*\|\s*(\S+)\s*$/);
+        if(f){ cur.files.push({n:f[1], p:f[2]}); return; }
+        if(line.trim() || cur.note) cur.note=(cur.note?cur.note+'\n':'')+line;
       }
     });
+    d.n.forEach(x=>{ x.note=(x.note||'').trim(); x.files=x.files||[]; });
     return d;
   },
   render:()=>renderMap()
@@ -3252,9 +3382,14 @@ function renderMap(){
   $('mpNodes').innerHTML=nodes.map((x,i)=>`<div class="mp-node${mpSel===x.id?' sel':''}" data-id="${x.id}"
       style="left:${x.x}px; top:${x.y}px">
       <div class="mp-h" data-drag="${x.id}"><i></i><i></i><i></i></div>
+      <button class="mp-more" onclick="mpOpenNode('${x.id}')" title="Заметка и файлы">${icon('dots',13)}</button>
       <textarea class="grow" rows="1" placeholder="Идея"
         oninput="mpSetText('${x.id}',this.value); autoGrow(this); mpEdges()"
         onfocus="mpPick('${x.id}')">${esc(x.t||'')}</textarea>
+      ${((x.note||'').trim()||(x.files||[]).length)?`<div class="mp-badges">
+        ${(x.note||'').trim()?`<span>${icon('doc',12)}заметка</span>`:''}
+        ${(x.files||[]).length?`<span>${icon('link',12)}${(x.files||[]).length}</span>`:''}
+      </div>`:''}
     </div>`).join('');
   growAll($('mpNodes'));
   mpApplyView(); mpEdges();
@@ -5257,7 +5392,7 @@ async function bootSync(after){
 document.addEventListener('keydown', ev=>{
   const wOpen=$('wMask').classList.contains('open');
   if((ev.metaKey||ev.ctrlKey)&&ev.key==='s'){ ev.preventDefault(); wOpen?saveWish():saveEntry(); }
-  if(ev.key==='Escape'){ closeSettings(); closeWish(); closeRepeat(); closeLayout(); }
+  if(ev.key==='Escape'){ closeSettings(); closeWish(); closeRepeat(); closeLayout(); closeNode(); }
 });
 window.addEventListener('beforeunload', ()=>{
   Object.values(ST).forEach(s=>s.flush&&s.flush());
