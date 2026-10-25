@@ -556,9 +556,7 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
   box-shadow:0 1px 3px rgba(0,0,0,.10), 0 0 0 .5px rgba(0,0,0,.04)}
 .carry{display:flex; align-items:center; gap:11px; flex-wrap:wrap; background:var(--red-soft);
   border-radius:10px; padding:11px 14px; margin-bottom:16px; font-size:13.5px; line-height:1.45}
-.pl-scroll{max-height:360px; overflow-y:auto; border-radius:10px; box-shadow:0 0 0 .5px var(--sep)}
-.pl-scroll::-webkit-scrollbar{width:5px}
-.pl-scroll::-webkit-scrollbar-thumb{background:var(--dim); border-radius:3px}
+.pl-scroll{border-radius:10px; box-shadow:0 0 0 .5px var(--sep)}
 .pl-grid{display:grid; grid-auto-rows:minmax(30px,auto)}
 .pl-dh{padding:8px 3px; text-align:center; font-size:11px; color:var(--ink2);
   position:sticky; top:0; background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
@@ -921,7 +919,14 @@ aside .stick{position:sticky; top:80px; display:flex; flex-direction:column; gap
   .grid{display:block}
   .sec{display:none} .sec#secPlanner{display:block}
   .sec-b{box-shadow:none; padding:0}
-  .pl-scroll{max-height:none; overflow:visible; box-shadow:none}
+  .pl-scroll{box-shadow:none}
+  .pl-add,.pl-dur,.pl-t .st{display:none !important}
+  /* дела печатаются мягкой красной заливкой */
+  .pl-cell.on,.pl-t,.day-tasks .task{background:rgba(255,59,48,.13) !important}
+  .pl-t,.day-tasks .task{border-radius:6px; padding:4px 7px}
+  .pl-cell.on textarea,.pl-t textarea,.day-tasks .task textarea{color:var(--ink) !important}
+  .pl-grid,.pl-tasks,.pl-cell,.pl-t,.day-view,.day-tasks .task,body{
+    -webkit-print-color-adjust:exact; print-color-adjust:exact}
 }
 </style>
 </head>
